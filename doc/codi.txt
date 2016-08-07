@@ -1,0 +1,16 @@
+*codi.txt*  A Numi-esque code interpreter.
+
+Author:   Ethan Chan <metakirby5@gmail.com>
+License:  MIT
+
+==============================================================================
+INTRODUCTION                                                   *codi-contents*
+
+TODO
+
+==============================================================================
+USAGE                                                             *codi-usage*
+
+TODO
+
+vim:tw=78:ft=help:norl:
