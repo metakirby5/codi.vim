@@ -16,4 +16,7 @@ TODO
 - Add a note about updatetime being used
 - Fix prompt grepping (node issues with >)
 
+==============================================================================
+INTERPRETERS                                               *codi-interpreters*
+
 vim:tw=78:ts=8:ft=help:norl:

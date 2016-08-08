@@ -1,9 +1,9 @@
-" User-defined interpreters
+" User-defined interpreters (see codi-interpreters)
 " Entries are in the form of
 "   <filetype>: {
 "     'bin': <interpreter binary>,
-"     'pre': <string to inject at start>,
-"     'post': <string to inject at end>
+"     'prompt': <regex pattern indicating the prompt>,
+"     'filter': <optional command to pipe output through>,
 "   }
 if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}
