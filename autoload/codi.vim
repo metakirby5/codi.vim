@@ -2,23 +2,15 @@
 let s:codi_interpreters = {
       \ 'python': {
           \ 'bin': 'python',
-          \ 'pre': "
-                \exec(",
-          \ 'post': "
-                \)\n",
-          \ 'eval_pre': "
-                \try: print(eval(",
-          \ 'eval_post': "
-                \))\nexcept: print ''",
+          \ 'prompt': '>>> |\.\.\. ',
+          \ 'filter': 'tail -n+4',
           \ },
        \ 'javascript': {
           \ 'bin': 'node',
-          \ 'pre': '
-                \console.log(eval(',
-          \ 'post': '
-                \))',
+          \ 'prompt': '> '
           \ },
       \ }
+
 " Load user-defined interpreters
 call extend(s:codi_interpreters, g:codi#interpreters)
 
@@ -39,58 +31,58 @@ augroup CODI_TARGET
   au CursorHold,CursorHoldI * silent! call s:codi_update()
 augroup END
 
+" Display a warning message
+function! s:warn(msg)
+  echohl WarningMsg | echom a:msg | echohl None
+endfunction
+
+" Update the codi buf
 function! s:codi_update()
   " Bail if no codi buf to act on
   if !exists('b:codi_bufnr') | return | endif
 
-  " Setup
+  " Setup target buf
   let pos = getcurpos()
-  let lim = line('$')
+  let num_lines = line('$')
+  let content = shellescape(join(getline('^', '$'), "\n"))
 
-  " Escape quotes
-  let unescaped_lines = getline('^', '$')
-  let lines = []
-  for line in unescaped_lines
-    call add(lines, substitute(line, '"', '\\"', 'g'))
-  endfor
-
+  " Setup codi buf
   exe 'buf '.b:codi_bufnr
   setlocal modifiable
-
-  " Clear buffer
   let codi_pos = getcurpos()
   normal! gg_dG
 
-  " For every line, interpret up to that point
-  let cur = 0
-  while cur < lim
-    " Build the content to run
-    let content =
-          \ b:codi_interpreter['pre']
-          \.'"'.join(lines[0:cur], '\n').'"'
-          \.b:codi_interpreter['post']
-    if has_key(b:codi_interpreter, 'eval_pre')
-          \ && has_key(b:codi_interpreter, 'eval_post')
-      let content .=
-          \.b:codi_interpreter['eval_pre']
-          \.'"'.lines[cur].'"'
-          \.b:codi_interpreter['eval_post']
-    endif
+  " Execute our code by:
+  "   - Using script to simulate a tty on...
+  "   - The interpreter, which will take...
+  "   - Our shell-escaped buffer as input, then piped through...
+  "   - tail, to get rid of the lines we input...
+  "   - any user-provided filter...
+  "   - sed, to remove color codes...
+  "   - awk, to only print the line right before a prompt...
+  "   - tail again, to remove the first blank line...
+  "   - tr, to remove those nasty line feeds
+  " TODO linux script support
+  exe 'r !script -q /dev/null '
+        \.b:codi_interpreter['bin']
+        \.' <<< '.content
+        \.' | tail -n+'.(num_lines + 1)
+        \.' | '.get(b:codi_interpreter, 'filter', 'cat')
+        \.' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g"'
+        \.' | awk "{'
+          \.'if (/'.b:codi_interpreter['prompt'].'/)'
+            \.'{ print taken; taken = \"\" }'
+          \.'else'
+            \.'{ taken = \$0 }'
+        \.'}" | tail -n+2'
+        \.' | tr -d $"\r"'
 
-    " Read in the last line printed
-    exe 'silent! r !'
-          \.b:codi_interpreter['bin'].' 2>&1 <<< '.shellescape(content)
-          \.' | tail -n1'
-
-    let cur += 1
-  endwhile
-
-  " Kill the empty line at the start and return to position
+  " Teardown codi buf
   normal! gg_dd
   call setpos('.', codi_pos)
-
-  " Teardown
   setlocal nomodifiable
+
+  " Teardown target buf
   buf #
   call setpos('.', pos)
 endfunction
@@ -106,12 +98,25 @@ function! codi#interpret(...)
 
   try
     let interpreter = s:codi_interpreters[filetype]
-  " If key not found
+  " If interpreter not found...
   catch E716
-    let filetype = !empty(filetype) ? filetype : 'plaintext'
-    echohl WarningMsg | echom filetype.' not supported.' | echohl None
+    if empty(filetype)
+      call s:warn('Cannot run Codi with empty filetype.')
+    else
+      call s:warn('No interpreter for '.filetype.'.')
+    endif
     return
   endtry
+
+  " Check if required keys present
+  let error = 0
+  for key in ['bin', 'prompt']
+    if !has_key(interpreter, key)
+      call s:warn('Interpreter for '.filetype.' missing required key '.key)
+      let error = 1
+    endif
+  endfor
+  if error | return | endif
 
   " If we already have a codi instance for the buffer, kill it
   if exists('b:codi_bufnr')
@@ -126,8 +131,10 @@ function! codi#interpret(...)
   let bufnr = bufnr('%')
   let restore = 'bdel|buf'.bufnr.'|unlet b:codi_bufnr'
   for opt in ['scrollbind', 'cursorbind', 'wrap', 'foldenable']
-    exe 'let val = &'.opt
-    let restore .= '|let &'.opt.'='.val.''
+    if exists('&'.opt)
+      exe 'let val = &'.opt
+      let restore .= '|let &'.opt.'='.val.''
+    endif
   endfor
 
   " Set target buf options
