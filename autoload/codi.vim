@@ -11,6 +11,13 @@ let s:codi_interpreters = {
           \ 'eval_post': "
                 \))\nexcept: print ''",
           \ },
+       \ 'javascript': {
+          \ 'bin': 'node',
+          \ 'pre': '
+                \console.log(eval(',
+          \ 'post': '
+                \))',
+          \ },
       \ }
 " Load user-defined interpreters
 call extend(s:codi_interpreters, g:codi#interpreters)
@@ -62,9 +69,13 @@ function! s:codi_update()
           \ b:codi_interpreter['pre']
           \.'"'.join(lines[0:cur], '\n').'"'
           \.b:codi_interpreter['post']
+    if has_key(b:codi_interpreter, 'eval_pre')
+          \ && has_key(b:codi_interpreter, 'eval_post')
+      let content .=
           \.b:codi_interpreter['eval_pre']
           \.'"'.lines[cur].'"'
           \.b:codi_interpreter['eval_post']
+    endif
 
     " Read in the last line printed
     exe 'silent! r !'
