@@ -4,6 +4,7 @@ let s:codi_interpreters = {
           \ 'bin': 'python',
           \ 'prompt': '>>> |\.\.\. ',
           \ 'prepipe': 'tail -n+4',
+          \ 'postpipe': 'head -n-1'
           \ },
       \ 'javascript': {
           \ 'bin': 'node',
@@ -56,7 +57,7 @@ function! s:codi_update()
   let b:codi_interpreting = 1
   let pos = getcurpos()
   let num_lines = line('$')
-  let content = shellescape(join(getline('^', '$'), "\n"))
+  let content = shellescape(join(getline('^', '$'), "\n")."")
 
   " Setup codi buf
   exe 'buf '.b:codi_bufnr
