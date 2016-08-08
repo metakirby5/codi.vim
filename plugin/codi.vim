@@ -3,7 +3,7 @@
 "   <filetype>: {
 "     'bin': <interpreter binary>,
 "     'env': <optional environment variables for bin>,
-"     'prompt': <regex pattern indicating the prompt>,
+"     'prompt': <awk pattern indicating the prompt>,
 "     'preprocess': <optional command to pipe output through
 "                    before prompt parsing>,
 "   }

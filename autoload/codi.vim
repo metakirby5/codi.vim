@@ -3,6 +3,7 @@ let s:codi_interpreters = {
       \ 'python': {
           \ 'bin': 'python',
           \ 'prompt': '^(>>>|\.\.\.) ',
+          \ 'preprocess': 'head -n-1',
           \ },
       \ 'javascript': {
           \ 'bin': 'node',
@@ -15,6 +16,12 @@ let s:codi_interpreters = {
           \ 'prompt': '^Prelude> ',
           \ 'preprocess':
             \ 'sed "s/\(\[?1[hl]\|E\)//g" | tr "" "\n" | cut -c2-',
+          \ },
+      \ 'ruby': {
+          \ 'bin': 'irb',
+          \ 'prompt': '^irb\([[:alnum:]]+\):[[:digit:]]{3,}:[[:digit:]]+. ',
+          \ 'preprocess':
+            \ 'sed "s/^=> //g"',
           \ },
       \ }
 
@@ -79,7 +86,7 @@ function! s:codi_update()
   let i = b:codi_interpreter
   let cmd = 'read !'
         \.get(i, 'env', '').' script -q /dev/null '
-        \.i['bin'].' <<< '.shellescape(content."").' | sed "s/^\^D//"'
+        \.i['bin'].' <<< '.shellescape(content."").' | sed "s/^\^D//"'
         \.' | tr -d ""'
         \.' | tail -n+'.(num_lines + 1)
         \.' | '.get(i, 'preprocess', 'cat')
