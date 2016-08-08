@@ -7,7 +7,7 @@ let s:codi_interpreters = {
           \ },
        \ 'javascript': {
           \ 'bin': 'node',
-          \ 'prompt': '> '
+          \ 'prompt': '> ',
           \ },
       \ }
 
