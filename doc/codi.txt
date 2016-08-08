@@ -12,6 +12,8 @@ TODO
 USAGE                                                             *codi-usage*
 
 TODO
-Also add a note about updatetime being used
+- Define spec for user-defined interpreters
+- Add a note about updatetime being used
+- Fix prompt grepping (node issues with >)
 
 vim:tw=78:ts=8:ft=help:norl:
