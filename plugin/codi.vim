@@ -4,8 +4,8 @@
 "     'bin': <interpreter binary>,
 "     'env': <optional environment variables for bin>,
 "     'prompt': <regex pattern indicating the prompt>,
-"     'prepipe': <optional command to pipe through first>,
-"     'postpipe': <optional command to pipe through last>,
+"     'preprocess': <optional command to pipe output through
+"                    before prompt parsing>,
 "   }
 if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}

@@ -8,12 +8,12 @@ let s:codi_interpreters = {
           \ 'bin': 'node',
           \ 'env': 'NODE_DISABLE_COLORS=1',
           \ 'prompt': '^(>|\.\.\.) ',
-          \ 'prepipe': 'sed "s/\[\(1G\|0J\|3G\)//g"',
+          \ 'preprocess': 'sed "s/\[\(1G\|0J\|3G\)//g"',
           \ },
       \ 'haskell': {
           \ 'bin': 'ghci',
           \ 'prompt': '^Prelude> ',
-          \ 'prepipe':
+          \ 'preprocess':
             \ 'sed "s/\(\[?1[hl]\|E\)//g" | tr "" "\n" | cut -c2-',
           \ },
       \ }
@@ -70,11 +70,11 @@ function! s:codi_update()
   "     code as input, which is piped through...
   "   - tr, to remove those backspaces (^H) and carriage returns (^M)...
   "   - tail, to get rid of the lines we input...
-  "   - any user-provided prepipe...
+  "   - any user-provided preprocess...
   "   - if raw isn't set...
   "     - awk, to only print the line right before a prompt...
   "     - tail again, to remove the first blank line...
-  "   - any user-provided postpipe
+  "   - and read it all into the Codi buffer.
   " TODO linux script support
   let i = b:codi_interpreter
   let cmd = 'read !'
@@ -82,7 +82,7 @@ function! s:codi_update()
         \.i['bin'].' <<< '.shellescape(content."").' | sed "s/^\^D//"'
         \.' | tr -d ""'
         \.' | tail -n+'.(num_lines + 1)
-        \.' | '.get(i, 'prepipe', 'cat')
+        \.' | '.get(i, 'preprocess', 'cat')
 
   " If the user wants raw, don't parse for prompt
   if !g:codi#raw
@@ -93,8 +93,6 @@ function! s:codi_update()
               \.'{ if (\$0) { taken = \$0 } }'
           \.'}" | tail -n+2'
   endif
-
-  let cmd .= ' | '.get(i, 'postpipe', 'cat')
 
   exe cmd
 

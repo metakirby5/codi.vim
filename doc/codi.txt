@@ -15,9 +15,7 @@ TODO
 - Define spec for user-defined interpreters
 - Document opts like interpreters, width, raw, etc.
 - Add a note about updatetime being used
-- Add a note saying
-  after prepipe -> looks like normal,
-  after postpipe -> clean up alignment
+- Add a note saying after preprocess -> looks like normal
 - Fix quitting codi on buf close
 
 ==============================================================================
