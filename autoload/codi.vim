@@ -3,11 +3,18 @@ let s:codi_interpreters = {
       \ 'python': {
           \ 'bin': 'python',
           \ 'prompt': '>>> |\.\.\. ',
-          \ 'filter': 'tail -n+4',
+          \ 'prepipe': 'tail -n+4',
           \ },
-       \ 'javascript': {
+      \ 'javascript': {
           \ 'bin': 'node',
           \ 'prompt': '> ',
+          \ 'postpipe': 'sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g"',
+          \ },
+      \ 'haskell': {
+          \ 'bin': 'ghci',
+          \ 'prompt': 'Prelude> ',
+          \ 'prepipe': 'tr "" "\n" | sed "/\[?1./d"',
+          \ 'postpipe': 'cut -c2-',
           \ },
       \ }
 
@@ -57,25 +64,26 @@ function! s:codi_update()
   "   - The interpreter, which will take...
   "   - Our shell-escaped buffer as input, then piped through...
   "   - tail, to get rid of the lines we input...
-  "   - any user-provided filter...
+  "   - any user-provided prepipe...
   "   - sed, to remove color codes...
   "   - awk, to only print the line right before a prompt...
   "   - tail again, to remove the first blank line...
-  "   - tr, to remove those nasty line feeds
+  "   - tr, to remove those nasty line feeds...
+  "   - any user-provided postpipe
   " TODO linux script support
   exe 'r !script -q /dev/null '
         \.b:codi_interpreter['bin']
         \.' <<< '.content
         \.' | tail -n+'.(num_lines + 1)
-        \.' | '.get(b:codi_interpreter, 'filter', 'cat')
-        \.' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g"'
+        \.' | '.get(b:codi_interpreter, 'prepipe', 'cat')
         \.' | awk "{'
           \.'if (/'.b:codi_interpreter['prompt'].'/)'
             \.'{ print taken; taken = \"\" }'
           \.'else'
-            \.'{ taken = \$0 }'
+            \.'{ if (\$0) { taken = \$0 } }'
         \.'}" | tail -n+2'
         \.' | tr -d $"\r"'
+        \.' | '.get(b:codi_interpreter, 'postpipe', 'cat')
 
   " Teardown codi buf
   normal! gg_dd

@@ -3,7 +3,8 @@
 "   <filetype>: {
 "     'bin': <interpreter binary>,
 "     'prompt': <regex pattern indicating the prompt>,
-"     'filter': <optional command to pipe output through>,
+"     'prepipe': <optional command to pipe through first>,
+"     'postpipe': <optional command to pipe through last>,
 "   }
 if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}
