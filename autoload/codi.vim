@@ -3,11 +3,23 @@ function! s:warn(msg)
   echohl WarningMsg | echom a:msg | echohl None
 endfunction
 
-" Determine script command
-if executable('script') != 1
-  call s:warn('Codi requires the `script` command.')
+" Check for missing commands
+let s:missing_cmds = []
+for bin in ['script', 'cat', 'head', 'tail', 'tr', 'sed', 'awk']
+  if executable(bin) != 1
+    call add(s:missing_cmds, bin)
+  endif
+endfor
+if !empty(s:missing_cmds)
+  function! codi#start(...)
+    call s:warn(
+          \'Codi requires these misssing commands: '
+          \.join(s:missing_cmds, ', ').'.')
+  endfunction
   finish
 endif
+
+" Detect what version of script to use based on OS
 if has("unix")
   let s:uname = system("uname -s")
   if s:uname =~ "Darwin" || s:uname =~ "BSD"
