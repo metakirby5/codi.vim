@@ -52,7 +52,7 @@ function! s:codi_update()
 
   " Clear buffer
   let codi_pos = getcurpos()
-  normal! ggdG
+  normal! gg_dG
 
   " For every line, interpret up to that point
   let cur = 0
@@ -75,7 +75,7 @@ function! s:codi_update()
   endwhile
 
   " Kill the empty line at the start and return to position
-  normal! ggdd
+  normal! gg_dd
   call setpos('.', codi_pos)
 
   " Teardown
