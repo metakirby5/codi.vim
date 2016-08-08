@@ -59,11 +59,11 @@ function! s:codi_update()
   while cur < lim
     " Build the content to run
     let content =
-          \ b:codi_interpreter['pre']                                     .'"'
-          \.join(lines[0:cur], '\n')                                      .'"'
+          \ b:codi_interpreter['pre']
+          \.'"'.join(lines[0:cur], '\n').'"'
           \.b:codi_interpreter['post']
-          \.b:codi_interpreter['eval_pre']                                .'"'
-          \.lines[cur]                                                    .'"'
+          \.b:codi_interpreter['eval_pre']
+          \.'"'.lines[cur].'"'
           \.b:codi_interpreter['eval_post']
 
     " Read in the last line printed
