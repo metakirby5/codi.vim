@@ -1,3 +1,20 @@
+" Default interpreters
+let s:codi_interpreters = {
+      \ 'python': {
+          \ 'bin': 'python',
+          \ 'pre': "
+                \exec(",
+          \ 'post': "
+                \)\n",
+          \ 'eval_pre': "
+                \try: print(eval(",
+          \ 'eval_post': "
+                \))\nexcept: print ''",
+          \ },
+      \ }
+" Load user-defined interpreters
+call extend(s:codi_interpreters, g:codi#interpreters)
+
 " Actions on codi
 augroup CODI
   au!
@@ -12,20 +29,54 @@ augroup END
 " Update codi buf on buf change
 augroup CODI_TARGET
   au!
-  au CursorHold,CursorHoldI * call codi#update()
+  au CursorHold,CursorHoldI * silent! call s:codi_update()
 augroup END
 
-function! codi#update()
+function! s:codi_update()
   " Bail if no codi buf to act on
   if !exists('b:codi_bufnr') | return | endif
 
   " Setup
   let pos = getcurpos()
+  let lim = line('$')
+
+  " Escape quotes
+  let unescaped_lines = getline('^', '$')
+  let lines = []
+  for line in unescaped_lines
+    call add(lines, substitute(line, '"', '\\"', 'g'))
+  endfor
+
   exe 'buf '.b:codi_bufnr
   setlocal modifiable
 
-  " Actions
-  silent! r !ls
+  " Clear buffer
+  let codi_pos = getcurpos()
+  normal! ggdG
+
+  " For every line, interpret up to that point
+  let cur = 0
+  while cur < lim
+    " Build the content to run
+    let content =
+          \ b:codi_interpreter['pre']                                     .'"'
+          \.join(lines[0:cur], '\n')                                      .'"'
+          \.b:codi_interpreter['post']
+          \.b:codi_interpreter['eval_pre']                                .'"'
+          \.lines[cur]                                                    .'"'
+          \.b:codi_interpreter['eval_post']
+
+    " Read in the last line printed
+    exe 'silent! r !'
+          \.b:codi_interpreter['bin'].' 2>&1 <<< '.shellescape(content)
+          \.' | tail -n1'
+
+    let cur += 1
+  endwhile
+
+  " Kill the empty line at the start and return to position
+  normal! ggdd
+  call setpos('.', codi_pos)
 
   " Teardown
   setlocal nomodifiable
@@ -43,7 +94,7 @@ function! codi#interpret(...)
   endif
 
   try
-    let interpreter = g:codi#interpreters[filetype]
+    let interpreter = s:codi_interpreters[filetype]
   " If key not found
   catch E716
     let filetype = !empty(filetype) ? filetype : 'plaintext'
@@ -81,6 +132,7 @@ function! codi#interpret(...)
   20vnew
   setlocal filetype=codi
   let b:codi_leave = restore
+  let b:codi_interpreter = interpreter
 
   " Get to target buf position
   exe top
@@ -90,5 +142,5 @@ function! codi#interpret(...)
   " Return to target split
   wincmd p
   let b:codi_bufnr = bufnr('$')
-  call codi#update()
+  silent! call s:codi_update()
 endfunction
