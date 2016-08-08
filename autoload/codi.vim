@@ -111,7 +111,6 @@ function! s:codi_update()
   "     - awk, to only print the line right before a prompt...
   "     - tail again, to remove the first blank line...
   "   - and read it all into the Codi buffer.
-  " TODO linux script support
   let i = b:codi_interpreter
   let cmd = 'read !'
         \.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
