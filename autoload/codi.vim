@@ -128,7 +128,7 @@ function! codi#interpret(...)
   let current = line('.')
 
   " Spawn codi
-  20vnew
+  exe g:codi#width.'vnew'
   setlocal filetype=codi
   let b:codi_target = bufnr
   let b:codi_leave = restore
