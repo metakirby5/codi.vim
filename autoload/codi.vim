@@ -4,6 +4,10 @@ function! s:warn(msg)
 endfunction
 
 " Determine script command
+if executable('script') != 1
+  call s:warn('Codi requires the `script` command.')
+  finish
+endif
 if has("unix")
   let s:uname = system("uname -s")
   if s:uname =~ "Darwin" || s:uname =~ "BSD"
@@ -13,9 +17,6 @@ if has("unix")
     let s:script_pre = 'script -qfec "'
     let s:script_post = '" /dev/null'
   endif
-else
-  call s:warn('Only UNIX is supported.')
-  finish
 endif
 
 " Default interpreters
@@ -171,6 +172,15 @@ function! codi#start(...)
       let error = 1
     endif
   endfor
+
+  " Check if bin present
+  if executable(interpreter['bin']) != 1
+    call s:warn(
+          \'Interpreter for '.filetype
+          \.' requires the `'.interpreter['bin'].'` command.')
+    let error = 1
+  endif
+
   if error | return | endif
 
   call s:codi_end()
