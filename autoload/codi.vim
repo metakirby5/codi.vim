@@ -113,12 +113,11 @@ function! codi#interpret(...)
 
   " Restore target buf options on codi close
   let bufnr = bufnr('%')
-  let restore = ''
+  let restore = 'bdel|buf'.bufnr.'|unlet b:codi_bufnr'
   for opt in ['scrollbind', 'cursorbind', 'wrap', 'foldenable']
     exe 'let val = &'.opt
-    let restore .= '|silent! call setwinvar(bufwinnr('.bufnr.'),"&'.opt.'",'.val.')'
+    let restore .= '|let &'.opt.'='.val.''
   endfor
-  let restore = strpart(restore, 1)
 
   " Set target buf options
   setlocal scrollbind nowrap nofoldenable
@@ -131,6 +130,7 @@ function! codi#interpret(...)
   " Spawn codi
   20vnew
   setlocal filetype=codi
+  let b:codi_target = bufnr
   let b:codi_leave = restore
   let b:codi_interpreter = interpreter
 
