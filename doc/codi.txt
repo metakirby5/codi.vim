@@ -14,7 +14,7 @@ USAGE                                                             *codi-usage*
 TODO
 - Define spec for user-defined interpreters
 - Add a note about updatetime being used
-- Add option to quit codi on buf close
+- Fix quitting codi on buf close
 
 ==============================================================================
 INTERPRETERS                                               *codi-interpreters*

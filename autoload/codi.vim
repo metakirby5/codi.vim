@@ -36,6 +36,10 @@ augroup END
 augroup CODI_TARGET
   au!
   au CursorHold,CursorHoldI * silent! call s:codi_update()
+  " TODO fix this
+  " if g:codi#autoclose
+  "   au BufWinLeave * silent! call s:codi_end()
+  " endif
 augroup END
 
 " Display a warning message
@@ -49,6 +53,7 @@ function! s:codi_update()
   if !exists('b:codi_bufnr') | return | endif
 
   " Setup target buf
+  let b:codi_interpreting = 1
   let pos = getcurpos()
   let num_lines = line('$')
   let content = shellescape(join(getline('^', '$'), "\n"))
@@ -71,19 +76,18 @@ function! s:codi_update()
   "   - tr, to remove those nasty line feeds...
   "   - any user-provided postpipe
   " TODO linux script support
-  exe 'r !script -q /dev/null '
-        \.b:codi_interpreter['bin']
-        \.' <<< '.content
+  let i = b:codi_interpreter
+  exe 'read !script -q /dev/null '.i['bin'].' <<< '.content
         \.' | tail -n+'.(num_lines + 1)
-        \.' | '.get(b:codi_interpreter, 'prepipe', 'cat')
+        \.' | '.get(i, 'prepipe', 'cat')
         \.' | awk "{'
-          \.'if (/'.b:codi_interpreter['prompt'].'/)'
+          \.'if (/'.i['prompt'].'/)'
             \.'{ print taken; taken = \"\" }'
           \.'else'
             \.'{ if (\$0) { taken = \$0 } }'
         \.'}" | tail -n+2'
         \.' | tr -d $"\r"'
-        \.' | '.get(b:codi_interpreter, 'postpipe', 'cat')
+        \.' | '.get(i, 'postpipe', 'cat')
 
   " Teardown codi buf
   normal! gg_dd
@@ -93,9 +97,22 @@ function! s:codi_update()
   " Teardown target buf
   buf #
   call setpos('.', pos)
+  unlet b:codi_interpreting
 endfunction
 
-function! codi#interpret(...)
+function! s:codi_end()
+  " Bail if interpreting in progress
+  if exists('b:codi_interpreting') | return | endif
+
+  " If we already have a codi instance for the buffer, kill it
+  if exists('b:codi_bufnr')
+    exe 'bdel '.b:codi_bufnr
+    unlet b:codi_bufnr
+  endif
+endfunction
+
+" Main function
+function! codi#start(...)
   " Get filetype from arg if exists
   if exists('a:1')
     let filetype = a:1
@@ -126,11 +143,7 @@ function! codi#interpret(...)
   endfor
   if error | return | endif
 
-  " If we already have a codi instance for the buffer, kill it
-  if exists('b:codi_bufnr')
-    exe 'bdel '.b:codi_bufnr
-    unlet b:codi_bufnr
-  endif
+  call s:codi_end()
 
   " Adapted from:
   " https://github.com/tpope/vim-fugitive/blob/master/plugin/fugitive.vim#L1988
@@ -156,7 +169,6 @@ function! codi#interpret(...)
   " Spawn codi
   exe g:codi#width.'vnew'
   setlocal filetype=codi
-  let b:codi_target = bufnr
   let b:codi_leave = restore
   let b:codi_interpreter = interpreter
 

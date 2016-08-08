@@ -15,4 +15,9 @@ if !exists('g:codi#width')
   let g:codi#width = 40
 endif
 
-command! -nargs=? -bar -complete=filetype Codi call codi#interpret(<f-args>)
+" Close codi on target buffer close?
+if !exists('g:codi#autoclose')
+  let g:codi#autoclose = 1
+endif
+
+command! -nargs=? -bar -complete=filetype Codi call codi#start(<f-args>)
