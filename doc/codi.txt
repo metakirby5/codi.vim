@@ -16,6 +16,7 @@ TODO
 - Document opts like interpreters, width, raw, etc.
 - Add a note about updatetime being used
 - Add a note saying after preprocess -> looks like normal
+- Add a note about dependencies (script)
 - Fix quitting codi on buf close
 
 ==============================================================================

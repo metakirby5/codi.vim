@@ -1,3 +1,23 @@
+" Display a warning message
+function! s:warn(msg)
+  echohl WarningMsg | echom a:msg | echohl None
+endfunction
+
+" Determine script command
+if has("unix")
+  let s:uname = system("uname -s")
+  if s:uname =~ "Darwin" || s:uname =~ "BSD"
+    let s:script_pre = 'script -q /dev/null '
+    let s:script_post = ''
+  else
+    let s:script_pre = 'script -qfec "'
+    let s:script_post = '" /dev/null'
+  endif
+else
+  call s:warn('Only UNIX is supported.')
+  finish
+endif
+
 " Default interpreters
 let s:codi_interpreters = {
       \ 'python': {
@@ -49,11 +69,6 @@ augroup CODI_TARGET
   " endif
 augroup END
 
-" Display a warning message
-function! s:warn(msg)
-  echohl WarningMsg | echom a:msg | echohl None
-endfunction
-
 " Update the codi buf
 function! s:codi_update()
   " Bail if no codi buf to act on
@@ -72,9 +87,10 @@ function! s:codi_update()
   normal! gg_dG
 
   " Execute our code by:
-  "   - Using script with environment variables to simulate a tty on...
-  "   - The interpreter, which will take our shell-escaped EOL-terminated
-  "     code as input, which is piped through...
+  "   - Using script with environment variables to simulate a tty on
+  "     the interpreter, which will take...
+  "   - our shell-escaped EOL-terminated code as input,
+  "     which is piped through...
   "   - tr, to remove those backspaces (^H) and carriage returns (^M)...
   "   - tail, to get rid of the lines we input...
   "   - any user-provided preprocess...
@@ -85,8 +101,8 @@ function! s:codi_update()
   " TODO linux script support
   let i = b:codi_interpreter
   let cmd = 'read !'
-        \.get(i, 'env', '').' script -q /dev/null '
-        \.i['bin'].' <<< '.shellescape(content."").' | sed "s/^\^D//"'
+        \.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
+        \.' <<< '.shellescape(content."").' | sed "s/^\^D//"'
         \.' | tr -d ""'
         \.' | tail -n+'.(num_lines + 1)
         \.' | '.get(i, 'preprocess', 'cat')
