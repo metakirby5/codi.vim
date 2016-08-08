@@ -13,7 +13,7 @@ endfor
 if !empty(s:missing_cmds)
   function! codi#start(...)
     call s:warn(
-          \'Codi requires these misssing commands: '
+          \ 'Codi requires these misssing commands: '
           \.join(s:missing_cmds, ', ').'.')
   endfunction
   finish
@@ -171,25 +171,34 @@ function! codi#start(...)
     if empty(filetype)
       call s:warn('Cannot run Codi with empty filetype.')
     else
-      call s:warn('No interpreter for '.filetype.'.')
+      call s:warn('No Codi interpreter for '.filetype.'.')
     endif
     return
   endtry
 
-  " Check if required keys present
+  " Error checking
+  let interpreter_str = 'Codi interpreter for '.filetype
   let error = 0
+
+  " Check if required keys present
+  let missing_keys = []
   for key in ['bin', 'prompt']
     if !has_key(interpreter, key)
-      call s:warn('Interpreter for '.filetype.' missing required key '.key)
-      let error = 1
+      call add(missing_keys, key)
     endif
   endfor
+  if !empty(missing_keys)
+    call s:warn(
+          \ interpreter_str.' requires these missing keys: '
+          \.join(missing_keys, ', '))
+    let error = 1
+  endif
 
   " Check if bin present
-  if executable(interpreter['bin']) != 1
+  if has_key(interpreter, 'bin') && executable(interpreter['bin']) != 1
     call s:warn(
-          \'Interpreter for '.filetype
-          \.' requires the `'.interpreter['bin'].'` command.')
+          \ interpreter_str.' requires this missing command: '
+          \.interpreter['bin'])
     let error = 1
   endif
 
