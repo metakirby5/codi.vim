@@ -8,8 +8,8 @@ let s:codi_interpreters = {
           \ },
       \ 'javascript': {
           \ 'bin': 'node',
+          \ 'env': 'NODE_DISABLE_COLORS=1',
           \ 'prompt': '> ',
-          \ 'postpipe': 'sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g"',
           \ },
       \ 'haskell': {
           \ 'bin': 'ghci',
@@ -78,7 +78,9 @@ function! s:codi_update()
   "   - any user-provided postpipe
   " TODO linux script support
   let i = b:codi_interpreter
-  exe 'read !script -q /dev/null '.i['bin'].' <<< '.content
+  exe 'read !'
+        \.get(i, 'env', '').' script -q /dev/null '
+        \.i['bin'].' <<< '.content
         \.' | tail -n+'.(num_lines + 1)
         \.' | '.get(i, 'prepipe', 'cat')
         \.' | awk "{'

@@ -2,6 +2,7 @@
 " Entries are in the form of
 "   <filetype>: {
 "     'bin': <interpreter binary>,
+"     'env': <optional environment variables for bin>,
 "     'prompt': <regex pattern indicating the prompt>,
 "     'prepipe': <optional command to pipe through first>,
 "     'postpipe': <optional command to pipe through last>,
