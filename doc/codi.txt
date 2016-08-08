@@ -12,5 +12,6 @@ TODO
 USAGE                                                             *codi-usage*
 
 TODO
+Also add a note about updatetime being used
 
-vim:tw=78:ft=help:norl:
+vim:tw=78:ts=8:ft=help:norl:
