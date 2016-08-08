@@ -21,4 +21,9 @@ if !exists('g:codi#autoclose')
   let g:codi#autoclose = 1
 endif
 
+" Disable prompt parsing?
+if !exists('g:codi#raw')
+  let g:codi#raw = 0
+endif
+
 command! -nargs=? -bar -complete=filetype Codi call codi#start(<f-args>)

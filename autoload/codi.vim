@@ -2,20 +2,19 @@
 let s:codi_interpreters = {
       \ 'python': {
           \ 'bin': 'python',
-          \ 'prompt': '>>> |\.\.\. ',
-          \ 'prepipe': 'tail -n+4',
-          \ 'postpipe': 'head -n-1'
+          \ 'prompt': '^(>>>|\.\.\.) ',
           \ },
       \ 'javascript': {
           \ 'bin': 'node',
           \ 'env': 'NODE_DISABLE_COLORS=1',
-          \ 'prompt': '> ',
+          \ 'prompt': '^(>|\.\.\.) ',
+          \ 'prepipe': 'sed "s/\[\(1G\|0J\|3G\)//g"',
           \ },
       \ 'haskell': {
           \ 'bin': 'ghci',
-          \ 'prompt': 'Prelude> ',
-          \ 'prepipe': 'tr "" "\n" | sed "/\[?1./d"',
-          \ 'postpipe': 'cut -c2-',
+          \ 'prompt': '^Prelude> ',
+          \ 'prepipe':
+            \ 'sed "s/\(\[?1[hl]\|E\)//g" | tr "" "\n" | cut -c2-',
           \ },
       \ }
 
@@ -57,7 +56,7 @@ function! s:codi_update()
   let b:codi_interpreting = 1
   let pos = getcurpos()
   let num_lines = line('$')
-  let content = shellescape(join(getline('^', '$'), "\n")."")
+  let content = join(getline('^', '$'), "\n")
 
   " Setup codi buf
   exe 'buf '.b:codi_bufnr
@@ -66,31 +65,38 @@ function! s:codi_update()
   normal! gg_dG
 
   " Execute our code by:
-  "   - Using script to simulate a tty on...
-  "   - The interpreter, which will take...
-  "   - Our shell-escaped buffer as input, then piped through...
+  "   - Using script with environment variables to simulate a tty on...
+  "   - The interpreter, which will take our shell-escaped EOL-terminated
+  "     code as input, which is piped through...
+  "   - tr, to remove those backspaces (^H) and carriage returns (^M)...
   "   - tail, to get rid of the lines we input...
   "   - any user-provided prepipe...
-  "   - sed, to remove color codes...
-  "   - awk, to only print the line right before a prompt...
-  "   - tail again, to remove the first blank line...
-  "   - tr, to remove those nasty line feeds...
+  "   - if raw isn't set...
+  "     - awk, to only print the line right before a prompt...
+  "     - tail again, to remove the first blank line...
   "   - any user-provided postpipe
   " TODO linux script support
   let i = b:codi_interpreter
-  exe 'read !'
+  let cmd = 'read !'
         \.get(i, 'env', '').' script -q /dev/null '
-        \.i['bin'].' <<< '.content
+        \.i['bin'].' <<< '.shellescape(content."").' | sed "s/^\^D//"'
+        \.' | tr -d ""'
         \.' | tail -n+'.(num_lines + 1)
         \.' | '.get(i, 'prepipe', 'cat')
-        \.' | awk "{'
-          \.'if (/'.i['prompt'].'/)'
-            \.'{ print taken; taken = \"\" }'
-          \.'else'
-            \.'{ if (\$0) { taken = \$0 } }'
-        \.'}" | tail -n+2'
-        \.' | tr -d $"\r"'
-        \.' | '.get(i, 'postpipe', 'cat')
+
+  " If the user wants raw, don't parse for prompt
+  if !g:codi#raw
+    let cmd .= ' | awk "{'
+            \.'if (/'.i['prompt'].'/)'
+              \.'{ print taken; taken = \"\" }'
+            \.'else'
+              \.'{ if (\$0) { taken = \$0 } }'
+          \.'}" | tail -n+2'
+  endif
+
+  let cmd .= ' | '.get(i, 'postpipe', 'cat')
+
+  exe cmd
 
   " Teardown codi buf
   normal! gg_dd
