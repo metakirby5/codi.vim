@@ -40,6 +40,14 @@ Most of these should come installed on any UNIX system:
 
 It doesn't matter whether you have BSD or Linux.
 
+Each interpreter also depends on its 'bin'; see |codi-interpreters-bin|.
+
+Default interpreter dependencies:
+             Python:    `python`
+             Javscript: `node`
+             Haskell:   `ghci`
+             Ruby:      `irb`
+
 ==============================================================================
 USAGE                                                             *codi-usage*
 
@@ -118,15 +126,15 @@ There are four possible attributes for an interpreter:
 
                                                        *codi-interpreters-bin*
 'bin' (REQUIRED)
-             Defines the command to use as the interpreter. For example, it
-             would be "python" for python, "node" for javascript, and "irb"
-             for ruby.
+             Defines the command to use for the REPL backing the interpreter.
+             For example, it would be "python" for python, "node" for
+             javascript, and "irb" for ruby.
 
                                                     *codi-interpreters-prompt*
 'prompt' (REQUIRED)
-             An awk-style regex pattern that exactly matches the prompt. This
-             will be used to correctly line up the output of 'bin' with your
-             buffer.
+             An awk-style regex pattern that exactly matches the prompt of
+             'bin'. This will be used to correctly line up the output of 'bin'
+             with your buffer.
 
                                                        *codi-interpreters-env*
 'env' (OPTIONAL)
