@@ -1,6 +1,6 @@
-" Display a warning message
-function! s:warn(msg)
-  echohl WarningMsg | echom a:msg | echohl None
+" Display an error message
+function! s:err(msg)
+  echohl ErrorMsg | echom a:msg | echohl None
 endfunction
 
 " Check for missing commands
@@ -12,7 +12,7 @@ for bin in ['script', 'cat', 'head', 'tail', 'tr', 'sed', 'awk']
 endfor
 if !empty(s:missing_cmds)
   function! codi#start(...)
-    call s:warn(
+    call s:err(
           \ 'Codi requires these misssing commands: '
           \.join(s:missing_cmds, ', ').'.')
   endfunction
@@ -165,9 +165,9 @@ function! s:codi_spawn(filetype)
   " If interpreter not found...
   catch E716
     if empty(a:filetype)
-      call s:warn('Cannot run Codi with empty filetype.')
+      call s:err('Cannot run Codi with empty filetype.')
     else
-      call s:warn('No Codi interpreter for '.a:filetype.'.')
+      call s:err('No Codi interpreter for '.a:filetype.'.')
     endif
     return
   endtry
@@ -184,7 +184,7 @@ function! s:codi_spawn(filetype)
     endif
   endfor
   if !empty(missing_keys)
-    call s:warn(
+    call s:err(
           \ interpreter_str.' requires these missing keys: '
           \.join(missing_keys, ', '))
     let error = 1
@@ -192,7 +192,7 @@ function! s:codi_spawn(filetype)
 
   " Check if bin present
   if has_key(interpreter, 'bin') && executable(interpreter['bin']) != 1
-    call s:warn(
+    call s:err(
           \ interpreter_str.' requires this missing command: '
           \.interpreter['bin'])
     let error = 1
