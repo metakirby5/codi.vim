@@ -151,4 +151,4 @@ A full interpreter configuration for javascript is given below.
                  \ 'preprocess': 'sed "s/\[\(1G\|0J\|3G\)//g"',
                  \ },
 <
-vim:ft=help:tw=78:norl:
+vim:ft=help:tw=78:sw=13:norl:
