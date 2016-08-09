@@ -53,10 +53,9 @@ augroup END
 augroup CODI_TARGET
   au!
   au TextChanged,TextChangedI * call s:codi_update()
-  " TODO fix this
-  " if g:codi#autoclose
-  "   au BufWinLeave * call s:codi_end()
-  " endif
+  if g:codi#autoclose
+    au QuitPre * call s:codi_end()
+  endif
 augroup END
 
 " Update the codi buf
