@@ -66,9 +66,13 @@ function! s:codi_update()
 
   " Setup target buf
   let b:codi_interpreting = 1
-  silent! let pos = getcurpos()
   let num_lines = line('$')
   let content = join(getline('^', '$'), "\n")
+
+  " So we can jump back later
+  let top = line('w0') + &scrolloff
+  let line = line('.')
+  let col = col('.')
 
   " So we can syncbind later
   keepjumps normal! gg
@@ -125,7 +129,9 @@ function! s:codi_update()
 
   " Teardown target buf
   exe 'keepjumps keepalt buf '.b:codi_target_bufnr
-  silent! call setpos('.', pos)
+  exe 'keepjumps '.top
+  keepjumps normal! zt
+  keepjumps call cursor(line, col)
   unlet b:codi_interpreting
 endfunction
 
@@ -189,7 +195,7 @@ function! s:codi_start(filetype)
 
   " Restore target buf options on codi close
   let bufnr = bufnr('%')
-  let restore = 'bdel|buf'.bufnr.'|unlet b:codi_bufnr'
+  let restore = 'bdel | buf '.bufnr.' | unlet b:codi_bufnr'
   for opt in ['scrollbind', 'cursorbind', 'wrap', 'foldenable']
     if exists('&'.opt)
       exe 'let val = &'.opt
