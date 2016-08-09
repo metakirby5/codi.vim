@@ -67,7 +67,8 @@ augroup CODI
   au!
   au FileType codi setlocal
         \ buftype=nofile nomodifiable nomodified
-        \ nomodeline nonumber nowrap
+        \ nonu nornu nolist nomodeline nowrap
+        \ nocursorline nocursorcolumn
         \ foldcolumn=0 nofoldenable winfixwidth
         \ scrollbind | silent! setlocal cursorbind | syncbind
   au BufWinLeave * if exists('b:codi_leave') | exe b:codi_leave | endif
@@ -163,30 +164,21 @@ function! s:codi_end()
   endif
 endfunction
 
-" Main function
-function! codi#start(...)
-  " Get filetype from arg if exists
-  if exists('a:1')
-    let filetype = a:1
-    exe 'setlocal filetype='.filetype
-  else
-    let filetype = &filetype
-  endif
-
+function! s:codi_start(filetype)
   try
-    let interpreter = s:codi_interpreters[filetype]
+    let interpreter = s:codi_interpreters[a:filetype]
   " If interpreter not found...
   catch E716
-    if empty(filetype)
+    if empty(a:filetype)
       call s:warn('Cannot run Codi with empty filetype.')
     else
-      call s:warn('No Codi interpreter for '.filetype.'.')
+      call s:warn('No Codi interpreter for '.a:filetype.'.')
     endif
     return
   endtry
 
   " Error checking
-  let interpreter_str = 'Codi interpreter for '.filetype
+  let interpreter_str = 'Codi interpreter for '.a:filetype
   let error = 0
 
   " Check if required keys present
@@ -235,7 +227,7 @@ function! codi#start(...)
   " Spawn codi
   exe 'keepjumps keepalt 'g:codi#width.'vnew'
   setlocal filetype=codi
-  exe 'setlocal syntax='.filetype
+  exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
   let b:codi_leave = restore
   let b:codi_interpreter = interpreter
@@ -244,4 +236,21 @@ function! codi#start(...)
   keepjumps keepalt wincmd p
   let b:codi_bufnr = bufnr('$')
   silent! call s:codi_update()
+endfunction
+
+" Main function
+function! codi#run(bang, ...)
+  if !empty(a:bang)
+    return s:codi_end()
+  endif
+
+  " Get filetype from arg if exists
+  if exists('a:2')
+    let filetype = a:2
+    exe 'setlocal filetype='.filetype
+  else
+    let filetype = &filetype
+  endif
+
+  return s:codi_start(filetype)
 endfunction
