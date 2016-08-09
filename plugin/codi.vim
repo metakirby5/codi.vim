@@ -1,5 +1,5 @@
 " User-defined interpreters (see codi-interpreters)
-" Entries are in the form of
+" Entries are in the form of:
 "   <filetype>: {
 "     'bin': <interpreter binary>,
 "     'env': <optional environment variables for bin>,
@@ -7,13 +7,22 @@
 "     'preprocess': <optional command to pipe output through
 "                    before prompt parsing>,
 "   }
+" For example:
+"   'javascript': {
+"     'bin': 'node',
+"     'env': 'NODE_DISABLE_COLORS=1',
+"     'prompt': '^(>|\.\.\.) ',
+"     'preprocess': 'sed "s/\[\(1G\|0J\|3G\)//g"',
+"   }
 if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}
 endif
 
 " Interpreter aliases
-" Entries are in the form of
+" Entries are in the form of:
 "   <aliased filetype>: <filetype>
+" For example:
+"   'javascript.jsx': 'javascript'
 if !exists('g:codi#aliases')
   let g:codi#aliases = {}
 endif
