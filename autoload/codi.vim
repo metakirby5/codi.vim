@@ -46,7 +46,9 @@ augroup CODI
         \ nonu nornu nolist nomodeline nowrap
         \ nocursorline nocursorcolumn
         \ foldcolumn=0 nofoldenable winfixwidth
-        \ scrollbind | silent! setlocal cursorbind
+        \ scrollbind
+        \ | noremap <buffer> q <esc>:q<cr>
+        \ | silent! setlocal cursorbind
   " Clean up when codi is killed
   au BufWinLeave * if exists('b:codi_leave') | exe b:codi_leave | endif
 augroup END
