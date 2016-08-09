@@ -52,10 +52,10 @@ augroup END
 " Update codi buf on buf change
 augroup CODI_TARGET
   au!
-  au CursorHold,CursorHoldI * silent! call s:codi_update()
+  au TextChanged,TextChangedI * call s:codi_update()
   " TODO fix this
   " if g:codi#autoclose
-  "   au BufWinLeave * silent! call s:codi_end()
+  "   au BufWinLeave * call s:codi_end()
   " endif
 augroup END
 
@@ -218,7 +218,7 @@ function! s:codi_start(filetype)
   " Return to target split
   keepjumps keepalt wincmd p
   let b:codi_bufnr = bufnr('$')
-  silent! call s:codi_update()
+  call s:codi_update()
 endfunction
 
 " Main function
