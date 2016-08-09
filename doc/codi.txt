@@ -54,8 +54,8 @@ USAGE                                                             *codi-usage*
                                                                        *:Codi*
 :Codi {filetype}
              Activates Codi for the current buffer, using the interpreter
-             defined for {filetype}, or the buffer's filetype. if {filetype}
-             is not specified.
+             defined for {filetype}. If {filetype} is not specified, the
+             buffer's 'filetype' is used instead.
 
                                                                       *:Codi!*
 :Codi!
@@ -63,7 +63,7 @@ USAGE                                                             *codi-usage*
 
                                                                      *:Codi!!*
 :Codi!! {filetype}
-             If Codi is on, acts like `:Codi!`. Otherwise, acts like `Codi`.
+             Toggles Codi for the current buffer.
 
 ==============================================================================
 CONFIGURATION                                             *codi-configuration*
