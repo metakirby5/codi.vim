@@ -61,6 +61,10 @@ USAGE                                                             *codi-usage*
 :Codi!
              Deactivates Codi for the current buffer.
 
+                                                                     *:Codi!!*
+:Codi!! {filetype}
+             If Codi is on, acts like |:Codi!|. Otherwise, acts like |Codi|.
+
 ==============================================================================
 CONFIGURATION                                             *codi-configuration*
 

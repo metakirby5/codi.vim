@@ -42,4 +42,4 @@ if !exists('g:codi#raw')
   let g:codi#raw = 0
 endif
 
-command! -nargs=? -bang -bar -complete=filetype Codi call codi#run('<bang>', <f-args>)
+command! -nargs=? -bang -bar -complete=filetype Codi call codi#run(<bang>0, <f-args>)

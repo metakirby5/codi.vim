@@ -57,7 +57,7 @@ augroup END
 augroup CODI_TARGET
   au!
   " Update codi buf on buf change
-  au TextChanged,TextChangedI * call s:codi_update()
+  au TextChanged,TextChangedI * silent! call s:codi_update()
   " If g:codi#autoclose, call s:codi_kill() when the target quits
   au QuitPre * call s:codi_autoclose()
 augroup END
@@ -136,17 +136,25 @@ function! s:codi_update()
   keepjumps call cursor(line, col)
 endfunction
 
+function! s:codi_autoclose()
+  if g:codi#autoclose
+    call s:codi_kill()
+  endif
+endfunction
+
+function! s:codi_toggle(filetype)
+  if exists('b:codi_bufnr')
+    return s:codi_kill()
+  else
+    return s:codi_spawn(a:filetype)
+  endif
+endfunction
+
 function! s:codi_kill()
   " If we already have a codi instance for the buffer, kill it
   if exists('b:codi_bufnr')
     exe 'bdel '.b:codi_bufnr
     unlet b:codi_bufnr
-  endif
-endfunction
-
-function! s:codi_autoclose()
-  if g:codi#autoclose
-    call s:codi_kill()
   endif
 endfunction
 
@@ -222,22 +230,42 @@ function! s:codi_spawn(filetype)
   " Return to target split
   keepjumps keepalt wincmd p
   let b:codi_bufnr = bufnr('$')
-  call s:codi_update()
+  silent! call s:codi_update()
 endfunction
 
 " Main function
 function! codi#run(bang, ...)
-  if !empty(a:bang)
-    call s:codi_kill()
-  endif
-
-  " Get filetype from arg if exists
+  " Handle arg
   if exists('a:1')
-    let filetype = a:1
-    exe 'setlocal filetype='.filetype
+    " Double-bang case
+    if a:bang && a:1 =~ '^!'
+      " Slice off the bang
+      let filetype = a:1[2:]
+      let toggle = 1
+    else
+      let filetype = a:1
+      let toggle = 0
+    endif
   else
-    let filetype = &filetype
+    let filetype = ''
+    let toggle = 0
   endif
 
-  call s:codi_spawn(filetype)
+  " Bang -> kill
+  if a:bang && !toggle
+    return s:codi_kill()
+  endif
+
+  " Grab filetype if not provided
+  if empty(filetype)
+    let filetype = &filetype
+  else
+    exe 'setlocal filetype='.filetype
+  endif
+
+  if toggle
+    return s:codi_toggle(filetype)
+  else
+    return s:codi_spawn(filetype)
+  endif
 endfunction
