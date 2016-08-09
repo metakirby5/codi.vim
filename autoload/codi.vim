@@ -40,22 +40,24 @@ endif
 " Actions on codi
 augroup CODI
   au!
+  " Local options
   au FileType codi setlocal
         \ buftype=nofile nomodifiable nomodified
         \ nonu nornu nolist nomodeline nowrap
         \ nocursorline nocursorcolumn
         \ foldcolumn=0 nofoldenable winfixwidth
         \ scrollbind | silent! setlocal cursorbind
+  " Clean up when codi is killed
   au BufWinLeave * if exists('b:codi_leave') | exe b:codi_leave | endif
 augroup END
 
-" Update codi buf on buf change
+" Actions on all windows
 augroup CODI_TARGET
   au!
+  " Update codi buf on buf change
   au TextChanged,TextChangedI * call s:codi_update()
-  if g:codi#autoclose
-    au QuitPre * call s:codi_end()
-  endif
+  " If g:codi#autoclose, call s:codi_kill() when the target quits
+  au QuitPre * call s:codi_autoclose()
 augroup END
 
 " Update the codi buf
@@ -64,7 +66,6 @@ function! s:codi_update()
   if !exists('b:codi_bufnr') | return | endif
 
   " Setup target buf
-  let b:codi_interpreting = 1
   let num_lines = line('$')
   let content = join(getline('^', '$'), "\n")
 
@@ -122,7 +123,7 @@ function! s:codi_update()
   exe cmd
 
   " Teardown codi buf
-  keepjumps normal! gg
+  keepjumps normal! G"_ddgg
   syncbind
   setlocal nomodifiable
 
@@ -131,13 +132,9 @@ function! s:codi_update()
   exe 'keepjumps '.top
   keepjumps normal! zt
   keepjumps call cursor(line, col)
-  unlet b:codi_interpreting
 endfunction
 
-function! s:codi_end()
-  " Bail if interpreting in progress
-  if exists('b:codi_interpreting') | return | endif
-
+function! s:codi_kill()
   " If we already have a codi instance for the buffer, kill it
   if exists('b:codi_bufnr')
     exe 'bdel '.b:codi_bufnr
@@ -145,7 +142,13 @@ function! s:codi_end()
   endif
 endfunction
 
-function! s:codi_start(filetype)
+function! s:codi_autoclose()
+  if g:codi#autoclose
+    call s:codi_kill()
+  endif
+endfunction
+
+function! s:codi_spawn(filetype)
   try
     let interpreter = s:codi_interpreters[
           \ get(s:codi_aliases, a:filetype, a:filetype)]
@@ -187,7 +190,7 @@ function! s:codi_start(filetype)
 
   if error | return | endif
 
-  call s:codi_end()
+  call s:codi_kill()
 
   " Adapted from:
   " https://github.com/tpope/vim-fugitive/blob/master/plugin/fugitive.vim#L1988
@@ -223,7 +226,7 @@ endfunction
 " Main function
 function! codi#run(bang, ...)
   if !empty(a:bang)
-    return s:codi_end()
+    call s:codi_kill()
   endif
 
   " Get filetype from arg if exists
@@ -234,5 +237,5 @@ function! codi#run(bang, ...)
     let filetype = &filetype
   endif
 
-  return s:codi_start(filetype)
+  call s:codi_spawn(filetype)
 endfunction
