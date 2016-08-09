@@ -96,10 +96,10 @@ function! s:codi_update()
   let content = join(getline('^', '$'), "\n")
 
   " Setup codi buf
-  exe 'buf '.b:codi_bufnr
+  exe 'keepjumps keepalt buf '.b:codi_bufnr
   setlocal modifiable
   silent! let codi_pos = getcurpos()
-  normal! gg_dG
+  keepjumps normal! gg_dG
 
   " Execute our code by:
   "   - Using script with environment variables to simulate a tty on
@@ -143,12 +143,12 @@ function! s:codi_update()
   exe cmd
 
   " Teardown codi buf
-  normal! gg_dd
+  keepjumps normal! gg_dd
   silent! call setpos('.', codi_pos)
   setlocal nomodifiable
 
   " Teardown target buf
-  buf #
+  keepjumps keepalt buf #
   silent! call setpos('.', pos)
   unlet b:codi_interpreting
 endfunction
@@ -245,7 +245,7 @@ function! codi#start(...)
 
   " Get to target buf position
   exe top
-  normal! zt
+  keepjumps normal! zt
   exe current
 
   " Return to target split
