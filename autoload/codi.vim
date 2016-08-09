@@ -23,9 +23,11 @@ endif
 if has("unix")
   let s:uname = system("uname -s")
   if s:uname =~ "Darwin" || s:uname =~ "BSD"
+    let s:bsd = 1
     let s:script_pre = 'script -q /dev/null '
     let s:script_post = ''
   else
+    let s:bsd = 0
     let s:script_pre = 'script -qfec "'
     let s:script_post = '" /dev/null'
   endif
@@ -52,7 +54,7 @@ let s:codi_interpreters = {
           \ },
       \ 'ruby': {
           \ 'bin': 'irb',
-          \ 'prompt': '^irb\([[:alnum:]]+\):[[:digit:]]{3,}:[[:digit:]]+. ',
+          \ 'prompt': '^irb\([_a-zA-Z0-9]+\):[0-9]+:[0-9]+. ',
           \ 'preprocess':
             \ 'sed "s/^=> //g"',
           \ },
@@ -89,14 +91,14 @@ function! s:codi_update()
 
   " Setup target buf
   let b:codi_interpreting = 1
-  let pos = getcurpos()
+  silent! let pos = getcurpos()
   let num_lines = line('$')
   let content = join(getline('^', '$'), "\n")
 
   " Setup codi buf
   exe 'buf '.b:codi_bufnr
   setlocal modifiable
-  let codi_pos = getcurpos()
+  silent! let codi_pos = getcurpos()
   normal! gg_dG
 
   " Execute our code by:
@@ -105,7 +107,8 @@ function! s:codi_update()
   "   - our shell-escaped EOL-terminated code as input,
   "     which is piped through...
   "   - tr, to remove those backspaces (^H) and carriage returns (^M)...
-  "   - tail, to get rid of the lines we input...
+  "   - if the system is bsd, use tail to get rid of inputted lines...
+  "   - if the system is not bsd, use awk to add line breaks...
   "   - any user-provided preprocess...
   "   - if raw isn't set...
   "     - awk, to only print the line right before a prompt...
@@ -115,9 +118,17 @@ function! s:codi_update()
   let cmd = 'read !'
         \.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
         \.' <<< '.shellescape(content."").' | sed "s/^\^D//"'
-        \.' | tr -d ""'
-        \.' | tail -n+'.(num_lines + 1)
-        \.' | '.get(i, 'preprocess', 'cat')
+        \.' | tr -d ""'
+
+  " If bsd, we need to get rid of inputted lines
+  if s:bsd
+    let cmd .= ' | tail -n+'.(num_lines + 1)
+  " If not bsd, we need to add line breaks
+  else
+    let cmd .= ' | awk "{gsub(/'.i['prompt'].'/, \"&\n\"); print}"'
+  endif
+
+  let cmd .= ' | '.get(i, 'preprocess', 'cat')
 
   " If the user wants raw, don't parse for prompt
   if !g:codi#raw
@@ -133,12 +144,12 @@ function! s:codi_update()
 
   " Teardown codi buf
   normal! gg_dd
-  call setpos('.', codi_pos)
+  silent! call setpos('.', codi_pos)
   setlocal nomodifiable
 
   " Teardown target buf
   buf #
-  call setpos('.', pos)
+  silent! call setpos('.', pos)
   unlet b:codi_interpreting
 endfunction
 
