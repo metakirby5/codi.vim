@@ -7,7 +7,7 @@ let s:codi_interpreters = {
       \ 'javascript': {
           \ 'bin': 'node',
           \ 'env': 'NODE_DISABLE_COLORS=1',
-          \ 'prompt': '^(>|\.\.\.) ',
+          \ 'prompt': '^(>|\.\.\.+) ',
           \ 'preprocess': 'sed "s/\[\(1G\|0J\|3G\)//g"',
           \ },
       \ 'haskell': {
