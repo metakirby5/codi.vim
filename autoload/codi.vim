@@ -45,7 +45,7 @@ augroup CODI
         \ nonu nornu nolist nomodeline nowrap
         \ nocursorline nocursorcolumn
         \ foldcolumn=0 nofoldenable winfixwidth
-        \ scrollbind | silent! setlocal cursorbind | syncbind
+        \ scrollbind | silent! setlocal cursorbind
   au BufWinLeave * if exists('b:codi_leave') | exe b:codi_leave | endif
 augroup END
 
@@ -70,11 +70,12 @@ function! s:codi_update()
   let num_lines = line('$')
   let content = join(getline('^', '$'), "\n")
 
+  " So we can syncbind later
+  keepjumps normal! gg
+
   " Setup codi buf
   exe 'keepjumps keepalt buf '.b:codi_bufnr
   setlocal modifiable
-  silent! let codi_pos = getcurpos()
-  keepjumps normal! gg_dG
 
   " Execute our code by:
   "   - Using script with environment variables to simulate a tty on
@@ -90,7 +91,7 @@ function! s:codi_update()
   "     - tail again, to remove the first blank line...
   "   - and read it all into the Codi buffer.
   let i = b:codi_interpreter
-  let cmd = 'read !'
+  let cmd = '1,$d _ | 0read !'
         \.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
         \.' <<< '.shellescape(content."", 1).' | sed "s/^\^D//"'
         \.' | tr -d ""'
@@ -118,8 +119,8 @@ function! s:codi_update()
   exe cmd
 
   " Teardown codi buf
-  keepjumps normal! gg_dd
-  silent! call setpos('.', codi_pos)
+  keepjumps normal! gg
+  syncbind
   setlocal nomodifiable
 
   " Teardown target buf
