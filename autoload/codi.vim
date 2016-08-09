@@ -117,7 +117,7 @@ function! s:codi_update()
   let i = b:codi_interpreter
   let cmd = 'read !'
         \.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
-        \.' <<< '.shellescape(content."").' | sed "s/^\^D//"'
+        \.' <<< '.shellescape(content."", 1).' | sed "s/^\^D//"'
         \.' | tr -d ""'
 
   " If bsd, we need to get rid of inputted lines
@@ -240,6 +240,7 @@ function! codi#start(...)
   " Spawn codi
   exe g:codi#width.'vnew'
   setlocal filetype=codi
+  exe 'setlocal syntax='.filetype
   let b:codi_leave = restore
   let b:codi_interpreter = interpreter
 
