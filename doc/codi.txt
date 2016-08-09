@@ -40,13 +40,13 @@ Most of these should come installed on any UNIX system:
 
 It doesn't matter whether you have BSD or Linux.
 
-Each interpreter also depends on its 'bin'; see |codi-interpreters-bin|.
+Each interpreter also depends on its bin; see |codi-interpreters-bin|.
 
 Default interpreter dependencies:
-             Python:    `python`
-             Javscript: `node`
-             Haskell:   `ghci`
-             Ruby:      `irb`
+             Python:    python
+             Javscript: node
+             Haskell:   ghci
+             Ruby:      irb
 
 ==============================================================================
 USAGE                                                             *codi-usage*
@@ -63,7 +63,7 @@ USAGE                                                             *codi-usage*
 
                                                                      *:Codi!!*
 :Codi!! {filetype}
-             If Codi is on, acts like |:Codi!|. Otherwise, acts like |Codi|.
+             If Codi is on, acts like `:Codi!`. Otherwise, acts like `Codi`.
 
 ==============================================================================
 CONFIGURATION                                             *codi-configuration*
@@ -90,9 +90,9 @@ g:codi#interpreters
 g:codi#aliases
              A dictionary of user-defined interpreter filetype aliases.
              This allows you to use an interpreter for more than one
-             filetype. For example, you can alias `javascript.jsx` to
-             `javascript` so the javascript interpreter (`node`) can be used
-             for the `javascript.jsx` filetype.
+             filetype. For example, you can alias "javascript.jsx" to
+             "javascript" so the javascript interpreter (node) can be used
+             for the "javascript.jsx" filetype.
 
              This will not overwrite the internal default aliases.
 >
@@ -129,29 +129,29 @@ Codi can be easily configured to use user-defined interpreters for langauges.
 There are four possible attributes for an interpreter:
 
                                                        *codi-interpreters-bin*
-'bin' (REQUIRED)
+bin (REQUIRED)
              Defines the command to use for the REPL backing the interpreter.
              For example, it would be "python" for python, "node" for
              javascript, and "irb" for ruby.
 
                                                     *codi-interpreters-prompt*
-'prompt' (REQUIRED)
+prompt (REQUIRED)
              An awk-style regex pattern that exactly matches the prompt of
-             'bin'. This will be used to correctly line up the output of 'bin'
+             bin. This will be used to correctly line up the output of bin
              with your buffer.
 
                                                        *codi-interpreters-env*
-'env' (OPTIONAL)
-             Any environment variables to set for 'bin'. The format is
+env (OPTIONAL)
+             Any environment variables to set for bin. The format is
              "VARIABLE=value", as if you were running a command with
              environment variables at the command line.
 
                                                 *codi-interpreters-preprocess*
-'preprocess' (OPTIONAL)
-             A command to pipe the output of 'bin' to, before it is formatted.
+preprocess (OPTIONAL)
+             A command to pipe the output of bin to, before it is formatted.
              Useful if escape codes need to be filtered out from running
-             'bin', or if the output is non-standard in any way. After piping
-             through 'preprocess', the output of 'bin' should look palatable.
+             bin, or if the output is non-standard in any way. After piping
+             through preprocess, the output of bin should look palatable.
 
                                                    *codi-interpreters-example*
 A full interpreter configuration for javascript is given below.
