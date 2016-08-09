@@ -38,7 +38,6 @@ let s:codi_interpreters = {
       \ 'python': {
           \ 'bin': 'python',
           \ 'prompt': '^(>>>|\.\.\.) ',
-          \ 'preprocess': 'head -n-1',
           \ },
       \ 'javascript': {
           \ 'bin': 'node',
