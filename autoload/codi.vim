@@ -62,6 +62,14 @@ let s:codi_interpreters = {
 " Load user-defined interpreters
 call extend(s:codi_interpreters, g:codi#interpreters)
 
+" Default aliases
+let s:codi_aliases = {
+      \ 'javascript.jsx': 'javascript',
+      \ }
+
+" Load user-defined interpreters
+call extend(s:codi_aliases, g:codi#aliases)
+
 " Actions on codi
 augroup CODI
   au!
@@ -166,7 +174,8 @@ endfunction
 
 function! s:codi_start(filetype)
   try
-    let interpreter = s:codi_interpreters[a:filetype]
+    let interpreter = s:codi_interpreters[
+          \ get(s:codi_aliases, a:filetype, a:filetype)]
   " If interpreter not found...
   catch E716
     if empty(a:filetype)

@@ -11,6 +11,13 @@ if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}
 endif
 
+" Interpreter aliases
+" Entries are in the form of
+"   <aliased filetype>: <filetype>
+if !exists('g:codi#aliases')
+  let g:codi#aliases = {}
+endif
+
 " Width of Codi split
 if !exists('g:codi#width')
   let g:codi#width = 40
