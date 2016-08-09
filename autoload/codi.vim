@@ -19,6 +19,10 @@ if !empty(s:missing_cmds)
   finish
 endif
 
+" Load resources
+let s:codi_interpreters = codi#defaults#interpreters()
+let s:codi_aliases = codi#defaults#aliases()
+
 " Detect what version of script to use based on OS
 if has("unix")
   let s:uname = system("uname -s")
@@ -32,43 +36,6 @@ if has("unix")
     let s:script_post = '" /dev/null'
   endif
 endif
-
-" Default interpreters
-let s:codi_interpreters = {
-      \ 'python': {
-          \ 'bin': 'python',
-          \ 'prompt': '^(>>>|\.\.\.) ',
-          \ },
-      \ 'javascript': {
-          \ 'bin': 'node',
-          \ 'env': 'NODE_DISABLE_COLORS=1',
-          \ 'prompt': '^(>|\.\.\.) ',
-          \ 'preprocess': 'sed "s/\[\(1G\|0J\|3G\)//g"',
-          \ },
-      \ 'haskell': {
-          \ 'bin': 'ghci',
-          \ 'prompt': '^Prelude> ',
-          \ 'preprocess':
-            \ 'sed "s/\(\[?1[hl]\|E\)//g" | tr "" "\n" | cut -c2-',
-          \ },
-      \ 'ruby': {
-          \ 'bin': 'irb',
-          \ 'prompt': '^irb\([_a-zA-Z0-9]+\):[0-9]+:[0-9]+. ',
-          \ 'preprocess':
-            \ 'sed "s/^=> //g"',
-          \ },
-      \ }
-
-" Load user-defined interpreters
-call extend(s:codi_interpreters, g:codi#interpreters)
-
-" Default aliases
-let s:codi_aliases = {
-      \ 'javascript.jsx': 'javascript',
-      \ }
-
-" Load user-defined interpreters
-call extend(s:codi_aliases, g:codi#aliases)
 
 " Actions on codi
 augroup CODI
@@ -254,8 +221,8 @@ function! codi#run(bang, ...)
   endif
 
   " Get filetype from arg if exists
-  if exists('a:2')
-    let filetype = a:2
+  if exists('a:1')
+    let filetype = a:1
     exe 'setlocal filetype='.filetype
   else
     let filetype = &filetype
