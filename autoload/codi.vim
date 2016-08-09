@@ -57,7 +57,7 @@ augroup END
 augroup CODI_TARGET
   au!
   " Update codi buf on buf change
-  au TextChanged,TextChangedI * silent! call s:codi_update()
+  au CursorHold,CursorHoldI * silent! call s:codi_update()
   " If g:codi#autoclose, call s:codi_kill() when the target quits
   au QuitPre * call s:codi_autoclose()
 augroup END
