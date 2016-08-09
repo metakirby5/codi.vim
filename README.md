@@ -46,3 +46,8 @@ Plug 'metakirby5/codi.vim'
   buffer is closed.
 - `g:codi#raw` is whether or not to display interpreter results without
   alignment formatting (useful for debugging).
+
+## Thanks to
+
+- [@DanielFGray](https://github.com/DanielFGray) and
+  [@purag](https://github.com/purag) for testing/feedback
