@@ -1,25 +1,154 @@
 *codi.txt*  A Numi-esque code interpreter.
+*codi*
+
+             .------------.~
+             |    .---.   |     .---.     .----.     ---.---~
+             |   /        |    /     \    |     \       |~
+             |  {         |   {       }   |      |      |~
+             |   \        |    \     /    |     /       |~
+             |    '---'   |     '---'     '----'     ---'---~
+             '------------'~
+              The interactive scratchpad for hackers.~
 
 Author:   Ethan Chan <metakirby5@gmail.com>
 License:  MIT
 
 ==============================================================================
-INTRODUCTION                                                   *codi-contents*
+TABLE OF CONTENTS                                              *codi-contents*
 
-TODO
+INTRODUCTION...............................................|codi-introduction|
+DEPENDENCIES...............................................|codi-dependencies|
+USAGE.............................................................|codi-usage|
+CONFIGURATION.............................................|codi-configuration|
+INTERPRETERS...............................................|codi-interpreters|
+
+==============================================================================
+INTRODUCTION                                               *codi-introduction*
+
+Codi is an interactive scratchpad for hackers, with a similar interface to
+Numi (https://numi.io). It opens a pane synchronized to your main buffer which
+displays the results of evaluating each line. It's extensible to nearly any
+language that provides an interactive interpreter (see |codi-interpreters|)!
+
+For more detail, check out the asciinema recording at https://ptpb.pw/t/~codi.
+
+==============================================================================
+DEPENDENCIES                                               *codi-dependencies*
+
+Most of these should come installed on any UNIX system:
+             script, cat, head, tail, tr, sed, awk
+
+It doesn't matter whether you have BSD or Linux.
 
 ==============================================================================
 USAGE                                                             *codi-usage*
 
-TODO
-- Define spec for user-defined interpreters
-- Document opts like interpreters, width, raw, etc.
-- Add a note about updatetime being used
-- Add a note saying after preprocess -> looks like normal
-- Add a note about dependencies (script)
-- Fix quitting codi on buf close
+                                                                       *:Codi*
+:Codi {filetype}
+             Activates Codi for the current buffer, using the interpreter
+             defined for {filetype}, or the buffer's filetype. if {filetype}
+             is not specified.
+
+                                                                      *:Codi!*
+:Codi!
+             Deactivates Codi for the current buffer.
+
+==============================================================================
+CONFIGURATION                                             *codi-configuration*
+
+                                                         *g:codi#interpreters*
+g:codi#interpreters
+             A dictionary of user-defined interpreters.
+             See |codi-interpreters| for the format specification.
+
+             This will not overwrite the internal default interpreters.
+>
+             let s:codi_interpreters = {
+                   \ 'javascript': {
+                       \ 'bin': 'node',
+                       \ 'env': 'NODE_DISABLE_COLORS=1',
+                       \ 'prompt': '^(>|\.\.\.) ',
+                       \ 'preprocess': 'sed "s/\[\(1G\|0J\|3G\)//g"',
+                       \ },
+                   \ }
+<
+             Default value is {}.
+
+                                                              *g:codi#aliases*
+g:codi#aliases
+             A dictionary of user-defined interpreter filetype aliases.
+             This allows you to use an interpreter for more than one
+             filetype. For example, you can alias `javascript.jsx` to
+             `javascript` so the javascript interpreter (`node`) can be used
+             for the `javascript.jsx` filetype.
+
+             This will not overwrite the internal default aliases.
+>
+             let s:codi_aliases = {
+                   \ 'javascript.jsx': 'javascript',
+                   \ }
+<
+             Default value is {}.
+
+                                                                *g:codi#width*
+g:codi#width
+             The width of the Codi split.
+
+             Default value is 40.
+
+                                                            *g:codi#autoclose*
+g:codi#autoclose
+             Whether or not to close Codi when the associated buffer is
+             closed.
+
+             Default value is 1.
+
+                                                                  *g:codi#raw*
+g:codi#raw
+             Whether or not to display interpreter results without
+             formatting each expression to align with the line numbers.
+             Useful if you are debugging a |codi-interpreters-preprocess|.
+
 
 ==============================================================================
 INTERPRETERS                                               *codi-interpreters*
 
-vim:tw=78:ts=8:ft=help:norl:
+Codi can be easily configured to use user-defined interpreters for langauges.
+There are four possible attributes for an interpreter:
+
+                                                       *codi-interpreters-bin*
+'bin' (REQUIRED)
+             Defines the command to use as the interpreter. For example, it
+             would be "python" for python, "node" for javascript, and "irb"
+             for ruby.
+
+                                                    *codi-interpreters-prompt*
+'prompt' (REQUIRED)
+             An awk-style regex pattern that exactly matches the prompt. This
+             will be used to correctly line up the output of 'bin' with your
+             buffer.
+
+                                                       *codi-interpreters-env*
+'env' (OPTIONAL)
+             Any environment variables to set for 'bin'. The format is
+             "VARIABLE=value", as if you were running a command with
+             environment variables at the command line.
+
+                                                *codi-interpreters-preprocess*
+'preprocess' (OPTIONAL)
+             A command to pipe the output of 'bin' to, before it is formatted.
+             Useful if escape codes need to be filtered out from running
+             'bin', or if the output is non-standard in any way. After piping
+             through 'preprocess', the output of 'bin' should look palatable.
+
+                                                   *codi-interpreters-example*
+A full interpreter configuration for javascript is given below.
+>
+             'javascript': {
+                 \ 'bin': 'node',
+                 \ 'env': 'NODE_DISABLE_COLORS=1',
+                 \ 'prompt': '^(>|\.\.\.) ',
+                 \ 'preprocess': 'sed "s/\[\(1G\|0J\|3G\)//g"',
+                 \ },
+<
+vim:ft=help:tw=78:norl:
