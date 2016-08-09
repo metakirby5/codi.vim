@@ -237,19 +237,19 @@ function! codi#start(...)
   let current = line('.')
 
   " Spawn codi
-  exe g:codi#width.'vnew'
+  exe 'keepjumps keepalt 'g:codi#width.'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.filetype
   let b:codi_leave = restore
   let b:codi_interpreter = interpreter
 
   " Get to target buf position
-  exe top
+  exe 'keepjumps '.top
   keepjumps normal! zt
-  exe current
+  exe 'keepjumps '.current
 
   " Return to target split
-  wincmd p
+  keepjumps keepalt wincmd p
   let b:codi_bufnr = bufnr('$')
   silent! call s:codi_update()
 endfunction
