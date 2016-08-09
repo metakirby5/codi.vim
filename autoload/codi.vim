@@ -147,7 +147,7 @@ function! s:codi_update()
   setlocal nomodifiable
 
   " Teardown target buf
-  keepjumps keepalt buf #
+  exe 'keepjumps keepalt buf '.b:codi_target_bufnr
   silent! call setpos('.', pos)
   unlet b:codi_interpreting
 endfunction
@@ -232,21 +232,13 @@ function! codi#start(...)
   setlocal scrollbind nowrap nofoldenable
   silent! setlocal cursorbind
 
-  " Save target buf position
-  let top = line('w0') + &scrolloff
-  let current = line('.')
-
   " Spawn codi
   exe 'keepjumps keepalt 'g:codi#width.'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.filetype
+  let b:codi_target_bufnr = bufnr
   let b:codi_leave = restore
   let b:codi_interpreter = interpreter
-
-  " Get to target buf position
-  exe 'keepjumps '.top
-  keepjumps normal! zt
-  exe 'keepjumps '.current
 
   " Return to target split
   keepjumps keepalt wincmd p
