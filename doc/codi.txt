@@ -1,6 +1,4 @@
-*codi.txt*  A Numi-esque code interpreter.
-*codi*
-
+                                                                        *codi*
              .------------.~
              |    .---.   |    .---.     .----.     ---.---~
              |   /        |   /     \    |     \       |~
