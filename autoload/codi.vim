@@ -12,7 +12,7 @@ for bin in ['script', 'awk', 'uname']
 endfor
 if !empty(s:missing_cmds)
   function! codi#start(...)
-    call s:err(
+    return s:err(
           \ 'Codi requires these misssing commands: '
           \.join(s:missing_cmds, ', ').'.')
   endfunction
@@ -25,6 +25,7 @@ let s:sh_cat = "awk '{ print }'"
 " Load resources
 let s:codi_interpreters = codi#load#interpreters()
 let s:codi_aliases = codi#load#aliases()
+let s:codi_updating = 0
 
 " Detect what version of script to use based on OS
 if has("unix")
@@ -45,7 +46,7 @@ augroup CODI
   au!
   " Local options
   au FileType codi setlocal
-        \ buftype=nofile bufhidden=delete nobuflisted
+        \ buftype=nofile bufhidden=hide nobuflisted
         \ nomodifiable nomodified
         \ nonu nornu nolist nomodeline nowrap
         \ statusline=\  nocursorline nocursorcolumn
@@ -55,7 +56,8 @@ augroup CODI
         \ | silent! setlocal cursorbind
   au FileType codi exe 'setlocal textwidth='.g:codi#width
   " Clean up when codi is killed
-  au BufWinLeave * if exists('b:codi_leave') | exe b:codi_leave | endif
+  au BufWinLeave *
+        \ if exists('b:codi_leave') | silent! exe b:codi_leave | endif
 augroup END
 
 " Actions on all windows
@@ -63,14 +65,55 @@ augroup CODI_TARGET
   au!
   " Update codi buf on buf change
   au CursorHold,CursorHoldI * silent! call s:codi_update()
-  " If g:codi#autoclose, call s:codi_kill() when the target quits
-  au QuitPre * call s:codi_autoclose()
+
+  " === g:codi#autoclose ===
+  " Hide on buffer leave
+  au BufWinLeave * silent! call s:codi_hide()
+  " Show on buffer return
+  au BufWinEnter * silent! call s:codi_show()
+  " Kill on target quit
+  au QuitPre * silent! call s:codi_autoclose()
 augroup END
+
+function! s:codi_toggle(filetype)
+  if exists('b:codi_bufnr')
+    return s:codi_kill()
+  else
+    return s:codi_spawn(a:filetype)
+  endif
+endfunction
+
+function! s:codi_hide()
+  if g:codi#autoclose && exists('b:codi_bufnr') && !s:codi_updating
+    silent! exe bufwinnr(b:codi_bufnr).'close'
+  endif
+endfunction
+
+function! s:codi_show()
+  if g:codi#autoclose && exists('b:codi_bufnr')
+    return s:codi_spawn(&filetype)
+  endif
+endfunction
+
+function! s:codi_autoclose()
+  if g:codi#autoclose
+    return s:codi_kill()
+  endif
+endfunction
+
+function! s:codi_kill()
+  " If we already have a codi instance for the buffer, kill it
+  if exists('b:codi_bufnr')
+    exe 'keepjumps keepalt bdel '.b:codi_bufnr
+    unlet b:codi_bufnr
+  endif
+endfunction
 
 " Update the codi buf
 function! s:codi_update()
   " Bail if no codi buf to act on
   if !exists('b:codi_bufnr') | return | endif
+  let s:codi_updating = 1
 
   " Setup target buf
   let num_lines = line('$')
@@ -141,28 +184,7 @@ function! s:codi_update()
   exe 'keepjumps '.top
   keepjumps normal! zt
   keepjumps call cursor(line, col)
-endfunction
-
-function! s:codi_autoclose()
-  if g:codi#autoclose
-    call s:codi_kill()
-  endif
-endfunction
-
-function! s:codi_toggle(filetype)
-  if exists('b:codi_bufnr')
-    return s:codi_kill()
-  else
-    return s:codi_spawn(a:filetype)
-  endif
-endfunction
-
-function! s:codi_kill()
-  " If we already have a codi instance for the buffer, kill it
-  if exists('b:codi_bufnr')
-    exe 'bdel '.b:codi_bufnr
-    unlet b:codi_bufnr
-  endif
+  let s:codi_updating = 0
 endfunction
 
 function! s:codi_spawn(filetype)
@@ -172,11 +194,10 @@ function! s:codi_spawn(filetype)
   " If interpreter not found...
   catch E716
     if empty(a:filetype)
-      call s:err('Cannot run Codi with empty filetype.')
+      return s:err('Cannot run Codi with empty filetype.')
     else
-      call s:err('No Codi interpreter for '.a:filetype.'.')
+      return s:err('No Codi interpreter for '.a:filetype.'.')
     endif
-    return
   endtry
 
   " Error checking
@@ -228,7 +249,9 @@ function! s:codi_spawn(filetype)
 
   " Restore target buf options on codi close
   let bufnr = bufnr('%')
-  let restore = 'bdel | buf '.bufnr.' | unlet b:codi_bufnr'
+  let restore = 'keepjumps keepalt bdel'
+        \.' | keepjumps keepalt buf '.bufnr
+        \.' | unlet b:codi_bufnr'
   for opt in ['scrollbind', 'cursorbind', 'wrap', 'foldenable']
     if exists('&'.opt)
       exe 'let val = &'.opt
@@ -251,7 +274,7 @@ function! s:codi_spawn(filetype)
   " Return to target split
   keepjumps keepalt wincmd p
   let b:codi_bufnr = bufnr('$')
-  silent! call s:codi_update()
+  silent! return s:codi_update()
 endfunction
 
 " Main function
