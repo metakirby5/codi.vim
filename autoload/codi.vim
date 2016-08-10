@@ -42,7 +42,8 @@ augroup CODI
   au!
   " Local options
   au FileType codi setlocal
-        \ buftype=nofile nomodifiable nomodified
+        \ buftype=nofile bufhidden=delete nobuflisted
+        \ nomodifiable nomodified
         \ nonu nornu nolist nomodeline nowrap
         \ statusline=\  nocursorline nocursorcolumn
         \ foldcolumn=0 nofoldenable winfixwidth
