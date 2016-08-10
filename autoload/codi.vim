@@ -19,6 +19,9 @@ if !empty(s:missing_cmds)
   finish
 endif
 
+" Command aliases
+let s:sh_cat = "awk '{ print }'"
+
 " Load resources
 let s:codi_interpreters = codi#load#interpreters()
 let s:codi_aliases = codi#load#aliases()
@@ -99,8 +102,8 @@ function! s:codi_update()
   "   - and read it all into the Codi buffer.
   let i = b:codi_interpreter
   let cmd = '1,$d _ | 0read !'
-        \.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
-        \.' <<< '.shellescape(content, 1)
+        \.get(i, 'rephrase', s:sh_cat).' <<< '.shellescape(content, 1)
+        \.' | '.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
         \.' | awk "{ gsub(//, \"\"); print }"'
 
   " If bsd, we need to get rid of inputted lines
@@ -111,7 +114,7 @@ function! s:codi_update()
     let cmd .= ' | awk "{ gsub(/'.i['prompt'].'/, \"&\n\"); print }"'
   endif
 
-  let cmd .= ' | '.get(i, 'preprocess', 'awk "{ print }"')
+  let cmd .= ' | '.get(i, 'preprocess', s:sh_cat)
 
   " If the user wants raw, don't parse for prompt
   if !g:codi#raw
@@ -199,6 +202,20 @@ function! s:codi_spawn(filetype)
     call s:err(
           \ interpreter_str.' requires this missing command: '
           \.interpreter['bin'])
+    let error = 1
+  endif
+
+  " Check if deps present
+  let s:missing_deps = []
+  for bin in get(interpreter, 'deps', [])
+    if executable(bin) != 1
+      call add(s:missing_deps, bin)
+    endif
+  endfor
+  if !empty(s:missing_deps)
+    call s:err(
+          \ interpreter_str.' requires these misssing commands: '
+          \.join(s:missing_deps, ', ').'.')
     let error = 1
   endif
 
