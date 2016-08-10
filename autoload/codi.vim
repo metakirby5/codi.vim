@@ -94,6 +94,7 @@ function! s:codi_update()
   "   - any user-provided preprocess...
   "   - if raw isn't set...
   "     - awk, to only print the line right before a prompt...
+  "     (searches for lines where the first character is not a space)
   "     - tail again, to remove the first blank line...
   "   - and read it all into the Codi buffer.
   let i = b:codi_interpreter
@@ -118,7 +119,7 @@ function! s:codi_update()
             \.'if (/'.i['prompt'].'/)'
               \.'{ print taken; taken = \"\" }'
             \.'else'
-              \.'{ if (\$0) { taken = \$0 } }'
+              \.'{ if (/^[^ \t\n\x0B\f\r]/) { taken = \$0 } }'
           \.'}" | tail -n+2'
   endif
 
