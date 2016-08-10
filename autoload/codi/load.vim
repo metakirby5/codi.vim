@@ -8,7 +8,7 @@ let s:codi_default_interpreters = {
           \ 'bin': 'node',
           \ 'deps': ['sed'],
           \ 'env': 'NODE_DISABLE_COLORS=1',
-          \ 'prompt': '^(>|\.{3,}) ',
+          \ 'prompt': '^(>|\.\.\.+) ',
           \ 'preprocess': 'sed "s/...//g"',
           \ },
       \ 'haskell': {
