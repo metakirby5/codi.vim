@@ -53,6 +53,7 @@ Each default interpreter also depends on its REPL and other commands:
 - `g:codi#aliases` is a list of user-defined interpreter filetype aliases.
   See the [documentation](doc/codi.txt) for more information.
 - `g:codi#width` is the width of the Codi split.
+- `g:codi#rightsplit` is whether or not Codi spawns on the right side.
 - `g:codi#rightalign` is whether or not to right-align the Codi buffer.
 - `g:codi#autoclose` is whether or not to close Codi when the associated
   buffer is closed.
@@ -62,4 +63,4 @@ Each default interpreter also depends on its REPL and other commands:
 ## Thanks to
 
 - [@DanielFGray](https://github.com/DanielFGray) and
-  [@purag](https://github.com/purag) for testing/feedback
+  [@purag](https://github.com/purag) for testing, feedback, and suggestions
