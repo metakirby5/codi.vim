@@ -98,7 +98,12 @@ endfunction
 
 function! s:codi_hide()
   if g:codi#autoclose && exists('b:codi_bufnr') && !s:updating
-    silent! exe bufwinnr(b:codi_bufnr).'close'
+    let codi_win = bufwinnr(b:codi_bufnr)
+    if codi_win != -1
+      " Remember width for when we respawn
+      let b:codi_width = winwidth(codi_win)
+      exe codi_win.'close'
+    endif
   endif
 endfunction
 
@@ -258,7 +263,8 @@ function! s:codi_spawn(filetype)
 
   " Spawn codi
   exe 'keepjumps keepalt '
-        \.(g:codi#rightsplit ? '' : ' leftabove ').g:codi#width.'vnew'
+        \.(g:codi#rightsplit ? '' : ' leftabove ')
+        \.(exists('b:codi_width') ? b:codi_width : g:codi#width).'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
