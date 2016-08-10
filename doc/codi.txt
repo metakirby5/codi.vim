@@ -10,6 +10,7 @@
 
 Author:   Ethan Chan <metakirby5@gmail.com>
 License:  MIT
+Repo:     https://github.com/metakirby5/codi.vim
 
 ==============================================================================
 TABLE OF CONTENTS                                              *codi-contents*

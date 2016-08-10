@@ -28,6 +28,17 @@ For example, if you're using `vim-plug`, add the following line to `~/.vimrc`:
 Plug 'metakirby5/codi.vim'
 ```
 
+### Dependencies
+
+script, cat, head, tail, tr, sed, awk
+
+Each default interpreter also depends on its REPL:
+
+  - Python:    `python`
+  - Javscript: `node`
+  - Haskell:   `ghci`
+  - Ruby:      `irb`
+
 ## Usage
 
 - `Codi [filetype]` activates Codi for the current buffer, using the provided
