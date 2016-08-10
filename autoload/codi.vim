@@ -44,14 +44,12 @@ augroup CODI
   au FileType codi setlocal
         \ buftype=nofile nomodifiable nomodified
         \ nonu nornu nolist nomodeline nowrap
-        \ nocursorline nocursorcolumn
+        \ statusline=\  nocursorline nocursorcolumn
         \ foldcolumn=0 nofoldenable winfixwidth
         \ scrollbind
         \ | noremap <buffer> q <esc>:q<cr>
         \ | silent! setlocal cursorbind
   au FileType codi exe 'setlocal textwidth='.g:codi#width
-  au FileType codi exe 'setlocal statusline='
-        \.(g:codi#rightalign ? '%=' : '').'codi'
   " Clean up when codi is killed
   au BufWinLeave * if exists('b:codi_leave') | exe b:codi_leave | endif
 augroup END
