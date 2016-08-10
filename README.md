@@ -4,6 +4,9 @@ The interactive scratchpad for hackers.
 
 ![Codi Screenshot](https://ptpb.pw/~codi-simple.png)
 
+*Using Codi as a Python scratchpad through the
+[shell wrapper](#shell-wrapper)*
+
 Codi is an interactive scratchpad for hackers, with a similar interface to
 Numi (https://numi.io). It opens a pane synchronized to your main buffer which
 displays the results of evaluating each line *as you type*. It's extensible to
@@ -45,6 +48,25 @@ Each default interpreter also depends on its REPL and other commands:
   filetype or the buffer's filetype.
 - `Codi!` deactivates Codi for the current buffer.
 - `Codi!! [filetype]` toggles Codi for the current buffer.
+
+### Shell wrapper
+
+A nice way to use Codi is through a shell wrapper that you can stick in your
+~/.bashrc:
+
+```sh
+# Codi
+# Usage: codi [filetype] [filename]
+codi() {
+  vim $2 -c \
+    "let g:startify_disable_at_vimenter = 1 |\
+    set laststatus=0 |\
+    hi ColorColumn ctermbg=NONE |\
+    hi VertSplit ctermbg=NONE |\
+    hi NonText ctermfg=0 |\
+    Codi ${1:-python}"
+}
+``````
 
 ### Options
 

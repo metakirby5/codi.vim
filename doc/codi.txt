@@ -61,6 +61,23 @@ USAGE                                                             *codi-usage*
 :Codi!! {filetype}
              Toggles Codi for the current buffer.
 
+SHELL WRAPPER~
+
+             A nice way to use Codi is through a shell wrapper that you can
+             stick in your ~/.bashrc:
+>
+             # Codi
+             # Usage: codi [filetype] [filename]
+             codi() {
+               vim $2 -c \
+                 "let g:startify_disable_at_vimenter = 1 |\
+                 set laststatus=0 |\
+                 hi ColorColumn ctermbg=NONE |\
+                 hi VertSplit ctermbg=NONE |\
+                 hi NonText ctermfg=0 |\
+                 Codi ${1:-python}"
+             }
+<
 ==============================================================================
 CONFIGURATION                                             *codi-configuration*
 
@@ -155,7 +172,6 @@ A full interpreter configuration for Javascript is given below.
                \ 'preprocess': 'sed "s/...//g"',
                \ },
 <
-
 POSSIBLE ATTRIBUTES~
 
                                                        *codi-interpreters-bin*
