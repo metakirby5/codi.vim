@@ -2,7 +2,7 @@
 
 The interactive scratchpad for hackers.
 
-![Codi Screenshot](https://ptpb.pw/~codi-img.png)
+![Codi Screenshot](https://ptpb.pw/~codi-png)
 
 Codi is an interactive scratchpad for hackers, with a similar interface to
 Numi (https://numi.io). It opens a pane synchronized to your main buffer which
