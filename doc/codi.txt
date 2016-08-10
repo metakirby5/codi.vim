@@ -40,9 +40,9 @@ Each interpreter also depends on its bin; see |codi-interpreters-bin|.
 
 Default interpreter dependencies:
              Python:    python
-             Javscript: node
-             Haskell:   ghci
-             Ruby:      irb
+             Javscript: node, sed
+             Haskell:   ghci, sed, tr, cut
+             Ruby:      irb, sed
 
 ==============================================================================
 USAGE                                                             *codi-usage*

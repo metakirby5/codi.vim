@@ -32,12 +32,12 @@ Plug 'metakirby5/codi.vim'
 
 Command line utilities (BSD and Linux are both fine): script, awk, uname
 
-Each default interpreter also depends on its REPL:
+Each default interpreter also depends on its REPL and other commands:
 
   - Python:    `python`
-  - Javscript: `node`
-  - Haskell:   `ghci`
-  - Ruby:      `irb`
+  - Javscript: `node`, `sed`
+  - Haskell:   `ghci`, `sed`, `tr`, `cut`
+  - Ruby:      `irb`, `sed`
 
 ## Usage
 
