@@ -22,7 +22,7 @@ Use your favorite package manager (
 [pathogen.vim](https://github.com/tpope/vim-pathogen)
 ), or add this directory to your Vim runtime path.
 
-For example, if you're using `vim-plug`, add the following line to `~/.vimrc`:
+For example, if you're using vim-plug, add the following line to `~/.vimrc`:
 
 ```
 Plug 'metakirby5/codi.vim'
