@@ -145,7 +145,7 @@ function! s:codi_update()
   "   - and read it all into the Codi buffer.
   let i = b:codi_interpreter
   let cmd = '1,$d _ | 0read !'
-        \.get(i, 'rephrase', s:sh_cat).' <<< '.shellescape(content, 1)
+        \.get(i, 'rephrase', s:sh_cat).' <<< '.shellescape(content."", 1)
         \.' | '.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
         \.' | awk "{ gsub(/^\^D||/, \"\"); print }"'
 
