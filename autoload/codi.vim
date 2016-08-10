@@ -22,13 +22,13 @@ function! s:all(predicate, required, ...)
 endfunction
 
 " Check for missing commands
-let s:codi_missing_deps = s:all(function('executable'),
+let s:missing_deps = s:all(function('executable'),
       \ ['script', 'awk', 'uname'])
-if len(s:codi_missing_deps)
+if len(s:missing_deps)
   function! codi#run(...)
     return s:err(
           \ 'Codi requires these misssing commands: '
-          \.join(s:codi_missing_deps, ', ').'.')
+          \.join(s:missing_deps, ', ').'.')
   endfunction
   finish
 endif
@@ -37,9 +37,9 @@ endif
 let s:sh_cat = "awk '{ print }'"
 
 " Load resources
-let s:codi_interpreters = codi#load#interpreters()
-let s:codi_aliases = codi#load#aliases()
-let s:codi_updating = 0
+let s:interpreters = codi#load#interpreters()
+let s:aliases = codi#load#aliases()
+let s:updating = 0
 
 " Detect what version of script to use based on OS
 if has("unix")
@@ -97,7 +97,7 @@ function! s:codi_toggle(filetype)
 endfunction
 
 function! s:codi_hide()
-  if g:codi#autoclose && exists('b:codi_bufnr') && !s:codi_updating
+  if g:codi#autoclose && exists('b:codi_bufnr') && !s:updating
     silent! exe bufwinnr(b:codi_bufnr).'close'
   endif
 endfunction
@@ -126,7 +126,7 @@ endfunction
 function! s:codi_update()
   " Bail if no codi buf to act on
   if !exists('b:codi_bufnr') | return | endif
-  let s:codi_updating = 1
+  let s:updating = 1
   let codi_winwidth = winwidth(bufwinnr(b:codi_bufnr))
 
   " Setup target buf
@@ -199,14 +199,14 @@ function! s:codi_update()
   exe 'keepjumps '.top
   keepjumps normal! zt
   keepjumps call cursor(line, col)
-  let s:codi_updating = 0
+  let s:updating = 0
 endfunction
 
 function! s:codi_spawn(filetype)
   try
     " Requires s: scope because of FP issues
-    let s:codi_interpreter = s:codi_interpreters[
-          \ get(s:codi_aliases, a:filetype, a:filetype)]
+    let s:interpreter = s:interpreters[
+          \ get(s:aliases, a:filetype, a:filetype)]
   " If interpreter not found...
   catch E716
     if empty(a:filetype)
@@ -221,7 +221,7 @@ function! s:codi_spawn(filetype)
 
   " Check if required keys present
   function! s:interpreter_has_key(key)
-    return has_key(s:codi_interpreter, a:key)
+    return has_key(s:interpreter, a:key)
   endfunction
   if len(s:all(function('s:interpreter_has_key'),
         \ ['bin', 'prompt'],
@@ -230,8 +230,8 @@ function! s:codi_spawn(filetype)
 
   " Check if deps present
   if len(s:all(function('executable'), []
-          \+[s:codi_interpreter['bin']]
-          \+get(s:codi_interpreter, 'deps', [])
+          \+[s:interpreter['bin']]
+          \+get(s:interpreter, 'deps', [])
           \, interpreter_str.' requires these missing commands'))
           \| return | endif
 
@@ -263,7 +263,7 @@ function! s:codi_spawn(filetype)
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
   let b:codi_leave = restore
-  let b:codi_interpreter = s:codi_interpreter
+  let b:codi_interpreter = s:interpreter
 
   " Return to target split
   keepjumps keepalt wincmd p
