@@ -93,7 +93,7 @@ g:codi#interpreters
                        \ 'bin': 'node',
                        \ 'deps': ['sed'],
                        \ 'env': 'NODE_DISABLE_COLORS=1',
-                       \ 'prompt': '^(\^D|)*(>|\.{3,}) ',
+                       \ 'prompt': '^(>|\.\.\.+) ',
                        \ 'rephrase':
                          \ 'sed "s/^\s*\(var\|let\)\s*\(\w\+\)\s*'
                          \.'=[^{]*$/&; \2/"',
@@ -165,7 +165,7 @@ A full interpreter configuration for Javascript is given below.
                \ 'bin': 'node',
                \ 'deps': ['sed'],
                \ 'env': 'NODE_DISABLE_COLORS=1',
-               \ 'prompt': '^(\^D|)*(>|\.{3,}) ',
+               \ 'prompt': '^(>|\.\.\.+) ',
                \ 'rephrase':
                  \ 'sed "s/^\s*\(var\|let\)\s*\(\w\+\)\s*'
                  \.'=[^{]*$/&; \2/"',
