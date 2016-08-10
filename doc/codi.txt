@@ -34,10 +34,7 @@ Watch a screencast at https://ptpb.pw/t/~codi!
 ==============================================================================
 DEPENDENCIES                                               *codi-dependencies*
 
-Most of these should come installed on any UNIX system:
-             script, cat, head, tail, tr, sed, awk
-
-It doesn't matter whether you have BSD or Linux.
+Command line utilities (BSD and Linux are both fine): script, awk
 
 Each interpreter also depends on its bin; see |codi-interpreters-bin|.
 

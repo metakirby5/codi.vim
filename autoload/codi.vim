@@ -5,7 +5,7 @@ endfunction
 
 " Check for missing commands
 let s:missing_cmds = []
-for bin in ['script', 'cat', 'head', 'tail', 'tr', 'sed', 'awk']
+for bin in ['script', 'awk']
   if executable(bin) != 1
     call add(s:missing_cmds, bin)
   endif
@@ -90,39 +90,37 @@ function! s:codi_update()
   "     the interpreter, which will take...
   "   - our shell-escaped EOL-terminated code as input,
   "     which is piped through...
-  "   - tr, to remove those backspaces (^H) and carriage returns (^M)...
-  "   - if the system is bsd, use tail to get rid of inputted lines...
+  "   - awk, to remove those backspaces (^H) and carriage returns (^M)...
+  "   - if the system is bsd, use awk to get rid of inputted lines...
   "   - if the system is not bsd, use awk to add line breaks...
   "   - any user-provided preprocess...
-  "   - if raw isn't set...
-  "     - awk, to only print the line right before a prompt...
+  "   - if raw isn't set, awk to only print the line right before a prompt...
   "     (searches for lines where the first character is not a space)
-  "     - tail again, to remove the first blank line...
   "   - and read it all into the Codi buffer.
   let i = b:codi_interpreter
   let cmd = '1,$d _ | 0read !'
         \.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
-        \.' <<< '.shellescape(content."", 1).' | sed "s/^\^D//"'
-        \.' | tr -d ""'
+        \.' <<< '.shellescape(content, 1)
+        \.' | awk "{ gsub(//, \"\"); print }"'
 
   " If bsd, we need to get rid of inputted lines
   if s:bsd
-    let cmd .= ' | tail -n+'.(num_lines + 1)
+    let cmd .= ' | awk "NR > '.num_lines.' { print }"'
   " If not bsd, we need to add line breaks
   else
-    let cmd .= ' | awk "{gsub(/'.i['prompt'].'/, \"&\n\"); print}"'
+    let cmd .= ' | awk "{ gsub(/'.i['prompt'].'/, \"&\n\"); print }"'
   endif
 
-  let cmd .= ' | '.get(i, 'preprocess', 'cat')
+  let cmd .= ' | '.get(i, 'preprocess', 'awk "{ print }"')
 
   " If the user wants raw, don't parse for prompt
   if !g:codi#raw
     let cmd .= ' | awk "{'
             \.'if (/'.i['prompt'].'/)'
-              \.'{ print taken; taken = \"\" }'
+              \.'{ if (x) { print taken; taken = \"\" } else { x = 1 } }'
             \.'else'
               \.'{ if (/^[^ \t\n\x0B\f\r]/) { taken = \$0 } }'
-          \.'}" | tail -n+2'
+          \.'}"'
   endif
 
   exe cmd
@@ -217,7 +215,7 @@ function! s:codi_spawn(filetype)
   for opt in ['scrollbind', 'cursorbind', 'wrap', 'foldenable']
     if exists('&'.opt)
       exe 'let val = &'.opt
-      let restore .= '|let &'.opt.'='.val.''
+      let restore .= '| let &'.opt.'='.val.''
     endif
   endfor
 
