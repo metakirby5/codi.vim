@@ -52,7 +52,7 @@ augroup CODI
         \ statusline=\  nocursorline nocursorcolumn
         \ foldcolumn=0 nofoldenable winfixwidth
         \ scrollbind
-        \ | noremap <buffer> q <esc>:q<cr>
+        \ | noremap <buffer> <silent> q <esc>:q<cr>
         \ | silent! setlocal cursorbind
   au FileType codi exe 'setlocal textwidth='.g:codi#width
   " Clean up when codi is killed
@@ -165,7 +165,7 @@ function! s:codi_update()
             \.'if (/'.i['prompt'].'/)'
               \.'{ if (x) { print taken; taken = \"\" } else { x = 1 } }'
             \.'else'
-              \.'{ if (/^[^ \t\n\x0B\f\r]/) { taken = \$0 } }'
+              \.'{ if (x && /^[^ \t\n\x0B\f\r]/) { taken = \$0 } }'
           \.'}"'
   endif
 
