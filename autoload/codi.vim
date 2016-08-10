@@ -49,6 +49,9 @@ augroup CODI
         \ scrollbind
         \ | noremap <buffer> q <esc>:q<cr>
         \ | silent! setlocal cursorbind
+  au FileType codi exe 'setlocal textwidth='.g:codi#width
+  au FileType codi exe 'setlocal statusline='
+        \.(g:codi#rightalign ? '%=' : '').'codi'
   " Clean up when codi is killed
   au BufWinLeave * if exists('b:codi_leave') | exe b:codi_leave | endif
 augroup END
@@ -124,6 +127,9 @@ function! s:codi_update()
   endif
 
   exe cmd
+  if g:codi#rightalign
+    1,$right
+  endif
 
   " Teardown codi buf
   keepjumps normal! G"_ddgg

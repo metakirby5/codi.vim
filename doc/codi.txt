@@ -106,6 +106,12 @@ g:codi#width
 
              Default value is 40.
 
+                                                           *g:codi#rightalign*
+g:codi#rightalign
+             Whether or not to right-align the Codi buffer.
+
+             Default value is 1.
+
                                                             *g:codi#autoclose*
 g:codi#autoclose
              Whether or not to close Codi when the associated buffer is

@@ -32,6 +32,11 @@ if !exists('g:codi#width')
   let g:codi#width = 40
 endif
 
+" Right-align?
+if !exists('g:codi#rightalign')
+  let g:codi#rightalign = 1
+endif
+
 " Close codi on target buffer close?
 if !exists('g:codi#autoclose')
   let g:codi#autoclose = 1

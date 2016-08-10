@@ -42,6 +42,7 @@ Plug 'metakirby5/codi.vim'
 - `g:codi#aliases` is a list of user-defined interpreter filetype aliases.
   See the [documentation](doc/codi.txt) for more information.
 - `g:codi#width` is the width of the Codi split.
+- `g:codi#rightalign` is whether or not to right-align the Codi buffer.
 - `g:codi#autoclose` is whether or not to close Codi when the associated
   buffer is closed.
 - `g:codi#raw` is whether or not to display interpreter results without
