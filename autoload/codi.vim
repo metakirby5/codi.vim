@@ -264,7 +264,8 @@ function! s:codi_spawn(filetype)
   silent! setlocal cursorbind
 
   " Spawn codi
-  exe 'keepjumps keepalt '.g:codi#width.'vnew'
+  exe 'keepjumps keepalt '
+        \.(g:codi#rightsplit ? '' : ' leftabove ').g:codi#width.'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr

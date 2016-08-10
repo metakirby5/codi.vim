@@ -32,6 +32,11 @@ if !exists('g:codi#width')
   let g:codi#width = 40
 endif
 
+" Split on right?
+if !exists('g:codi#rightsplit')
+  let g:codi#rightsplit = 1
+endif
+
 " Right-align?
 if !exists('g:codi#rightalign')
   let g:codi#rightalign = 1

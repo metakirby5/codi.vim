@@ -108,6 +108,13 @@ g:codi#width
 
              Default value is 40.
 
+                                                           *g:codi#rightsplit*
+g:codi#rightsplit
+             Whether or not to spawn Codi on the right side of the current
+             buffer.
+
+             Default value is 1.
+
                                                            *g:codi#rightalign*
 g:codi#rightalign
              Whether or not to right-align the Codi buffer.
@@ -127,6 +134,7 @@ g:codi#raw
              formatting each expression to align with the line numbers.
              Useful if you are debugging a |codi-interpreters-preprocess|.
 
+             Default value is 0.
 
 ==============================================================================
 INTERPRETERS                                               *codi-interpreters*
