@@ -3,18 +3,32 @@ function! s:err(msg)
   echohl ErrorMsg | echom a:msg | echohl None
 endfunction
 
-" Check for missing commands
-let s:missing_cmds = []
-for bin in ['script', 'awk', 'uname']
-  if executable(bin) != 1
-    call add(s:missing_cmds, bin)
+" Returns the array of items not satisfying a:predicate.
+" Optional error printed in the format of
+" [msg]: [items].
+function! s:all(predicate, required, ...)
+  let s:missing = []
+  for bin in a:required
+    if a:predicate(bin) != 1
+      call add(s:missing, bin)
+    endif
+  endfor
+  if len(s:missing)
+    if a:0
+      call s:err(a:1.': '.join(s:missing, ', ').'.')
+    endif
   endif
-endfor
-if !empty(s:missing_cmds)
-  function! codi#start(...)
+  return s:missing
+endfunction
+
+" Check for missing commands
+let s:codi_missing_deps = s:all(function('executable'),
+      \ ['script', 'awk', 'uname'])
+if len(s:codi_missing_deps)
+  function! codi#run(...)
     return s:err(
           \ 'Codi requires these misssing commands: '
-          \.join(s:missing_cmds, ', ').'.')
+          \.join(s:codi_missing_deps, ', ').'.')
   endfunction
   finish
 endif
@@ -190,7 +204,8 @@ endfunction
 
 function! s:codi_spawn(filetype)
   try
-    let interpreter = s:codi_interpreters[
+    " Requires s: scope because of FP issues
+    let s:codi_interpreter = s:codi_interpreters[
           \ get(s:codi_aliases, a:filetype, a:filetype)]
   " If interpreter not found...
   catch E716
@@ -203,45 +218,22 @@ function! s:codi_spawn(filetype)
 
   " Error checking
   let interpreter_str = 'Codi interpreter for '.a:filetype
-  let error = 0
 
   " Check if required keys present
-  let missing_keys = []
-  for key in ['bin', 'prompt']
-    if !has_key(interpreter, key)
-      call add(missing_keys, key)
-    endif
-  endfor
-  if !empty(missing_keys)
-    call s:err(
-          \ interpreter_str.' requires these missing keys: '
-          \.join(missing_keys, ', '))
-    let error = 1
-  endif
-
-  " Check if bin present
-  if has_key(interpreter, 'bin') && executable(interpreter['bin']) != 1
-    call s:err(
-          \ interpreter_str.' requires this missing command: '
-          \.interpreter['bin'])
-    let error = 1
-  endif
+  function! s:interpreter_has_key(key)
+    return has_key(s:codi_interpreter, a:key)
+  endfunction
+  if len(s:all(function('s:interpreter_has_key'),
+        \ ['bin', 'prompt'],
+        \ interpreter_str.' requires these missing keys'))
+        \| return | endif
 
   " Check if deps present
-  let s:missing_deps = []
-  for bin in get(interpreter, 'deps', [])
-    if executable(bin) != 1
-      call add(s:missing_deps, bin)
-    endif
-  endfor
-  if !empty(s:missing_deps)
-    call s:err(
-          \ interpreter_str.' requires these misssing commands: '
-          \.join(s:missing_deps, ', ').'.')
-    let error = 1
-  endif
-
-  if error | return | endif
+  if len(s:all(function('executable'), []
+          \+[s:codi_interpreter['bin']]
+          \+get(s:codi_interpreter, 'deps', [])
+          \, interpreter_str.' requires these missing commands'))
+          \| return | endif
 
   call s:codi_kill()
 
@@ -271,7 +263,7 @@ function! s:codi_spawn(filetype)
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
   let b:codi_leave = restore
-  let b:codi_interpreter = interpreter
+  let b:codi_interpreter = s:codi_interpreter
 
   " Return to target split
   keepjumps keepalt wincmd p
@@ -282,7 +274,7 @@ endfunction
 " Main function
 function! codi#run(bang, ...)
   " Handle arg
-  if exists('a:1')
+  if a:0
     " Double-bang case
     if a:bang && a:1 =~ '^!'
       " Slice off the bang
