@@ -208,7 +208,7 @@ function! s:codi_spawn(filetype)
     let s:interpreter = s:interpreters[
           \ get(s:aliases, a:filetype, a:filetype)]
   " If interpreter not found...
-  catch E716
+  catch /E71\(3\|6\)/
     if empty(a:filetype)
       return s:err('Cannot run Codi with empty filetype.')
     else
