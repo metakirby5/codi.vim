@@ -54,7 +54,6 @@ augroup CODI
         \ scrollbind
         \ | noremap <buffer> <silent> q <esc>:q<cr>
         \ | silent! setlocal cursorbind
-  au FileType codi exe 'setlocal textwidth='.g:codi#width
   " Clean up when codi is killed
   au BufWinLeave *
         \ if exists('b:codi_leave') | silent! exe b:codi_leave | endif
@@ -114,6 +113,7 @@ function! s:codi_update()
   " Bail if no codi buf to act on
   if !exists('b:codi_bufnr') | return | endif
   let s:codi_updating = 1
+  let codi_winwidth = winwidth(bufwinnr(b:codi_bufnr))
 
   " Setup target buf
   let num_lines = line('$')
@@ -170,6 +170,7 @@ function! s:codi_update()
   endif
 
   exe cmd
+  exe 'setlocal textwidth='.codi_winwidth
   if g:codi#rightalign
     1,$right
   endif
