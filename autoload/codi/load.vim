@@ -2,18 +2,13 @@
 let s:codi_default_interpreters = {
       \ 'python': {
           \ 'bin': 'python',
-          \ 'deps': ['sed'],
           \ 'prompt': '^(>>>|\.\.\.) ',
-          \ 'rephrase': 'sed "s/^\s*\(\w\+\)\s*[-+/*\%]\{,2\}=.*$/&; \1/"',
           \ },
       \ 'javascript': {
           \ 'bin': 'node',
           \ 'deps': ['sed'],
           \ 'env': 'NODE_DISABLE_COLORS=1',
           \ 'prompt': '^(>|\.{3,}) ',
-          \ 'rephrase':
-            \ 'sed "s/^\s*\(var\|let\)\s*\(\w\+\)\s*'
-            \.'=[^{]*$/&; \2/"',
           \ 'preprocess': 'sed "s/...//g"',
           \ },
       \ 'haskell': {

@@ -203,7 +203,9 @@ rephrase (OPTIONAL)
              statements with "let" or "var" (i.e. those not ending in "{")
              to append the variable being let/var to the end. This allows
              the overall evaluated result to be the variable being let/var,
-             rather than undefined.
+             rather than undefined. Note that this will break when you have
+             something like "var a = [", since it will be rephrased as
+             "var a = [; a". The default interpreters have no rephrasing.
 
                                                 *codi-interpreters-preprocess*
 preprocess (OPTIONAL)
