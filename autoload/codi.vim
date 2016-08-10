@@ -241,7 +241,7 @@ function! s:codi_spawn(filetype)
   silent! setlocal cursorbind
 
   " Spawn codi
-  exe 'keepjumps keepalt 'g:codi#width.'vnew'
+  exe 'keepjumps keepalt '.g:codi#width.'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
@@ -261,7 +261,7 @@ function! codi#run(bang, ...)
     " Double-bang case
     if a:bang && a:1 =~ '^!'
       " Slice off the bang
-      let filetype = a:1[2:]
+      let filetype = substitute(a:1[1:], '^\s*', '', '')
       let toggle = 1
     else
       let filetype = a:1
@@ -272,16 +272,16 @@ function! codi#run(bang, ...)
     let toggle = 0
   endif
 
-  " Bang -> kill
-  if a:bang && !toggle
-    return s:codi_kill()
-  endif
-
   " Grab filetype if not provided
   if empty(filetype)
     let filetype = &filetype
   else
     exe 'setlocal filetype='.filetype
+  endif
+
+  " Bang -> kill
+  if a:bang && !toggle
+    return s:codi_kill()
   endif
 
   if toggle
