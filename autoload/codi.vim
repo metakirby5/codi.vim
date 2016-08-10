@@ -20,8 +20,8 @@ if !empty(s:missing_cmds)
 endif
 
 " Load resources
-let s:codi_interpreters = codi#defaults#interpreters()
-let s:codi_aliases = codi#defaults#aliases()
+let s:codi_interpreters = codi#load#interpreters()
+let s:codi_aliases = codi#load#aliases()
 
 " Detect what version of script to use based on OS
 if has("unix")

@@ -1,5 +1,5 @@
 " Default interpreters
-let s:codi_interpreters = {
+let s:codi_default_interpreters = {
       \ 'python': {
           \ 'bin': 'python',
           \ 'prompt': '^(>>>|\.\.\.) ',
@@ -23,14 +23,14 @@ let s:codi_interpreters = {
             \ 'sed "s/^=> //g"',
           \ },
       \ }
-function! codi#defaults#interpreters()
-  return extend(s:codi_interpreters, g:codi#interpreters)
+function! codi#load#interpreters()
+  return extend(s:codi_default_interpreters, g:codi#interpreters)
 endfunction
 
 " Default aliases
-let s:codi_aliases = {
+let s:codi_default_aliases = {
       \ 'javascript.jsx': 'javascript',
       \ }
-function! codi#defaults#aliases()
-  return extend(s:codi_aliases, g:codi#aliases)
+function! codi#load#aliases()
+  return extend(s:codi_default_aliases, g:codi#aliases)
 endfunction
