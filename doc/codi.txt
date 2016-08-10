@@ -73,7 +73,7 @@ g:codi#interpreters
 
              This will not overwrite the internal default interpreters.
 >
-             let s:codi_interpreters = {
+             let g:codi#interpreters = {
                    \ 'javascript': {
                        \ 'bin': 'node',
                        \ 'env': 'NODE_DISABLE_COLORS=1',
@@ -94,7 +94,7 @@ g:codi#aliases
 
              This will not overwrite the internal default aliases.
 >
-             let s:codi_aliases = {
+             let g:codi#aliases = {
                    \ 'javascript.jsx': 'javascript',
                    \ }
 <
