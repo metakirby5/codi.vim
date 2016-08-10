@@ -5,7 +5,7 @@ endfunction
 
 " Check for missing commands
 let s:missing_cmds = []
-for bin in ['script', 'awk']
+for bin in ['script', 'awk', 'uname']
   if executable(bin) != 1
     call add(s:missing_cmds, bin)
   endif

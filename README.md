@@ -30,7 +30,7 @@ Plug 'metakirby5/codi.vim'
 
 ### Dependencies
 
-Command line utilities (BSD and Linux are both fine): script, awk
+Command line utilities (BSD and Linux are both fine): script, awk, uname
 
 Each default interpreter also depends on its REPL:
 

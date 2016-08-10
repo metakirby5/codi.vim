@@ -34,7 +34,7 @@ Watch a screencast at https://ptpb.pw/t/~codi!
 ==============================================================================
 DEPENDENCIES                                               *codi-dependencies*
 
-Command line utilities (BSD and Linux are both fine): script, awk
+Command line utilities (BSD and Linux are both fine): script, awk, uname
 
 Each interpreter also depends on its bin; see |codi-interpreters-bin|.
 
