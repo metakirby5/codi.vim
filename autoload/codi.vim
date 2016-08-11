@@ -119,8 +119,10 @@ endfunction
 function! s:codi_kill()
   " If we already have a codi instance for the buffer, kill it
   if exists('b:codi_bufnr')
-    exe 'keepjumps keepalt bdel '.b:codi_bufnr
+    " Shuffling is necessary because bdel triggers events
+    let codi_bufnr = b:codi_bufnr
     unlet b:codi_bufnr
+    exe 'keepjumps keepalt bdel '.codi_bufnr
   endif
 endfunction
 
