@@ -194,8 +194,8 @@ function! s:codi_update()
       if match(l, i['prompt']) != -1
         " If we have passed the first prompt
         if passed_first
-          " Record what was taken
-          call add(result, taken)
+          " Record what was taken (needs to be at least one character)
+          call add(result, len(taken) ? taken : ' ')
           let taken = ''
         else
           let passed_first = 1
