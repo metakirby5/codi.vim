@@ -36,6 +36,7 @@ endif
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:updating = 0
+let s:prefix = '__CODI__'
 
 " Detect what version of script to use based on OS
 if has("unix")
@@ -75,7 +76,7 @@ augroup END
 augroup CODI_TARGET
   au!
   " Update codi buf on buf change
-  au CursorHold,CursorHoldI * silent! call s:codi_update()
+  au TextChanged,TextChangedI * silent! call s:codi_update()
 
   " === g:codi#autoclose ===
   " Hide on buffer leave
@@ -130,12 +131,56 @@ endfunction
 function! s:codi_update()
   " Bail if no codi buf to act on
   if !exists('b:codi_bufnr') | return | endif
+
+  " Build input
+  let input = join(getline('^', '$'), "\n")
+  let i = getbufvar(b:codi_bufnr, 'codi_interpreter')
+  if has_key(i, 'rephrase')
+    let input = i['rephrase'](input)
+  endif
+
+  " We use the magic sequence '' to get out of the REPL
+  let input = input.''.s:prefix.bufnr('%').''
+
+  " Build the command
+  let cmd = get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
+
+  " Async or sync
+  if get(i, 'async', 1)
+    let job = job_start(cmd, { 'close_cb': 'codi#__callback' })
+    call ch_sendraw(job_getchannel(job), input)
+  else
+    " TODO not working
+    call codi#__callback(system(cmd, input))
+  endif
+
+endfunction
+function! codi#__callback(data)
+
+  " We should really use a mutex, but Vim doesn't have those.
+  " Oh well, user keystrokes are pretty slow anyways, relative to code.
+
+  " Grab the output - can either be channel or string
+  try
+    let output = []
+    while ch_status(a:data) == 'buffered'
+      call add(output, ch_readraw(a:data))
+    endwhile
+    let evaled = join(output, "\n")
+  catch E475
+    let evaled = data
+  endtry
+
+  let bufnr = evaled[match(evaled, s:prefix) + len(s:prefix) + 1]
+
+  " Save for later
+  let ret_bufnr = bufnr('%')
+
+  " Go to target buf
+  exe 'keepjumps keepalt buf '.bufnr
   let s:updating = 1
   let codi_winwidth = winwidth(bufwinnr(b:codi_bufnr))
-
-  " Grab current buffer information
   let num_lines = line('$')
-  let content = join(getline('^', '$'), "\n")
 
   " So we can jump back later
   let top = line('w0') + &scrolloff
@@ -150,18 +195,8 @@ function! s:codi_update()
   setlocal modifiable
   let i = b:codi_interpreter
 
-  " Rephrase
-  if has_key(i, 'rephrase')
-    let content = i['rephrase'](content)
-  endif
-
-  " Run bin on the buffer contents
-  " We use '' to ensure all our input is captured
-  " We use the magic sequence '' to get out of the REPL
   " We then strip out some crap characters from script
-  let evaled = substitute(system(
-        \ get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post,
-        \ ''.content.''),
+  let evaled = substitute(evaled,
         \ '\(^\|'."\n".'\)\(\^D\)\+\|\|', '', 'g')
 
   " If bsd, we need to get rid of inputted lines
@@ -235,6 +270,9 @@ function! s:codi_update()
   keepjumps normal! zt
   keepjumps call cursor(line, col)
   let s:updating = 0
+
+  " Go back to original buf
+  exe 'keepjumps keepalt buf '.ret_bufnr
 endfunction
 
 function! s:codi_spawn(filetype)

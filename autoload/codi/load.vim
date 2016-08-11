@@ -2,16 +2,6 @@
 function! s:pp_js(evaled)
   return substitute(a:evaled, '...', '', 'g')
 endfunction
-function! s:pp_hs(evaled)
-  let c = substitute(a:evaled, '\(\[?1[hl]\|E\)', '', 'g')
-  let c = substitute(c, '', "\n", 'g')
-  let l = split(c, "\n")
-  let l = []
-  for line in split(c, "\n")
-    call add(l, line[1:])
-  endfor
-  return join(l, "\n")
-endfunction
 function! s:pp_rb(evaled)
   return substitute(a:evaled, "\n=> ", "\n", 'g')
 endfunction
@@ -24,12 +14,11 @@ let s:codi_default_interpreters = {
           \ 'bin': 'node',
           \ 'env': 'NODE_DISABLE_COLORS=1',
           \ 'prompt': '^\(>\|\.\.\.\+\) ',
-          \ 'preprocess': function('s:pp_js'),
+          \ 'async': 0,
           \ },
       \ 'haskell': {
           \ 'bin': 'ghci',
           \ 'prompt': '^Prelude> ',
-          \ 'preprocess': function('s:pp_hs'),
           \ },
       \ 'ruby': {
           \ 'bin': 'irb',
