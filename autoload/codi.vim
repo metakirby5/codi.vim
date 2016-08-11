@@ -181,7 +181,7 @@ function! codi#__callback(data)
     let evaled = a:data
   endtry
 
-  let bufnr = evaled[match(evaled, s:prefix) + len(s:prefix) + 1]
+  let bufnr = matchlist(evaled, s:prefix.'\(\d\+\)'.s:suffix)[1]
 
   " Save for later
   let ret_bufnr = bufnr('%')
@@ -350,7 +350,7 @@ function! s:codi_spawn(filetype)
   " Return to target split
   keepjumps keepalt wincmd p
   let b:codi_bufnr = bufnr('$')
-  silent! return s:codi_update()
+  silent! return s:codi_update(get(s:interpreter, 'async', 1))
 endfunction
 
 " Main function
