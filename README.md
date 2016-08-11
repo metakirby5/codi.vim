@@ -9,9 +9,9 @@ The interactive scratchpad for hackers.
 
 Codi is an interactive scratchpad for hackers, with a similar interface to
 Numi (https://numi.io). It opens a pane synchronized to your main buffer which
-displays the results of evaluating each line *as you type* (asynchronously
-for supported interpreters). It's extensible to nearly any language that
-provides an interactive interpreter!
+displays the results of evaluating each line *as you type* (if Vim has `+job`,
+asynchronously for supported interpreters). It's extensible to nearly any
+language that provides an interactive interpreter!
 
 For more information, check out the [documentation](doc/codi.txt).
 Watch a [screencast](https://ptpb.pw/t/~codi)!
@@ -32,11 +32,15 @@ Plug 'metakirby5/codi.vim'
 
 ### Dependencies
 
-Vim should be compiled with `+job` for a smoother experience.
+Asynchronous evaluation requires `+job`.
 
 Command line utilities (BSD and Linux are both fine): `script`, `uname`.
 
-Each interpreter also depends on its REPL:
+Each interpreter also depends on its REPL. These are loaded on-demand. For
+example, if you only want to use the Python Codi interpreter, you will not
+need `ghci`.
+
+Default interpreter dependencies:
 
   - Python:    `python`
   - Javscript: `node`

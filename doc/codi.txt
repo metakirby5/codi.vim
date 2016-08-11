@@ -26,20 +26,22 @@ INTRODUCTION                                               *codi-introduction*
 
 Codi is an interactive scratchpad for hackers, with a similar interface to
 Numi (https://numi.io). It opens a pane synchronized to your main buffer which
-displays the results of evaluating each line as you type (asynchronously for
-supported interpreters). It's extensible to nearly any language that provides
-an interactive interpreter!
+displays the results of evaluating each line as you type (if Vim has |+job|,
+asynchronously for supported interpreters). It's extensible to nearly any
+language that provides an interactive interpreter!
 
 Watch a screencast at https://ptpb.pw/t/~codi!
 
 ==============================================================================
 DEPENDENCIES                                               *codi-dependencies*
 
-Vim should be compiled with |+job| for a smoother experience.
+Asynchronous evaluation requires |+job|.
 
 Command line utilities (BSD and Linux are both fine): script, uname.
 
-Each interpreter also depends on its bin; see |codi-interpreters-bin|.
+Each interpreter also depends on its bin; see |codi-interpreters-bin|. These
+are loaded on-demand. For example, if you only want to use the Python Codi
+interpreter, you will not need ghci.
 
 Default interpreter dependencies:
              Python:    python
@@ -153,21 +155,42 @@ g:codi#raw
 ==============================================================================
 INTERPRETERS                                               *codi-interpreters*
 
-Codi can be easily configured to use user-defined interpreters for langauges.
-A full interpreter configuration for Javascript is given below.
+Codi relies on interpreter configurations to understand how to evaluate your
+buffer's contents. A number of default interpreters are bundled in, but you
+can easily create your own configurations to add support for more filetypes.
 
-                                                   *codi-interpreters-example*
+DEFAULT INTERPRETERS~
+
+Codi currently has support for the following filetypes:
+
+             +-----------------------------+
+             | Filetype   | bin    | async |
+             | ---------- | ------ | ----- |
+             | python     | python | yes   |
+             | javascript | node   | no    |
+             | haskell    | ghci   | yes   |
+             | ruby       | irb    | yes   |
+             +-----------------------------+
+
+EXAMPLE INTERPRETER CONFIGURATION~
+
+A full interpreter configuration for Javascript can be found below. (Note that
+in Vimscript, you still need to add forwardslashes for continuing newlines.)
 >
-             \ 'javascript': {
-                 \ 'bin': 'node',
-                 \ 'env': 'NODE_DISABLE_COLORS=1',
-                 \ 'prompt': '^\(>\|\.\.\.\+\) ',
-                 \ 'preprocess': function('s:pp_js'),
-                 \ 'rephrase': function('s:rp_js'),
-                 \ 'async': 0,
-                 \ },
+             'javascript': {
+                 'bin': 'node',
+                 'env': 'NODE_DISABLE_COLORS=1',
+                 'prompt': '^\(>\|\.\.\.\+\) ',
+                 'preprocess': function('s:pp_js'),
+                 'rephrase': function('s:rp_js'),
+                 'async': 0,
+             }
 <
 POSSIBLE ATTRIBUTES~
+
+Interpreter configurations have an number of attributes, but only a few of
+them are required. However, you may need to use the optional attributes
+to get your interpreter to successfully work.
 
                                                        *codi-interpreters-bin*
 bin (REQUIRED)
