@@ -23,7 +23,7 @@ endfunction
 
 " Check for missing commands
 let s:missing_deps = s:all(function('executable'),
-      \ ['script', 'awk', 'uname'])
+      \ ['script', 'uname'])
 if len(s:missing_deps)
   function! codi#run(...)
     return s:err(
@@ -32,9 +32,6 @@ if len(s:missing_deps)
   endfunction
   finish
 endif
-
-" Command aliases
-let s:sh_cat = "awk '{ print }'"
 
 " Load resources
 let s:interpreters = codi#load#interpreters()
@@ -134,7 +131,7 @@ function! s:codi_update()
   let s:updating = 1
   let codi_winwidth = winwidth(bufwinnr(b:codi_bufnr))
 
-  " Setup target buf
+  " Grab current buffer information
   let num_lines = line('$')
   let content = join(getline('^', '$'), "\n")
 
@@ -146,60 +143,87 @@ function! s:codi_update()
   " So we can syncbind later
   keepjumps normal! gg
 
-  " Setup codi buf
+  " Go to codi buf
   exe 'keepjumps keepalt buf '.b:codi_bufnr
   setlocal modifiable
-
-  " Execute our code by:
-  "   - Using script with environment variables to simulate a tty on
-  "     the interpreter, which will take...
-  "   - our shell-escaped EOL-terminated code as input,
-  "     which is piped through...
-  "   - awk, to remove ^Ds, backspaces (^H), and carriage returns (^M)...
-  "   - if the system is bsd, use awk to get rid of inputted lines...
-  "   - if the system is not bsd, use awk to add line breaks...
-  "   - any user-provided preprocess...
-  "   - if raw isn't set, awk to only print the line right before a prompt...
-  "     (searches for lines where the first character is not a space)
-  "   - and read it all into the Codi buffer.
   let i = b:codi_interpreter
-  let cmd = '1,$d _ | 0read !'
-        \.get(i, 'rephrase', s:sh_cat).' <<< '.shellescape(content."", 1)
-        \.' | '.get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
-        \.' | awk "{ gsub(/^\^D||/, \"\"); print }"'
+
+  " Rephrase
+  if has_key(i, 'rephrase')
+    let content = i['rephrase'](content)
+  endif
+
+  " Run bin on the buffer contents
+  " We use the magic sequence '' to get out of the REPL
+  let evaled = substitute(system(
+        \ get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
+        \.' <<< '''.content.''.''''
+        \), '\(^\|'."\n".'\)\(\^D\)\+\|\|', '', 'g')
 
   " If bsd, we need to get rid of inputted lines
   if s:bsd
-    let cmd .= ' | awk "NR > '.num_lines.' { print }"'
+    let evaled = join(split(evaled, "\n")[num_lines:], "\n")
   " If not bsd, we need to add line breaks
   else
-    let cmd .= ' | awk "{ gsub(/'.i['prompt'].'/, \"&\n\"); print }"'
+    let evaled = substitute(evaled, i['prompt'], submatch(1)."\n", 'g')
   endif
 
-  let cmd .= ' | '.get(i, 'preprocess', s:sh_cat)
+  " Preprocess
+  if has_key(i, 'preprocess')
+    let evaled = i['preprocess'](evaled)
+  endif
 
-  " If the user wants raw, don't parse for prompt
+  " Unless raw, parse for propmt
+  " Basic algorithm, for all lines:
+  "   If we hit a prompt,
+  "     If we have already passed the first prompt, record our taken line.
+  "     Otherwise, note that we have passed the first prompt.
+  "   Else,
+  "     If we have passed the first prompt,
+  "       If the line has no leading whitespace (usually stacktraces),
+  "         Save the line as taken.
   if !g:codi#raw
-    let cmd .= ' | awk "{'
-            \.'if (/'.i['prompt'].'/)'
-              \.'{ if (x) { print taken; taken = \"\" } else { x = 1 } }'
-            \.'else'
-              \.'{ if (x && /^[^ \t\n\x0B\f\r]/) { taken = \$0 } }'
-          \.'}" | awk "NR <= '.num_lines.' { print }"'
+    let result = []      " Overall result list
+    let passed_first = 0 " Whether we have passed the first prompt
+    let taken = ''       " What to print at the prompt
+
+    " Iterate through all lines
+    for l in split(evaled, "\n")
+      " If we hit a prompt
+      if match(l, i['prompt']) != -1
+        " If we have passed the first prompt
+        if passed_first
+          call add(result, taken)
+          let taken = ''
+        else
+          let passed_first = 1
+        endif
+      else
+        if passed_first && match(l, '^\S') != -1
+          let taken = l
+        endif
+      endif
+    endfor
+
+    " Only take last num_lines of lines
+    let result = join(result[:num_lines - 1], "\n")
+  else
+    let result = evaled
   endif
 
-  exe cmd
+  " Read the result into the codi buf
+  1,$d _ | 0put =result
   exe 'setlocal textwidth='.codi_winwidth
   if g:codi#rightalign
     1,$right
   endif
 
-  " Teardown codi buf
+  " Syncbind codi buf
   keepjumps normal! G"_ddgg
   syncbind
   setlocal nomodifiable
 
-  " Teardown target buf
+  " Restore target buf position
   exe 'keepjumps keepalt buf '.b:codi_target_bufnr
   exe 'keepjumps '.top
   keepjumps normal! zt
@@ -233,12 +257,10 @@ function! s:codi_spawn(filetype)
         \ interpreter_str.' requires these missing keys'))
         \| return | endif
 
-  " Check if deps present
-  if len(s:all(function('executable'), []
-          \+[s:interpreter['bin']]
-          \+get(s:interpreter, 'deps', [])
-          \, interpreter_str.' requires these missing commands'))
-          \| return | endif
+  " Check if bin present
+  if !executable(s:interpreter['bin'])
+      return s:err(interpreter_str.' requires '.s:interpreter['bin'].'.')
+  endif
 
   call s:codi_kill()
 

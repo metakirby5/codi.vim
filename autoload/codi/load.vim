@@ -1,28 +1,40 @@
 " Default interpreters
+function! s:pp_js(content)
+  return substitute(a:content, '...', '', 'g')
+endfunction
+function! s:pp_hs(content)
+  let c = substitute(a:content, '\(\[?1[hl]\|E\)', '', 'g')
+  let c = substitute(c, '', "\n", 'g')
+  let l = split(c, "\n")
+  let l = []
+  for line in split(c, "\n")
+    call add(l, line[1:])
+  endfor
+  return join(l, "\n")
+endfunction
+function! s:pp_rb(content)
+  return substitute(a:content, "\n=> ", "\n", 'g')
+endfunction
 let s:codi_default_interpreters = {
       \ 'python': {
           \ 'bin': 'python',
-          \ 'prompt': '^(>>>|\.\.\.) ',
+          \ 'prompt': '^\(>>>\|\.\.\.\) ',
           \ },
       \ 'javascript': {
           \ 'bin': 'node',
-          \ 'deps': ['sed'],
           \ 'env': 'NODE_DISABLE_COLORS=1',
-          \ 'prompt': '^(>|\.\.\.+) ',
-          \ 'preprocess': 'sed "s/...//g"',
+          \ 'prompt': '^\(>\|\.\.\.\+\) ',
+          \ 'preprocess': function('s:pp_js'),
           \ },
       \ 'haskell': {
           \ 'bin': 'ghci',
-          \ 'deps': ['sed', 'tr', 'cut'],
           \ 'prompt': '^Prelude> ',
-          \ 'preprocess':
-            \ 'sed "s/\(\[?1[hl]\|E\)//g" | tr "" "\n" | cut -c2-',
+          \ 'preprocess': function('s:pp_hs'),
           \ },
       \ 'ruby': {
           \ 'bin': 'irb',
-          \ 'deps': ['sed'],
-          \ 'prompt': '^irb\([_a-zA-Z0-9]+\):[0-9]+:[0-9]+. ',
-          \ 'preprocess': 'sed "s/^=> //g"',
+          \ 'prompt': '^irb(\w\+):\d\+:\d\+. ',
+          \ 'preprocess': function('s:pp_rb'),
           \ },
       \ }
 function! codi#load#interpreters()
