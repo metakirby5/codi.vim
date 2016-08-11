@@ -140,7 +140,7 @@ function! s:codi_update(async)
 
   " Bail if async doesn't match up
   let async = has('job') && get(i, 'async', 1)
-  if a:async != async | return | endif
+  if (has('job') && a:async) != async | return | endif
 
   " Build input
   let input = join(getline('^', '$'), "\n")
