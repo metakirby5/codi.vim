@@ -2,7 +2,7 @@
 
 The interactive scratchpad for hackers.
 
-![Codi Screenshot](https://ptpb.pw/NjGt.png)
+![Codi Screenshot](https://ptpb.pw/LRF6.png)
 
 *Using Codi as a Python scratchpad through the
 [shell wrapper](#shell-wrapper)*
@@ -65,7 +65,7 @@ A nice way to use Codi is through a shell wrapper that you can stick in your
 codi() {
   vim $2 -c \
     "let g:startify_disable_at_vimenter = 1 |\
-    set laststatus=0 nonu nornu |\
+    set buftype=nofile laststatus=0 nonu nornu |\
     hi ColorColumn ctermbg=NONE |\
     hi VertSplit ctermbg=NONE |\
     hi NonText ctermfg=0 |\
