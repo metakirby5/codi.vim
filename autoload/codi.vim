@@ -22,8 +22,7 @@ function! s:all(predicate, required, ...)
 endfunction
 
 " Check for missing commands
-let s:missing_deps = s:all(function('executable'),
-      \ ['script', 'uname'])
+let s:missing_deps = s:all(function('executable'), ['script', 'uname'])
 if len(s:missing_deps)
   function! codi#run(...)
     return s:err(
@@ -50,6 +49,8 @@ if has("unix")
     let s:script_pre = 'script -qfec "'
     let s:script_post = '" /dev/null'
   endif
+else
+  call s:err('Codi does not support Windows yet.')
 endif
 
 " Actions on codi
@@ -95,18 +96,17 @@ endfunction
 
 function! s:codi_hide()
   if g:codi#autoclose && exists('b:codi_bufnr') && !s:updating
-    let codi_win = bufwinnr(b:codi_bufnr)
-    if codi_win != -1
-      " Remember width for when we respawn
-      let b:codi_width = winwidth(codi_win)
-      exe codi_win.'close'
-    endif
+    " Remember width for when we respawn
+    let b:codi_width = winwidth(bufwinnr(b:codi_bufnr))
+    call s:codi_kill()
   endif
 endfunction
 
 function! s:codi_show()
-  if g:codi#autoclose && exists('b:codi_bufnr')
-    return s:codi_spawn(&filetype)
+  " If we saved a width, that means we hid codi earlier
+  if g:codi#autoclose && exists('b:codi_width')
+    call s:codi_spawn(&filetype)
+    unlet b:codi_width
   endif
 endfunction
 
@@ -155,6 +155,7 @@ function! s:codi_update()
 
   " Run bin on the buffer contents
   " We use the magic sequence '' to get out of the REPL
+  " We then strip out some crap characters from script
   let evaled = substitute(system(
         \ get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
         \.' <<< '''.content.''.''''
@@ -193,12 +194,14 @@ function! s:codi_update()
       if match(l, i['prompt']) != -1
         " If we have passed the first prompt
         if passed_first
+          " Record what was taken
           call add(result, taken)
           let taken = ''
         else
           let passed_first = 1
         endif
       else
+        " If we have passed the first prompt and it's content worth taking
         if passed_first && match(l, '^\S') != -1
           let taken = l
         endif
