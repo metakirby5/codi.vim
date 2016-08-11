@@ -156,12 +156,13 @@ function! s:codi_update()
   endif
 
   " Run bin on the buffer contents
+  " We use '' to ensure all our input is captured
   " We use the magic sequence '' to get out of the REPL
   " We then strip out some crap characters from script
   let evaled = substitute(system(
-        \ get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
-        \.' <<< '''.content.''.''''
-        \), '\(^\|'."\n".'\)\(\^D\)\+\|\|', '', 'g')
+        \ get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post,
+        \ ''.content.''),
+        \ '\(^\|'."\n".'\)\(\^D\)\+\|\|', '', 'g')
 
   " If bsd, we need to get rid of inputted lines
   if s:bsd
