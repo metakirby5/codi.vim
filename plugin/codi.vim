@@ -8,6 +8,7 @@
 "                    before prompt parsing>,
 "     'rephrase': <optional function to run buffer contents through
 "                    before handing off to bin>,
+"     'async': <whether or not to interpret asynchronously>,
 "   }
 " For example:
 "   'javascript': {
@@ -16,6 +17,7 @@
 "       'prompt': '^\(>\|\.\.\.\+\) ',
 "       'preprocess': function('s:pp_js'),
 "       'rephrase': function('s:rp_js'),
+"       'async': 0,
 "    }
 if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}

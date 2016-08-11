@@ -34,7 +34,9 @@ Watch a screencast at https://ptpb.pw/t/~codi!
 ==============================================================================
 DEPENDENCIES                                               *codi-dependencies*
 
-Command line utilities (BSD and Linux are both fine): script, uname
+Vim should be compiled with |+job| for a smoother experience.
+
+Command line utilities (BSD and Linux are both fine): script, uname.
 
 Each interpreter also depends on its bin; see |codi-interpreters-bin|.
 
@@ -161,6 +163,7 @@ A full interpreter configuration for Javascript is given below.
                  \ 'prompt': '^\(>\|\.\.\.\+\) ',
                  \ 'preprocess': function('s:pp_js'),
                  \ 'rephrase': function('s:rp_js'),
+                 \ 'async': 0,
                  \ },
 <
 POSSIBLE ATTRIBUTES~
@@ -238,5 +241,18 @@ rephrase (OPTIONAL)
 
              The configuration process is similar to preproccess, so just look
              at |codi-interpreters-preprocess| if you're unsure how to start.
+
+                                                     *codi-interpreters-async*
+async (OPTIONAL)
+             Whether or not bin should be run asynchronously. Async works fine
+             most of the time, so you shouldn't have to touch this. Node is a
+             notable exception, and I don't know why yet, so that's why this
+             option exists.
+
+             Note that if running synchronousy, |CursorHold| and |CursorHoldI|
+             will be used instaed of |TextChanged| and |TextChangedI| to
+             make typing bearable.
+
+             Default value is 1.
 
 vim:ft=help:tw=78:sw=13:norl:

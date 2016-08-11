@@ -139,7 +139,7 @@ function! s:codi_update(async)
   let i = getbufvar(b:codi_bufnr, 'codi_interpreter')
 
   " Bail if async doesn't match up
-  let async = get(i, 'async', 1)
+  let async = has('job') && get(i, 'async', 1)
   if a:async != async | return | endif
 
   " Build input
@@ -177,7 +177,7 @@ function! codi#__callback(data)
       call add(output, ch_readraw(a:data))
     endwhile
     let evaled = join(output, "\n")
-  catch E475
+  catch /E\(475\|117\)/
     let evaled = a:data
   endtry
 
