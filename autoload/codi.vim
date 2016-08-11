@@ -37,6 +37,7 @@ let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:updating = 0
 let s:prefix = '__CODI__'
+let s:suffix = '__END_CODI__'
 
 " Detect what version of script to use based on OS
 if has("unix")
@@ -75,8 +76,11 @@ augroup END
 " Actions on all windows
 augroup CODI_TARGET
   au!
-  " Update codi buf on buf change
-  au TextChanged,TextChangedI * silent! call s:codi_update()
+  " === g:codi#update(async) ===
+  " Async: TextChanged
+  au TextChanged,TextChangedI * silent! call s:codi_update(1)
+  " Sync: CursorHold
+  au CursorHold,CursorHoldI * silent! call s:codi_update(0)
 
   " === g:codi#autoclose ===
   " Hide on buffer leave
@@ -128,29 +132,35 @@ function! s:codi_kill()
 endfunction
 
 " Update the codi buf
-function! s:codi_update()
+function! s:codi_update(async)
   " Bail if no codi buf to act on
   if !exists('b:codi_bufnr') | return | endif
 
+  let i = getbufvar(b:codi_bufnr, 'codi_interpreter')
+
+  " Bail if async doesn't match up
+  let async = get(i, 'async', 1)
+  if a:async != async | return | endif
+
   " Build input
   let input = join(getline('^', '$'), "\n")
-  let i = getbufvar(b:codi_bufnr, 'codi_interpreter')
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
 
+  " We write the buffer number into stdin as a hack because
+  "   Vimscript can't into anonymous closures
   " We use the magic sequence '' to get out of the REPL
-  let input = input.''.s:prefix.bufnr('%').''
+  let input = input."\n".s:prefix.bufnr('%').s:suffix."\n".''
 
   " Build the command
   let cmd = get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
 
   " Async or sync
-  if get(i, 'async', 1)
+  if async
     let job = job_start(cmd, { 'close_cb': 'codi#__callback' })
     call ch_sendraw(job_getchannel(job), input)
   else
-    " TODO not working
     call codi#__callback(system(cmd, input))
   endif
 
@@ -168,7 +178,7 @@ function! codi#__callback(data)
     endwhile
     let evaled = join(output, "\n")
   catch E475
-    let evaled = data
+    let evaled = a:data
   endtry
 
   let bufnr = evaled[match(evaled, s:prefix) + len(s:prefix) + 1]
@@ -196,8 +206,8 @@ function! codi#__callback(data)
   let i = b:codi_interpreter
 
   " We then strip out some crap characters from script
-  let evaled = substitute(evaled,
-        \ '\(^\|'."\n".'\)\(\^D\)\+\|\|', '', 'g')
+  let evaled = substitute(substitute(evaled,
+        \ '\|', '', 'g'), '\(^\|\n\)\(\^D\)\+', '', 'g')
 
   " If bsd, we need to get rid of inputted lines
   if s:bsd
