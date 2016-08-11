@@ -161,11 +161,14 @@ function! s:codi_update(async)
     let job = job_start(cmd, { 'close_cb': 'codi#__callback' })
     call ch_sendraw(job_getchannel(job), input)
   else
-    call codi#__callback(system(cmd, input))
+    call codi#__handle_data(system(cmd, input))
   endif
 
 endfunction
 function! codi#__callback(data)
+  silent! return codi#__handle_data(a:data) " To silence any async output
+endfunction
+function! codi#__handle_data(data)
 
   " We should really use a mutex, but Vim doesn't have those.
   " Oh well, user keystrokes are pretty slow anyways, relative to code.
