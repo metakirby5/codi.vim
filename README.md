@@ -33,14 +33,14 @@ Plug 'metakirby5/codi.vim'
 
 ### Dependencies
 
-Command line utilities (BSD and Linux are both fine): script, awk, uname
+Command line utilities (BSD and Linux are both fine): script, uname
 
-Each default interpreter also depends on its REPL and other commands:
+Each interpreter also depends on its REPL:
 
   - Python:    `python`
-  - Javscript: `node`, `sed`
-  - Haskell:   `ghci`, `sed`, `tr`, `cut`
-  - Ruby:      `irb`, `sed`
+  - Javscript: `node`
+  - Haskell:   `ghci`
+  - Ruby:      `irb`
 
 ## Usage
 

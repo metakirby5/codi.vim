@@ -1,9 +1,9 @@
 " Default interpreters
-function! s:pp_js(content)
-  return substitute(a:content, '...', '', 'g')
+function! s:pp_js(evaled)
+  return substitute(a:evaled, '...', '', 'g')
 endfunction
-function! s:pp_hs(content)
-  let c = substitute(a:content, '\(\[?1[hl]\|E\)', '', 'g')
+function! s:pp_hs(evaled)
+  let c = substitute(a:evaled, '\(\[?1[hl]\|E\)', '', 'g')
   let c = substitute(c, '', "\n", 'g')
   let l = split(c, "\n")
   let l = []
@@ -12,8 +12,8 @@ function! s:pp_hs(content)
   endfor
   return join(l, "\n")
 endfunction
-function! s:pp_rb(content)
-  return substitute(a:content, "\n=> ", "\n", 'g')
+function! s:pp_rb(evaled)
+  return substitute(a:evaled, "\n=> ", "\n", 'g')
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {

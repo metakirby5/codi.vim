@@ -1,19 +1,22 @@
 " User-defined interpreters (see codi-interpreters)
 " Entries are in the form of:
 "   <filetype>: {
-"     'bin': <interpreter binary>,
+"     'bin': <interpreter binary name>,
 "     'env': <optional environment variables for bin>,
-"     'prompt': <awk pattern indicating the prompt>,
-"     'preprocess': <optional command to pipe output through
+"     'prompt': <vim regex pattern indicating the prompt>,
+"     'preprocess': <optional function to run bin output through
 "                    before prompt parsing>,
+"     'rephrase': <optional function to run buffer contents through
+"                    before handing off to bin>,
 "   }
 " For example:
 "   'javascript': {
-"     'bin': 'node',
-"     'env': 'NODE_DISABLE_COLORS=1',
-"     'prompt': '^(>|\.\.\.) ',
-"     'preprocess': 'sed "s/\[\(1G\|0J\|3G\)//g"',
-"   }
+"       'bin': 'node',
+"       'env': 'NODE_DISABLE_COLORS=1',
+"       'prompt': '^\(>\|\.\.\.\+\) ',
+"       'preprocess': function('s:pp_js'),
+"       'rephrase': function('s:rp_js'),
+"    }
 if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}
 endif

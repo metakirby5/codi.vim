@@ -34,15 +34,15 @@ Watch a screencast at https://ptpb.pw/t/~codi!
 ==============================================================================
 DEPENDENCIES                                               *codi-dependencies*
 
-Command line utilities (BSD and Linux are both fine): script, awk, uname
+Command line utilities (BSD and Linux are both fine): script, uname
 
 Each interpreter also depends on its bin; see |codi-interpreters-bin|.
 
 Default interpreter dependencies:
              Python:    python
-             Javscript: node, sed
-             Haskell:   ghci, sed, tr, cut
-             Ruby:      irb, sed
+             Javscript: node
+             Haskell:   ghci
+             Ruby:      irb
 
 ==============================================================================
 USAGE                                                             *codi-usage*
@@ -89,15 +89,9 @@ g:codi#interpreters
              This will not overwrite the internal default interpreters.
 >
              let g:codi#interpreters = {
-                   \ 'javascript': {
-                       \ 'bin': 'node',
-                       \ 'deps': ['sed'],
-                       \ 'env': 'NODE_DISABLE_COLORS=1',
-                       \ 'prompt': '^(>|\.\.\.+) ',
-                       \ 'rephrase':
-                         \ 'sed "s/^\s*\(var\|let\)\s*\(\w\+\)\s*'
-                         \.'=[^{]*$/&; \2/"',
-                       \ 'preprocess': 'sed "s/...//g"',
+                   \ 'python': {
+                       \ 'bin': 'python',
+                       \ 'prompt': '^\(>>>\|\.\.\.\) ',
                        \ },
                    \ }
 <
@@ -161,16 +155,13 @@ A full interpreter configuration for Javascript is given below.
 
                                                    *codi-interpreters-example*
 >
-             'javascript': {
-               \ 'bin': 'node',
-               \ 'deps': ['sed'],
-               \ 'env': 'NODE_DISABLE_COLORS=1',
-               \ 'prompt': '^(>|\.\.\.+) ',
-               \ 'rephrase':
-                 \ 'sed "s/^\s*\(var\|let\)\s*\(\w\+\)\s*'
-                 \.'=[^{]*$/&; \2/"',
-               \ 'preprocess': 'sed "s/...//g"',
-               \ },
+             \ 'javascript': {
+                 \ 'bin': 'node',
+                 \ 'env': 'NODE_DISABLE_COLORS=1',
+                 \ 'prompt': '^\(>\|\.\.\.\+\) ',
+                 \ 'preprocess': function('s:pp_js'),
+                 \ 'rephrase': function('s:rp_js'),
+                 \ },
 <
 POSSIBLE ATTRIBUTES~
 
@@ -182,15 +173,13 @@ bin (REQUIRED)
 
                                                     *codi-interpreters-prompt*
 prompt (REQUIRED)
-             An awk-style regex pattern that exactly matches the prompt of
+             A vim-style regex pattern that exactly matches the prompt of
              bin. This will be used to correctly line up the output of bin
              with your buffer.
 
-             In the Javascript example, we set propmt to match
+             In the Javascript example, we set prompt to match
              ">", "...", and any amount of dots greater than that to
-             accomodate further nesting levels. We also include ^D and ,
-             because those are (for some reason or another) prepended to the
-             first prompt.
+             accomodate further nesting levels.
 
                                                        *codi-interpreters-env*
 env (OPTIONAL)
@@ -201,37 +190,53 @@ env (OPTIONAL)
              In the Javascript example, we enable "NODE_DISABLE_COLORS"
              so we have to strip less control characters.
 
-                                                      *codi-interpreters-deps*
-deps (OPTIONAL)
-             Any dependencies for the interpreter. Ensures that users of this
-             interpreter cannot use it without all of the deps.
-
-             In the Javascript example, we add "sed" because we make use
-             of it in rephrase and preprocess.
-
-                                                  *codi-interpreters-rephrase*
-rephrase (OPTIONAL)
-             A command to pipe the current buffer to, before it is sent to
-             bin. Useful if you need to modify certain lines to get
-             them to evaluate to your liking.
-
-             In the Javascript example, we rephrase simple assignment
-             statements with "let" or "var" (i.e. those not ending in "{")
-             to append the variable being let/var to the end. This allows
-             the overall evaluated result to be the variable being let/var,
-             rather than undefined. Note that this will break when you have
-             something like "var a = [", since it will be rephrased as
-             "var a = [; a". The default interpreters have no rephrasing.
-
                                                 *codi-interpreters-preprocess*
 preprocess (OPTIONAL)
-             A command to pipe the output of bin to, before it is formatted.
-             Useful if control characters need to be filtered out from running
-             bin, or if the output is non-standard in any way. After piping
-             through preprocess, the output of bin should look palatable.
+             A function to adjust the output of bin after running the buffer
+             contents. Useful if control characters need to be filtered out,
+             or if the output is non-standard in any way. After preprocess,
+             the output should be very human-friendly. That way, output result
+             lines can be successfully lined up with the corresponding lines.
+
+             The function should take a single string argument that is the
+             output of bin, and return a single string that is the adjusted
+             output of bin.
+
+             When creating your own preprocess, it is useful to enable
+             g:codi#raw to see what the output initially looks like, and what
+             your preprocess function does to the output.
 
              In the Javascript example, "node" has a tendency to print out
              control characters with a pattern of  (esc) followed by three
-             characters, so we strip those.
+             characters, so we strip those with the following function:
+>
+             function! s:pp_js(evaled)
+               return substitute(a:evaled, '...', '', 'g')
+             endfunction
+<
+             Notice that in the example, preprocess is configured as
+             `function('s:pp_js')`. In case you are unfamiliar with Vimscript,
+             this is the construct that is normally used to pass functions as
+             data.
+
+                                                  *codi-interpreters-rephrase*
+rephrase (OPTIONAL)
+             A function to adjust the contents of the current buffer to,
+             before it is sent to bin. Useful if you need to modify certain
+             lines to get them to evaluate to your liking.
+
+             The function should take a single string argument that is the
+             contents of the current buffer, and return a single string that
+             is the adjusted contents to send to bin.
+
+             This attribute is actually not recommended, since it is very
+             difficult to achieve desired goals without unforeseen
+             side-effects. None of the default interpreters actually use
+             rephrase. However, for example, if you REALLY want
+             "let var x = 5" to show "5" instead of "undefined", this is the
+             way to do it.
+
+             The configuration process is similar to preproccess, so just look
+             at |codi-interpreters-preprocess| if you're unsure how to start.
 
 vim:ft=help:tw=78:sw=13:norl:
