@@ -49,7 +49,7 @@ if has("unix")
   else
     let s:bsd = 0
     let s:script_pre = 'script -qfec "'
-    let s:script_post = '" /dev/null'
+    let s:script_post = '" /dev/null | cat'
   endif
 else
   call s:err('Codi does not support Windows yet.')
@@ -214,7 +214,17 @@ function! codi#__callback(data)
     let evaled = join(split(evaled, "\n")[num_lines:], "\n")
   " If not bsd, we need to add line breaks
   else
-    let evaled = substitute(evaled, i['prompt'], submatch(1)."\n", 'g')
+    " Use a loop to handle ^ achors
+    let result = []
+    for l in split(evaled, "\n")
+      while match(l, i['prompt']) != -1
+        let subbed = substitute(l, i['prompt'], '\0'."\n", '')
+        let [matched, l] = split(subbed, "\n", 1)
+        call add(result, matched)
+      endwhile
+      call add(result, l)
+    endfor
+    let evaled = join(result, "\n")
   endif
 
   " Preprocess
@@ -257,13 +267,13 @@ function! codi#__callback(data)
     endfor
 
     " Only take last num_lines of lines
-    let result = join(result[:num_lines - 1], "\n")
+    let lines = join(result[:num_lines - 1], "\n")
   else
-    let result = evaled
+    let lines = evaled
   endif
 
   " Read the result into the codi buf
-  1,$d _ | 0put =result
+  1,$d _ | 0put =lines
   exe 'setlocal textwidth='.codi_winwidth
   if g:codi#rightalign
     1,$right
