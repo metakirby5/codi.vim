@@ -1,7 +1,7 @@
 " Default interpreters
 function! s:pp_js(output)
   " Strip escape codes
-  return substitute(a:output, '...', '', 'g')
+  return substitute(a:output, '\[\d\(\a\|\dm\)', '', 'g')
 endfunction
 function! s:pp_rb(output)
   " Strip fat arrows
