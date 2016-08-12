@@ -55,12 +55,12 @@ Watch a screencast at https://ptpb.pw/t/~codi!
 
 SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
 
-+---------------+-----------------------------------+-------------+
-| Asynchronous? | Autocommands that trigger updates | Blocking?   |
-+---------------+-----------------------------------+-------------+
-| yes           | |TextChanged|, |TextChangedI|         | no          |
-| no            | |CursorHold|, |CursorHoldI|           | yes         |
-+---------------+-----------------------------------+-------------+
+     +---------------+-----------------------------------+-------------+
+     | Asynchronous? | Autocommands that trigger updates | Blocking?   |
+     +---------------+-----------------------------------+-------------+
+     | yes           | |TextChanged|, |TextChangedI|         | no          |
+     | no            | |CursorHold|, |CursorHoldI|           | yes         |
+     +---------------+-----------------------------------+-------------+
 
 WARNINGS                                          *codi-introduction-warnings*
 
@@ -212,17 +212,17 @@ can easily create your own configurations to add support for more filetypes.
 
 DEFAULT INTERPRETERS                              *codi-interpreters-defaults*
 
-Codi currently has support for the following filetypes:
+Codi currently has default support for the following filetypes:
 
-                          +------------+--------+
-                          | Filetype   | bin    |
-                          +------------+--------+
-                          | python     | python |
-                          | javascript | node   |
-                          | haskell    | ghci   |
-                          | ruby       | irb    |
-                          | ocaml      | ocaml  |
-                          +------------+--------+
+          +------------+--------+----------------------------------+
+          | Filetype   | bin    | Notes                            |
+          +------------+--------+----------------------------------+
+          | python     | python |                                  |
+          | javascript | node   |                                  |
+          | haskell    | ghci   |                                  |
+          | ruby       | irb    |                                  |
+          | ocaml      | ocaml  | Must end every statement with ;; |
+          +------------+--------+----------------------------------+
 
 OUTPUT SPECIFICATION                           *codi-interpreters-output-spec*
 
