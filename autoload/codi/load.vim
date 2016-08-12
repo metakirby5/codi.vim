@@ -1,13 +1,13 @@
 " Default interpreters
-function! s:pp_js(evaled)
-  return substitute(a:evaled, '...', '', 'g')
+function! s:pp_js(output)
+  return substitute(a:output, '...', '', 'g')
 endfunction
-function! s:pp_rb(evaled)
-  return substitute(a:evaled, "\n=> ", "\n", 'g')
+function! s:pp_rb(output)
+  return substitute(a:output, "\n=> ", "\n", 'g')
 endfunction
-function! s:pp_ml(evaled)
+function! s:pp_ml(output)
   let result = []
-  for line in split(a:evaled, "\n")
+  for line in split(a:output, "\n")
     " If the line is a prompt
     if match(line, '^# ') != -1
       " In ocaml, the number of characters before value divided by 2 is
@@ -18,7 +18,6 @@ function! s:pp_ml(evaled)
       call add(result, line)
     endif
   endfor
-  " Ignore the last 4 lines, because those are crap
   return join(result, "\n")
 endfunction
 let s:codi_default_interpreters = {
