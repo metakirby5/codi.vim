@@ -18,8 +18,29 @@ TABLE OF CONTENTS                                              *codi-contents*
 INTRODUCTION...............................................|codi-introduction|
 DEPENDENCIES...............................................|codi-dependencies|
 USAGE.............................................................|codi-usage|
+    :Codi {filetype}....................................................|Codi|
+    :Codi..............................................................|Codi!|
+    :Codi!! {filetype}................................................|Codi!!|
+    SHELL WRAPPER.........................................|codi-usage-wrapper|
 CONFIGURATION.............................................|codi-configuration|
+    g:codi#interpreters..................................|g:codi#interpreters|
+    g:codi#aliases............................................|g:codi#aliases|
+    g:codi#width................................................|g:codi#width|
+    g:codi#rightsplit......................................|g:codi#rightsplit|
+    g:codi#rightalign......................................|g:codi#rightalign|
+    g:codi#autoclose........................................|g:codi#autoclose|
+    g:codi#raw....................................................|g:codi#raw|
 INTERPRETERS...............................................|codi-interpreters|
+    DEFAULT INTERPRETERS..........................|codi-interpreters-defaults|
+    OUTPUT SPECIFICATION.......................|codi-interpreters-output-spec|
+    EXAMPLE INTERPRETER CONFIGURATION..............|codi-interpreters-example|
+    POSSIBLE ATTRIBUTES.........................|codi-interpreters-attributes|
+        bin............................................|codi-interpreters-bin|
+        prompt......................................|codi-interpreters-prompt|
+        env............................................|codi-interpreters-env|
+        preprocess..............................|codi-interpreters-preprocess|
+        rephrase..................................|codi-interpreters-rephrase|
+        async........................................|codi-interpreters-async|
 
 ==============================================================================
 INTRODUCTION                                               *codi-introduction*
@@ -67,7 +88,7 @@ USAGE                                                             *codi-usage*
 :Codi!! {filetype}
              Toggles Codi for the current buffer.
 
-SHELL WRAPPER~
+SHELL WRAPPER                                             *codi-usage-wrapper*
 
              A nice way to use Codi is through a shell wrapper that you can
              stick in your ~/.bashrc:
@@ -128,13 +149,14 @@ g:codi#width
                                                            *g:codi#rightsplit*
 g:codi#rightsplit
              Whether or not to spawn Codi on the right side of the current
-             buffer.
+             buffer. If 0, Codi spawns on the left.
 
              Default value is 1.
 
                                                            *g:codi#rightalign*
 g:codi#rightalign
-             Whether or not to right-align the Codi buffer.
+             Whether or not to right-align the Codi buffer. If 0, the Codi
+             buffer is left-aligned.
 
              Default value is 1.
 
