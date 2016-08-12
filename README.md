@@ -46,6 +46,7 @@ Default interpreter dependencies:
   - Javscript: `node`
   - Haskell:   `ghci`
   - Ruby:      `irb`
+  - Ocaml:     `ocaml`
 
 ## Usage
 

@@ -48,6 +48,7 @@ Default interpreter dependencies:
              Javscript: node
              Haskell:   ghci
              Ruby:      irb
+             Ocaml:     ocaml
 
 ==============================================================================
 USAGE                                                             *codi-usage*
@@ -159,20 +160,61 @@ Codi relies on interpreter configurations to understand how to evaluate your
 buffer's contents. A number of default interpreters are bundled in, but you
 can easily create your own configurations to add support for more filetypes.
 
-DEFAULT INTERPRETERS~
+DEFAULT INTERPRETERS                              *codi-interpreters-defaults*
 
 Codi currently has support for the following filetypes:
 
              +-----------------------------+
              | Filetype   | bin    | async |
-             | ---------- | ------ | ----- |
+             +------------+--------+-------+
              | python     | python | yes   |
              | javascript | node   | no    |
              | haskell    | ghci   | yes   |
              | ruby       | irb    | yes   |
+             | ocaml      | ocaml  | yes   |
              +-----------------------------+
 
-EXAMPLE INTERPRETER CONFIGURATION~
+OUTPUT SPECIFICATION                           *codi-interpreters-output-spec*
+
+To ensure evaluated lines align with the corresponding buffer's lines, the
+output prior to formatting (as if you had enabled |g:codi#raw|) must follow
+this spec:
+>
+             [any number of lines]
+             [prompt][any text]
+             [any number of lines]
+             [result associated with prompt, no leading whitespace]
+             [any number of lines with leading whitespace]
+             [next prompt][any text]
+             ...
+<
+So, the following would be valid, assuming the prompt regex is "^> ":
+>
+             > 1 + 1                                | prompt 1
+             2                                      | result 1
+             > make_stacktrace()                    | prompt 2
+             A BAD ERROR                            | result 2
+               stacktrace line 1                    | ignored
+               stacktrace line 2                    | ignored
+               stacktrace line 3                    | ignored
+             > function_that_prints_and_returns_1() | prompt 3
+             I printed something!                   | ignored
+             1                                      | result 3
+             > and so on...                         | prompt 4
+<
+However, be careful of the following cases:
+>
+             > 1 + 1      | prompt 1
+              2           | IGNORED (leading whitespace)
+             > return_1() | prompt 2
+             1            | IGNORED (next line has no leading whitespace)
+             Returned 1.  | result 2
+<
+If your output does not follow spec, you MUST implement
+|codi-interpreters-preprocess|.
+The easiest way to check is to enable |g:codi#raw|.
+
+EXAMPLE INTERPRETER CONFIGURATION                  *codi-interpreters-example*
 
 A full interpreter configuration for Javascript can be found below. (Note that
 in Vimscript, you still need to add forwardslashes for continuing newlines.)
@@ -186,7 +228,7 @@ in Vimscript, you still need to add forwardslashes for continuing newlines.)
                  'async': 0,
              }
 <
-POSSIBLE ATTRIBUTES~
+POSSIBLE ATTRIBUTES                             *codi-interpreters-attributes*
 
 Interpreter configurations have an number of attributes, but only a few of
 them are required. However, you may need to use the optional attributes
@@ -217,21 +259,24 @@ env (OPTIONAL)
              In the Javascript example, we enable "NODE_DISABLE_COLORS"
              so we have to strip less control characters.
 
+             Default value is ''.
+
                                                 *codi-interpreters-preprocess*
 preprocess (OPTIONAL)
              A function to adjust the output of bin after running the buffer
              contents. Useful if control characters need to be filtered out,
              or if the output is non-standard in any way. After preprocess,
-             the output should be very human-friendly. That way, output result
-             lines can be successfully lined up with the corresponding lines.
+             the output should conform to |codi-interpreters-output-spec|.
+             That way, output result lines can be successfully lined up with
+             the corresponding lines.
 
              The function should take a single string argument that is the
              output of bin, and return a single string that is the adjusted
              output of bin.
 
              When creating your own preprocess, it is useful to enable
-             g:codi#raw to see what the output initially looks like, and what
-             your preprocess function does to the output.
+             |g:codi#raw| to see what the output initially looks like, and
+             what your preprocess function does to the output.
 
              In the Javascript example, "node" has a tendency to print out
              control characters with a pattern of  (esc) followed by three
@@ -245,6 +290,8 @@ preprocess (OPTIONAL)
              `function('s:pp_js')`. In case you are unfamiliar with Vimscript,
              this is the construct that is normally used to pass functions as
              data.
+
+             Default value is the identity function.
 
                                                   *codi-interpreters-rephrase*
 rephrase (OPTIONAL)
@@ -266,6 +313,8 @@ rephrase (OPTIONAL)
              The configuration process is similar to preproccess, so just look
              at |codi-interpreters-preprocess| if you're unsure how to start.
 
+             Default value is the identity function.
+
                                                      *codi-interpreters-async*
 async (OPTIONAL)
              Whether or not bin should be run asynchronously. Async works fine
@@ -273,9 +322,12 @@ async (OPTIONAL)
              notable exception, and I don't know why yet, so that's why this
              option exists.
 
-             Note that if running synchronousy, |CursorHold| and |CursorHoldI|
-             will be used instaed of |TextChanged| and |TextChangedI| to
-             make typing bearable.
+             If your bin fails to generate any output in the Codi pane with
+             |g:codi#raw| enabled, try enabling this.
+
+             Note that if running synchronously,
+             |CursorHold| and |CursorHoldI| will be used instaed of
+             |TextChanged| and |TextChangedI| to make typing bearable.
 
              Default value is 1.
 
