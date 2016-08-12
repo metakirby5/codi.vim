@@ -211,7 +211,7 @@ output prior to formatting (as if you had enabled |g:codi#raw|) must follow
 this spec:
 >
              [any number of lines]
-             [prompt][any text]
+             [first prompt][any text]
              [any number of lines]
              [result associated with prompt, no leading whitespace]
              [any number of lines with leading whitespace]
@@ -220,6 +220,7 @@ this spec:
 <
 So, the following would be valid, assuming the prompt regex is "^> ":
 >
+             LANGUAGE INTERPRETER v1.0              | ignored
              > 1 + 1                                | prompt 1
              2                                      | result 1
              > make_stacktrace()                    | prompt 2
@@ -296,7 +297,7 @@ preprocess (OPTIONAL)
              what your preprocess function does to the output.
 
              In the Javascript example, "node" has a tendency to print out
-             control characters with a pattern of  (esc) followed by three
+             escape codes with a pattern of  (esc) followed by three
              characters, so we strip those with the following function:
 >
              function! s:pp_js(evaled)

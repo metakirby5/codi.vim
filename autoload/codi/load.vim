@@ -1,11 +1,14 @@
 " Default interpreters
 function! s:pp_js(output)
+  " Strip escape codes
   return substitute(a:output, '...', '', 'g')
 endfunction
 function! s:pp_rb(output)
+  " Strip fat arrows
   return substitute(a:output, "\n=> ", "\n", 'g')
 endfunction
 function! s:pp_ml(output)
+  " Add newlines
   let result = []
   for line in split(a:output, "\n")
     " If the line is a prompt
