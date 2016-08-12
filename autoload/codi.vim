@@ -36,8 +36,7 @@ endif
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:updating = 0
-let s:prefix = '__CODI__'
-let s:suffix = '__END_CODI__'
+let s:channels = {} " { ch_id: bufnr }
 
 " Detect what version of script to use based on OS
 if has("unix")
@@ -142,16 +141,16 @@ function! s:codi_update(async)
   let async = has('job') && get(i, 'async', 1)
   if (has('job') && a:async) != async | return | endif
 
+  let bufnr = bufnr('%')
+
   " Build input
   let input = join(getline('^', '$'), "\n")
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
 
-  " We write the buffer number into stdin as a hack because
-  "   Vimscript can't into anonymous closures
   " We use the magic sequence '' to get out of the REPL
-  let input = input."\n".s:prefix.bufnr('%').s:suffix."\n".''
+  let input = input.''
 
   " Build the command
   let cmd = get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
@@ -159,9 +158,15 @@ function! s:codi_update(async)
   " Async or sync
   if async
     let job = job_start(cmd, { 'close_cb': 'codi#__callback' })
-    call ch_sendraw(job_getchannel(job), input)
+    let ch = job_getchannel(job)
+
+    " Save the associated bufnr
+    let s:channels[ch_info(ch)['id']] = bufnr
+
+    " Send the input
+    call ch_sendraw(ch, input)
   else
-    call codi#__handle_data(system(cmd, input))
+    call codi#__handle_data({ 'bufnr': bufnr, 'output': system(cmd, input) })
   endif
 
 endfunction
@@ -173,18 +178,26 @@ function! codi#__handle_data(data)
   " We should really use a mutex, but Vim doesn't have those.
   " Oh well, user keystrokes are pretty slow anyways, relative to code.
 
-  " Grab the output - can either be channel or string
+  " Grab the output - can either be dict (sync) or channel (async)
+  " Dict case, the dict is the info
+  " Channel case, we get info by channel id
   try
+    let bufnr = a:data['bufnr']
+    let evaled = a:data['output']
+
+  " Failure to index means this is a channel
+  catch E909
+    " Get some information
+    let ch_id = ch_info(a:data)['id']
+    let bufnr = s:channels[ch_id]
+
+    " Reconstruct from output
     let output = []
     while ch_status(a:data) == 'buffered'
       call add(output, ch_readraw(a:data))
     endwhile
     let evaled = join(output, "\n")
-  catch /E\(475\|117\)/
-    let evaled = a:data
   endtry
-
-  let bufnr = matchlist(evaled, s:prefix.'\(\d\+\)'.s:suffix)[1]
 
   " Save for later
   let ret_bufnr = bufnr('%')
@@ -210,7 +223,7 @@ function! codi#__handle_data(data)
 
   " We then strip out some crap characters from script
   let evaled = substitute(substitute(evaled,
-        \ '\|', '', 'g'), '\(^\|\n\)\(\^D\)\+', '', 'g')
+        \ '\|', '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
 
   " If bsd, we need to get rid of inputted lines
   if s:bsd

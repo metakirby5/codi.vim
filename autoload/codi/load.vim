@@ -19,7 +19,7 @@ function! s:pp_ml(evaled)
     endif
   endfor
   " Ignore the last 4 lines, because those are crap
-  return join(result[:-4], "\n")
+  return join(result, "\n")
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {
