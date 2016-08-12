@@ -27,6 +27,7 @@ USAGE.............................................................|codi-usage|
 CONFIGURATION.............................................|codi-configuration|
     g:codi#interpreters..................................|g:codi#interpreters|
     g:codi#aliases............................................|g:codi#aliases|
+    g:codi#autocmd............................................|g:codi#autocmd|
     g:codi#width................................................|g:codi#width|
     g:codi#rightsplit......................................|g:codi#rightsplit|
     g:codi#rightalign......................................|g:codi#rightalign|
@@ -56,7 +57,7 @@ Watch a screencast at https://ptpb.pw/t/~codi!
 SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
 
      +---------------+-----------------------------------+-------------+
-     | Asynchronous? | Autocommands that trigger updates | Blocking?   |
+     | Asynchronous? | Default autocommands for updates  | Blocking?   |
      +---------------+-----------------------------------+-------------+
      | yes           | |TextChanged|, |TextChangedI|         | no          |
      | no            | |CursorHold|, |CursorHoldI|           | yes         |
@@ -167,6 +168,15 @@ g:codi#aliases
                    \ }
 <
              Default value is {}.
+
+                                                             *g:codi#autocmd*
+g:codi#autocmd
+             What |autocommand|s trigger updates. Possible values:
+             |TextChanged|, |CursorHold|, |InsertLeave|
+
+             These will also register the insert mode variants.
+
+             Default value is 'TextChanged' for async, 'CursorHold' for sync.
 
                                                                 *g:codi#width*
 g:codi#width

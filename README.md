@@ -83,6 +83,8 @@ codi() {
   See the [documentation](doc/codi.txt) for more information.
 - `g:codi#aliases` is a list of user-defined interpreter filetype aliases.
   See the [documentation](doc/codi.txt) for more information.
+- `g:codi#autocmd` determines what autocommands trigger updates.
+  See the [documentation](doc/codi.txt) for more information.
 - `g:codi#width` is the width of the Codi split.
 - `g:codi#rightsplit` is whether or not Codi spawns on the right side.
 - `g:codi#rightalign` is whether or not to right-align the Codi buffer.

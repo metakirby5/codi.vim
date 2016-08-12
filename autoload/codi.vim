@@ -77,12 +77,24 @@ augroup END
 augroup CODI_TARGET
   au!
   " === g:codi#update() ===
-  " Async: TextChanged
-  if s:async
+  " Instant
+  if s:async && g:codi#autocmd == 'TextChanged'
     au TextChanged,TextChangedI * silent! call s:codi_update()
-  " Sync: CursorHold
-  else
+  " 'updatetime'
+  elseif g:codi#autocmd == 'CursorHold'
     au CursorHold,CursorHoldI * silent! call s:codi_update()
+  " Insert mode left
+  elseif g:codi#autocmd == 'InsertLeave'
+    au InsertLeave * silent! call s:codi_update()
+  " Defaults
+  else
+    " Instant
+    if s:async
+      au TextChanged,TextChangedI * silent! call s:codi_update()
+    " 'updatetime'
+    else
+      au CursorHold,CursorHoldI * silent! call s:codi_update()
+    endif
   endif
 
   " === g:codi#autoclose ===

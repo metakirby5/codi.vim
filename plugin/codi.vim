@@ -28,6 +28,11 @@ if !exists('g:codi#aliases')
   let g:codi#aliases = {}
 endif
 
+" What autocmds trigger updates
+if !exists('g:codi#autocmd')
+  let g:codi#autocmd = 0
+endif
+
 " Width of Codi split
 if !exists('g:codi#width')
   let g:codi#width = 40
