@@ -148,8 +148,8 @@ function! s:codi_update()
     let input = i['rephrase'](input)
   endif
 
-  " We use the magic sequence '' to get out of the REPL
-  let input = input.''
+  " We use the magic sequence '' to get out of the REPL
+  let input = input.''
 
   " Build the command
   let cmd = s:script_pre.i['bin'].s:script_post
