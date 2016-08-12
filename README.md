@@ -47,7 +47,7 @@ Default interpreter dependencies:
 
   - Python:    `python`
   - Javscript: `node`
-  - Haskell:   `ghci`
+  - Haskell:   `ghci` (be really careful with lazy evaluation!)
   - Ruby:      `irb`
   - Ocaml:     `ocaml`
 

@@ -17,7 +17,8 @@ TABLE OF CONTENTS                                              *codi-contents*
 
 INTRODUCTION...............................................|codi-introduction|
     SYNCHRONOUS VS ASYNCHRONOUS.................|codi-introduction-sync-diffs|
-DEPENDENCIES...............................................|codi-dependencies|
+    WARNINGS......................................|codi-introduction-warnings|
+    DEPENDENCIES...........................................|codi-dependencies|
 USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
     :Codi!............................................................|:Codi!|
@@ -61,7 +62,26 @@ SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
 | no            | |CursorHold|, |CursorHoldI|           | yes         |
 +---------------+-----------------------------------+-------------+
 
-==============================================================================
+WARNINGS                                          *codi-introduction-warnings*
+
+Be EXTREMELY careful with lazily evaluated languages. I cannot stress this
+enough: the moment you type an infinite list, vim will freeze and your CPU
+usage will skyrocket.
+
+For example, as cool as this is, NEVER attempt the below in Codi with Haskell:
+>
+             let fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+             f !! 5
+<
+Even if you only intend to extract the 5th element of f, unless you are clever
+about how you write it, the second line will be just "f" at some point. This
+leads to evaluating the infinite list, which you might not notice for a few
+seconds, but will definitely stress out your computer if you leave it going
+for much longer.
+
+Should this happen to you, kill both Vim and the interpreter.
+Seriously, I mean it.
+
 DEPENDENCIES                                               *codi-dependencies*
 
 Asynchronous evaluation requires |+job| and |+channel|.
