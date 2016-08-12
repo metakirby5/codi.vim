@@ -181,7 +181,6 @@ function! s:codi_update()
 
     " Save the associated bufnr
     let s:channels[s:ch_get_id(ch)] = {
-          \ 'job': job,
           \ 'bufnr': bufnr,
           \ 'lines': [],
           \ }
@@ -197,9 +196,6 @@ endfunction
 function! codi#__callback(ch, msg)
   let data = s:channels[s:ch_get_id(a:ch)]
   call add(data['lines'], a:msg)
-
-  " When to do this?
-  " call job_stop(data['job'])
 endfunction
 
 " Callback to finish data gathering
