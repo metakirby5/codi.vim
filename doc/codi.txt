@@ -16,6 +16,7 @@ Repo:     https://github.com/metakirby5/codi.vim
 TABLE OF CONTENTS                                              *codi-contents*
 
 INTRODUCTION...............................................|codi-introduction|
+    SYNCHRONOUS VS ASYNCHRONOUS.................|codi-introduction-sync-diffs|
 DEPENDENCIES...............................................|codi-dependencies|
 USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
@@ -37,10 +38,8 @@ INTERPRETERS...............................................|codi-interpreters|
     POSSIBLE ATTRIBUTES.........................|codi-interpreters-attributes|
         bin............................................|codi-interpreters-bin|
         prompt......................................|codi-interpreters-prompt|
-        env............................................|codi-interpreters-env|
         preprocess..............................|codi-interpreters-preprocess|
         rephrase..................................|codi-interpreters-rephrase|
-        async........................................|codi-interpreters-async|
 
 ==============================================================================
 INTRODUCTION                                               *codi-introduction*
@@ -48,10 +47,19 @@ INTRODUCTION                                               *codi-introduction*
 Codi is an interactive scratchpad for hackers, with a similar interface to
 Numi (https://numi.io). It opens a pane synchronized to your main buffer which
 displays the results of evaluating each line as you type (if Vim has |+job|
-and |+channel|, asynchronously for supported interpreters). It's extensible to
-nearly any language that provides a REPL (interactive interpreter)!
+and |+channel|, asynchronously!). It's extensible to nearly any language that
+provides a REPL (interactive interpreter)!
 
 Watch a screencast at https://ptpb.pw/t/~codi!
+
+SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
+
++---------------+-----------------------------------+-------------+
+| Asynchronous? | Autocommands that trigger updates | Blocking?   |
++---------------+-----------------------------------+-------------+
+| yes           | |TextChanged|, |TextChangedI|         | no          |
+| no            | |CursorHold|, |CursorHoldI|           | yes         |
++---------------+-----------------------------------+-------------+
 
 ==============================================================================
 DEPENDENCIES                                               *codi-dependencies*
@@ -186,15 +194,15 @@ DEFAULT INTERPRETERS                              *codi-interpreters-defaults*
 
 Codi currently has support for the following filetypes:
 
-             +-----------------------------+
-             | Filetype   | bin    | async |
-             +------------+--------+-------+
-             | python     | python | yes   |
-             | javascript | node   | no    |
-             | haskell    | ghci   | yes   |
-             | ruby       | irb    | yes   |
-             | ocaml      | ocaml  | yes   |
-             +-----------------------------+
+                          +------------+--------+
+                          | Filetype   | bin    |
+                          +------------+--------+
+                          | python     | python |
+                          | javascript | node   |
+                          | haskell    | ghci   |
+                          | ruby       | irb    |
+                          | ocaml      | ocaml  |
+                          +------------+--------+
 
 OUTPUT SPECIFICATION                           *codi-interpreters-output-spec*
 
@@ -243,11 +251,9 @@ in Vimscript, you still need to add forwardslashes for continuing newlines.)
 >
              'javascript': {
                  'bin': 'node',
-                 'env': 'NODE_DISABLE_COLORS=1',
                  'prompt': '^\(>\|\.\.\.\+\) ',
                  'preprocess': function('s:pp_js'),
                  'rephrase': function('s:rp_js'),
-                 'async': 0,
              }
 <
 POSSIBLE ATTRIBUTES                             *codi-interpreters-attributes*
@@ -271,17 +277,6 @@ prompt (REQUIRED)
              In the Javascript example, we set prompt to match
              ">", "...", and any amount of dots greater than that to
              accomodate further nesting levels.
-
-                                                       *codi-interpreters-env*
-env (OPTIONAL)
-             Any environment variables to set for bin. The format is
-             "VARIABLE=value", as if you were running a command with
-             environment variables at the command line.
-
-             In the Javascript example, we enable "NODE_DISABLE_COLORS"
-             so we have to strip less control characters.
-
-             Default value is ''.
 
                                                 *codi-interpreters-preprocess*
 preprocess (OPTIONAL)
@@ -336,21 +331,5 @@ rephrase (OPTIONAL)
              at |codi-interpreters-preprocess| if you're unsure how to start.
 
              Default value is the identity function.
-
-                                                     *codi-interpreters-async*
-async (OPTIONAL)
-             Whether or not bin should be run asynchronously. Async works fine
-             most of the time, so you shouldn't have to touch this. Node is a
-             notable exception, and I don't know why yet, so that's why this
-             option exists.
-
-             If your bin fails to generate any output in the Codi pane with
-             |g:codi#raw| enabled, try enabling this.
-
-             Note that if running synchronously,
-             |CursorHold| and |CursorHoldI| will be used instaed of
-             |TextChanged| and |TextChangedI| to make typing bearable.
-
-             Default value is 1.
 
 vim:ft=help:tw=78:sw=13:norl:

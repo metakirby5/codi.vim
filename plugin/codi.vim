@@ -2,22 +2,18 @@
 " Entries are in the form of:
 "   <filetype>: {
 "     'bin': <interpreter binary name>,
-"     'env': <optional environment variables for bin>,
 "     'prompt': <vim regex pattern indicating the prompt>,
 "     'preprocess': <optional function to run bin output through
 "                    before prompt parsing>,
 "     'rephrase': <optional function to run buffer contents through
 "                    before handing off to bin>,
-"     'async': <whether or not to interpret asynchronously>,
 "   }
 " For example:
 "   'javascript': {
 "       'bin': 'node',
-"       'env': 'NODE_DISABLE_COLORS=1',
 "       'prompt': '^\(>\|\.\.\.\+\) ',
 "       'preprocess': function('s:pp_js'),
 "       'rephrase': function('s:rp_js'),
-"       'async': 0,
 "    }
 if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}

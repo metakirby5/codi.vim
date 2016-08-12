@@ -28,10 +28,8 @@ let s:codi_default_interpreters = {
           \ },
       \ 'javascript': {
           \ 'bin': 'node',
-          \ 'env': 'NODE_DISABLE_COLORS=1',
           \ 'prompt': '^\(>\|\.\.\.\+\) ',
           \ 'preprocess': function('s:pp_js'),
-          \ 'async': 0,
           \ },
       \ 'haskell': {
           \ 'bin': 'ghci',

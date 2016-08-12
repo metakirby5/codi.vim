@@ -35,6 +35,7 @@ endif
 " Load resources
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
+let s:async = has('job') && has('channel')
 let s:updating = 0
 let s:channels = {} " { ch_id: { bufnr: int, lines: [string] } }
 
@@ -75,11 +76,14 @@ augroup END
 " Actions on all windows
 augroup CODI_TARGET
   au!
-  " === g:codi#update(async) ===
+  " === g:codi#update() ===
   " Async: TextChanged
-  au TextChanged,TextChangedI * silent! call s:codi_update(1)
+  if s:async
+    au TextChanged,TextChangedI * silent! call s:codi_update()
   " Sync: CursorHold
-  au CursorHold,CursorHoldI * silent! call s:codi_update(0)
+  else
+    au CursorHold,CursorHoldI * silent! call s:codi_update()
+  endif
 
   " === g:codi#autoclose ===
   " Hide on buffer leave
@@ -131,16 +135,11 @@ function! s:codi_kill()
 endfunction
 
 " Update the codi buf
-function! s:codi_update(async)
+function! s:codi_update()
   " Bail if no codi buf to act on
   if !exists('b:codi_bufnr') | return | endif
 
   let i = getbufvar(b:codi_bufnr, 'codi_interpreter')
-
-  " Bail if async doesn't match up
-  let async = has('job') && get(i, 'async', 1)
-  if (has('job') && a:async) != async | return | endif
-
   let bufnr = bufnr('%')
 
   " Build input
@@ -149,14 +148,14 @@ function! s:codi_update(async)
     let input = i['rephrase'](input)
   endif
 
-  " We use the magic sequence '' to get out of the REPL
-  let input = input.''
+  " We use the magic sequence '' to get out of the REPL
+  let input = input.''
 
   " Build the command
-  let cmd = get(i, 'env', '').' '.s:script_pre.i['bin'].s:script_post
+  let cmd = s:script_pre.i['bin'].s:script_post
 
   " Async or sync
-  if async
+  if s:async
     let job = job_start(cmd, {
           \ 'callback': 'codi#__callback',
           \ 'close_cb': 'codi#__close_cb' })
@@ -363,7 +362,7 @@ function! s:codi_spawn(filetype)
   " Return to target split
   keepjumps keepalt wincmd p
   let b:codi_bufnr = bufnr('$')
-  silent! return s:codi_update(get(s:interpreter, 'async', 1))
+  silent! return s:codi_update()
 endfunction
 
 " Main function
