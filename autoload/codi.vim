@@ -181,7 +181,6 @@ function! s:codi_update()
   else
     call s:codi_handle_done(bufnr, system(cmd, input))
   endif
-
 endfunction
 
 " Callback to handle output
