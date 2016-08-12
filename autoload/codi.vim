@@ -50,7 +50,7 @@ if has("unix")
     let s:async = 0 " TODO: remove this when i fix async
     let s:bsd = 0
     let s:script_pre = 'script -qfec "'
-    let s:script_post = '" /dev/null'
+    let s:script_post = '" /dev/null | cat'
   endif
 else
   call s:err('Codi does not support Windows yet.')
