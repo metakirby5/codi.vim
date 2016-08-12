@@ -3,6 +3,24 @@ function! s:pp_js(output)
   " Strip escape codes
   return substitute(a:output, '\[\d\(\a\|\dm\)', '', 'g')
 endfunction
+function! s:pp_hs(output)
+  " BSD is fine.
+  let s:uname = system('uname -s')
+  if s:uname =~ 'Darwin' || s:uname =~ 'BSD'
+    return a:output
+  endif
+
+  " On Linux, strip escape codes and add newlines where they should go
+  let c = substitute(a:output, '\(\[?1[hl]\|E\)', '', 'g')
+  let c = substitute(c, '', "\n", 'g')
+
+  " Also strip first character
+  let l = []
+  for line in split(c, "\n")
+    call add(l, line[1:])
+  endfor
+  return join(l, "\n")
+endfunction
 function! s:pp_rb(output)
   " Strip fat arrows
   return substitute(a:output, "\n=> ", "\n", 'g')
@@ -36,6 +54,7 @@ let s:codi_default_interpreters = {
       \ 'haskell': {
           \ 'bin': 'ghci',
           \ 'prompt': '^Prelude> ',
+          \ 'preprocess': function('s:pp_hs'),
           \ },
       \ 'ruby': {
           \ 'bin': 'irb',
