@@ -1,0 +1,46 @@
+#!/usr/bin/env expect -f
+# The script used to create the README gif.
+# The playback was recorded with QuickTime and converted with ffmpeg.
+
+set send_human {.07 .1 infinity .07 .1}
+
+sleep 4
+send -h -- "i"
+send -h -- "x = 2\r"
+sleep 0.5
+send -h -- "y = 3\r"
+sleep 0.5
+send -h -- "x"
+sleep 1
+send -h -- "y"
+sleep 1
+send -h -- "x * y + z"
+sleep 1
+send -h -- "5"
+sleep 1
+send -h -- "\r"
+sleep 0.5
+send -h -- "\r"
+sleep 0.5
+send -h -- "def fun(z):\r"
+sleep 0.5
+send -h -- "return x + y * 2 + z * 3\r"
+sleep 0.5
+send -h -- "\r"
+sleep 0.5
+send -h -- "map(fun, range(3))\r"
+sleep 1
+send -h -- "reduce(lambda a, n: a + n, range(10))\r"
+sleep 1
+send -h -- "\r"
+sleep 0.5
+send -h -- "from datetime import datetime\r"
+sleep 0.5
+send -h -- "datetime.now().time().isoformat()\r"
+sleep 1
+send -h -- "\r"
+sleep 0.5
+send -h -- "\"Thanks for flying Codi!\""
+sleep 1
+send -h -- ";q!\r"
+sleep 1
