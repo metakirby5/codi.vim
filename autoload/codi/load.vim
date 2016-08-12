@@ -8,16 +8,18 @@ endfunction
 function! s:pp_ml(evaled)
   let result = []
   for line in split(a:evaled, "\n")
-    " In ocaml, the # of characters before '-' divided by 2 is
-    " the number of newlines.
-    let match = match(line, '-')
-    if match != -1
-      call add(result, '# '.repeat("\n# ", match / 2 - 1)."\n".line[match:])
+    " If the line is a prompt
+    if match(line, '^# ') != -1
+      " In ocaml, the number of characters before value divided by 2 is
+      " the number of newlines.
+      let val = match(line, '[^# ]')
+      call add(result, '# '.repeat("\n# ", val / 2 - 1)."\n".line[val:])
     else
       call add(result, line)
     endif
   endfor
-  return join(result, "\n")
+  " Ignore the last 4 lines, because those are crap
+  return join(result[:-4], "\n")
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {
