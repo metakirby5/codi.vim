@@ -47,9 +47,10 @@ if has("unix")
     let s:script_pre = 'script -q /dev/null '
     let s:script_post = ''
   else
+    let s:async = 0 " TODO: remove this when i fix async
     let s:bsd = 0
     let s:script_pre = 'script -qfec "'
-    let s:script_post = '" /dev/null | cat'
+    let s:script_post = '" /dev/null'
   endif
 else
   call s:err('Codi does not support Windows yet.')
@@ -105,6 +106,11 @@ augroup CODI_TARGET
   " Kill on target quit
   au QuitPre * silent! call s:codi_autoclose()
 augroup END
+
+" Gets the ID, no matter if ch is open or closed.
+function! s:ch_get_id(ch)
+  let id = substitute(a:ch, '^channel \(\d\+\) \(open\|closed\)$', '\1', '')
+endfunction
 
 function! s:codi_toggle(filetype)
   if exists('b:codi_bufnr')
@@ -174,7 +180,11 @@ function! s:codi_update()
     let ch = job_getchannel(job)
 
     " Save the associated bufnr
-    let s:channels[ch_info(ch)['id']] = { 'bufnr': bufnr, 'lines': [] }
+    let s:channels[s:ch_get_id(ch)] = {
+          \ 'job': job,
+          \ 'bufnr': bufnr,
+          \ 'lines': [],
+          \ }
 
     " Send the input
     call ch_sendraw(ch, input)
@@ -185,12 +195,16 @@ endfunction
 
 " Callback to handle output
 function! codi#__callback(ch, msg)
-  call add(s:channels[ch_info(a:ch)['id']]['lines'], a:msg)
+  let data = s:channels[s:ch_get_id(a:ch)]
+  call add(data['lines'], a:msg)
+
+  " When to do this?
+  " call job_stop(data['job'])
 endfunction
 
 " Callback to finish data gathering
 function! codi#__close_cb(ch)
-  let data = s:channels[ch_info(a:ch)['id']]
+  let data = s:channels[s:ch_get_id(a:ch)]
   silent! return s:codi_handle_done(data['bufnr'], join(data['lines'], "\n"))
 endfunction
 
