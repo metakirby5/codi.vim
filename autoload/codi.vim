@@ -36,7 +36,7 @@ endif
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:updating = 0
-let s:channels = {} " { ch_id: bufnr }
+let s:channels = {} " { ch_id: { bufnr: int, lines: [string] } }
 
 " Detect what version of script to use based on OS
 if has("unix")
@@ -157,53 +157,40 @@ function! s:codi_update(async)
 
   " Async or sync
   if async
-    let job = job_start(cmd, { 'close_cb': 'codi#__callback' })
+    let job = job_start(cmd, {
+          \ 'callback': 'codi#__callback',
+          \ 'close_cb': 'codi#__close_cb' })
     let ch = job_getchannel(job)
 
     " Save the associated bufnr
-    let s:channels[ch_info(ch)['id']] = bufnr
+    let s:channels[ch_info(ch)['id']] = { 'bufnr': bufnr, 'lines': [] }
 
     " Send the input
     call ch_sendraw(ch, input)
   else
-    call codi#__handle_data({ 'bufnr': bufnr, 'output': system(cmd, input) })
+    call s:codi_handle_done(bufnr, system(cmd, input))
   endif
 
 endfunction
-function! codi#__callback(data)
-  silent! return codi#__handle_data(a:data) " To silence any async output
+
+" Callback to handle output
+function! codi#__callback(ch, msg)
+  call add(s:channels[ch_info(a:ch)['id']]['lines'], a:msg)
 endfunction
-function! codi#__handle_data(data)
 
-  " We should really use a mutex, but Vim doesn't have those.
-  " Oh well, user keystrokes are pretty slow anyways, relative to code.
+" Callback to finish data gathering
+function! codi#__close_cb(ch)
+  let data = s:channels[ch_info(a:ch)['id']]
+  silent! return s:codi_handle_done(data['bufnr'], join(data['lines'], "\n"))
+endfunction
 
-  " Grab the output - can either be dict (sync) or channel (async)
-  " Dict case, the dict is the info
-  " Channel case, we get info by channel id
-  try
-    let bufnr = a:data['bufnr']
-    let evaled = a:data['output']
-
-  " Failure to index means this is a channel
-  catch E909
-    " Get some information
-    let ch_id = ch_info(a:data)['id']
-    let bufnr = s:channels[ch_id]
-
-    " Reconstruct from output
-    let output = []
-    while ch_status(a:data) == 'buffered'
-      call add(output, ch_readraw(a:data))
-    endwhile
-    let evaled = join(output, "\n")
-  endtry
-
+" Handle finished bin output
+function! s:codi_handle_done(bufnr, output)
   " Save for later
   let ret_bufnr = bufnr('%')
 
   " Go to target buf
-  exe 'keepjumps keepalt buf '.bufnr
+  exe 'keepjumps keepalt buf '.a:bufnr
   let s:updating = 1
   let codi_winwidth = winwidth(bufwinnr(b:codi_bufnr))
   let num_lines = line('$')
@@ -222,17 +209,17 @@ function! codi#__handle_data(data)
   let i = b:codi_interpreter
 
   " We then strip out some crap characters from script
-  let evaled = substitute(substitute(evaled,
+  let output = substitute(substitute(a:output,
         \ '\|', '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
 
   " If bsd, we need to get rid of inputted lines
   if s:bsd
-    let evaled = join(split(evaled, "\n")[num_lines:], "\n")
+    let output = join(split(output, "\n")[num_lines:], "\n")
   " If not bsd, we need to add line breaks
   else
     " Use a loop to handle ^ achors
     let result = []
-    for l in split(evaled, "\n")
+    for l in split(output, "\n")
       while match(l, i['prompt']) != -1
         let subbed = substitute(l, i['prompt'], '\0'."\n", '')
         let [matched, l] = split(subbed, "\n", 1)
@@ -240,12 +227,12 @@ function! codi#__handle_data(data)
       endwhile
       call add(result, l)
     endfor
-    let evaled = join(result, "\n")
+    let output = join(result, "\n")
   endif
 
   " Preprocess
   if has_key(i, 'preprocess')
-    let evaled = i['preprocess'](evaled)
+    let output = i['preprocess'](output)
   endif
 
   " Unless raw, parse for propmt
@@ -263,7 +250,7 @@ function! codi#__handle_data(data)
     let taken = ''       " What to print at the prompt
 
     " Iterate through all lines
-    for l in split(evaled, "\n")
+    for l in split(output, "\n")
       " If we hit a prompt
       if match(l, i['prompt']) != -1
         " If we have passed the first prompt
@@ -285,7 +272,7 @@ function! codi#__handle_data(data)
     " Only take last num_lines of lines
     let lines = join(result[:num_lines - 1], "\n")
   else
-    let lines = evaled
+    let lines = output
   endif
 
   " Read the result into the codi buf
