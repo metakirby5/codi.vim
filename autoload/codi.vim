@@ -39,7 +39,7 @@ let s:async = !g:codi#sync && has('job') && has('channel')
 let s:updating = 0
 let s:jobs = {} " { bufnr: job }
 let s:channels = {} " { ch_id: { job-related data } }
-let s:magic = '' " to get out of REPL
+let s:magic = "\n".'' " to get out of REPL
 
 " Detect what version of script to use based on OS
 if has("unix")
