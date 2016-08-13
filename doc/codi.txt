@@ -85,7 +85,7 @@ Should this happen to you, kill both Vim and the interpreter.
 Seriously, I mean it.
 
 Also, Codi will very occasionally leave interpreters running in the background
-which need to be killed. This has only been observed with haskell (ghci), so
+which need to be killed. This has only been observed with Haskell (ghci), so
 if your fans spin up, you may need to investigate.
 
 DEPENDENCIES                                               *codi-dependencies*
@@ -147,12 +147,21 @@ g:codi#interpreters
              A dictionary of user-defined interpreters.
              See |codi-interpreters| for the format specification.
 
-             This will not overwrite the internal default interpreters.
+             This will not erase the internal default interpreters.
 >
              let g:codi#interpreters = {
                    \ 'python': {
                        \ 'bin': 'python',
                        \ 'prompt': '^\(>>>\|\.\.\.\) ',
+                       \ },
+                   \ }
+<
+             This dictionary is deeply updated, so if all you want to do is
+             change the Haskell prompt to "> ", use the following:
+>
+             let g:codi#interpreters = {
+                   \ 'haskell': {
+                       \ 'prompt': '^> ',
                        \ },
                    \ }
 <
@@ -166,7 +175,7 @@ g:codi#aliases
              "javascript" so the Javascript interpreter (node) can be used
              for the "javascript.jsx" filetype.
 
-             This will not overwrite the internal default aliases.
+             This will not erase the internal default aliases.
 >
              let g:codi#aliases = {
                    \ 'javascript.jsx': 'javascript',
