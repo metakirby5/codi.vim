@@ -37,7 +37,8 @@ let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:async = has('job') && has('channel')
 let s:updating = 0
-let s:channels = {} " { ch_id: { bufnr: int, lines: [string] } }
+let s:jobs = {} " { bufnr: job }
+let s:channels = {} " { ch_id: { job-related data } }
 let s:magic = '' " to get out of REPL
 
 " Detect what version of script to use based on OS
@@ -173,9 +174,14 @@ function! s:codi_update()
     let job = job_start(cmd, { 'callback': 'codi#__callback' })
     let ch = job_getchannel(job)
 
-    " Save the associated bufnr
+    " Kill previously running job if necessary
+    if has_key(s:jobs, bufnr)
+      call job_stop(s:jobs[bufnr])
+    endif
+
+    " Save job-related information
+    let s:jobs[bufnr] = job
     let s:channels[s:ch_get_id(ch)] = {
-          \ 'job': job,
           \ 'bufnr': bufnr,
           \ 'lines': [],
           \ 'preprocess': get(i, 'preprocess', 0),
@@ -195,8 +201,10 @@ endfunction
 function! codi#__callback(ch, msg)
   let data = s:channels[s:ch_get_id(a:ch)]
 
+  " Bail early if we're done
   if data['received'] > data['expected'] | return | endif
 
+  " Preprocess early so we can properly detect prompts
   if data['preprocess'] != 0
     let out = data['preprocess'](a:msg)
   else
@@ -210,7 +218,7 @@ function! codi#__callback(ch, msg)
     if match(line, data['prompt']) != -1
       let data['received'] += 1
       if data['received'] > data['expected']
-        call job_stop(data['job'])
+        call job_stop(s:jobs[data['bufnr']])
         silent! return s:codi_handle_done(
               \ data['bufnr'], join(data['lines'], "\n"))
       endif
