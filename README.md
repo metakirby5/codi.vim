@@ -92,6 +92,8 @@ codi() {
   buffer is closed.
 - `g:codi#raw` is whether or not to display interpreter results without
   alignment formatting (useful for debugging).
+- `g:codi#sync` is whether or not to force synchronous execution. No reason to
+  touch this unless you want to compare async to sync.
 
 ## Thanks to
 

@@ -58,4 +58,9 @@ if !exists('g:codi#raw')
   let g:codi#raw = 0
 endif
 
+" Force sync?
+if !exists('g:codi#sync')
+  let g:codi#sync = 0
+endif
+
 command! -nargs=? -bang -bar -complete=filetype Codi call codi#run(<bang>0, <f-args>)

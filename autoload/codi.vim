@@ -35,7 +35,7 @@ endif
 " Load resources
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
-let s:async = has('job') && has('channel')
+let s:async = !g:codi#sync && has('job') && has('channel')
 let s:updating = 0
 let s:jobs = {} " { bufnr: job }
 let s:channels = {} " { ch_id: { job-related data } }

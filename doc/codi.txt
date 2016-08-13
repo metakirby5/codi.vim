@@ -33,6 +33,7 @@ CONFIGURATION.............................................|codi-configuration|
     g:codi#rightalign......................................|g:codi#rightalign|
     g:codi#autoclose........................................|g:codi#autoclose|
     g:codi#raw....................................................|g:codi#raw|
+    g:codi#sync..................................................|g:codi#sync|
 INTERPRETERS...............................................|codi-interpreters|
     DEFAULT INTERPRETERS..........................|codi-interpreters-defaults|
     OUTPUT SPECIFICATION.......................|codi-interpreters-output-spec|
@@ -213,6 +214,13 @@ g:codi#raw
 
              Default value is 0.
 
+                                                                 *g:codi#sync*
+g:codi#sync
+             Whether or not force synchronous execution.
+             No reason to touch this unless you want to compare async to sync.
+
+             Default value is 0.
+
 ==============================================================================
 INTERPRETERS                                               *codi-interpreters*
 
@@ -349,7 +357,7 @@ rephrase (OPTIONAL)
 
              The function should take a single string argument that is the
              contents of the current buffer, and return a single string that
-             is the adjusted contents to send to bin. Unlike preprocess,
+             is the adjusted contents to send to bin. Note: unlike preprocess,
              which operates per-line, rephrase operates on the entire buffer.
 
              This attribute is actually not recommended, since it is very
