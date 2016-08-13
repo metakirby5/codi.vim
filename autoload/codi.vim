@@ -111,6 +111,18 @@ function! s:ch_get_id(ch)
   let id = substitute(a:ch, '^channel \(\d\+\) \(open\|closed\)$', '\1', '')
 endfunction
 
+" Stop the job and clear it from the process table.
+function! s:job_stop_and_clear(job, ...)
+  if a:0
+    call job_stop(a:job, a:1)
+  else
+    call job_stop(a:job)
+  end
+
+  " Implicitly clears from process table.
+  call job_status(a:job)
+endfunction
+
 function! s:codi_toggle(filetype)
   if exists('b:codi_bufnr')
     return s:codi_kill()
@@ -176,7 +188,7 @@ function! s:codi_update()
 
     " Kill previously running job if necessary
     if has_key(s:jobs, bufnr)
-      call job_stop(s:jobs[bufnr])
+      call s:job_stop_and_clear(s:jobs[bufnr])
     endif
 
     " Save job-related information
@@ -218,7 +230,7 @@ function! codi#__callback(ch, msg)
     if match(line, data['prompt']) != -1
       let data['received'] += 1
       if data['received'] > data['expected']
-        call job_stop(s:jobs[data['bufnr']])
+        call s:job_stop_and_clear(s:jobs[data['bufnr']])
         silent! return s:codi_handle_done(
               \ data['bufnr'], join(data['lines'], "\n"))
       endif
