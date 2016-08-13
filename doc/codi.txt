@@ -84,6 +84,10 @@ for much longer.
 Should this happen to you, kill both Vim and the interpreter.
 Seriously, I mean it.
 
+Also, Codi will very occasionally leave interpreters running in the background
+which need to be killed. This has only been observed with haskell (ghci), so
+if your fans spin up, you may need to investigate.
+
 DEPENDENCIES                                               *codi-dependencies*
 
 Asynchronous evaluation requires |+job| and |+channel|.
