@@ -1,3 +1,15 @@
+" Utils
+function! s:deep_extend(d, e)
+  for [k, v] in items(a:e)
+    try
+      let a:d[k] = s:deep_extend(get(a:d, k, {}), v)
+    catch E715
+      let a:d[k] = v
+    endtry
+  endfor
+  return a:d
+endfunction
+
 " Default interpreters
 function! s:pp_js(line)
   " Strip escape codes
@@ -56,7 +68,7 @@ let s:codi_default_interpreters = {
           \ },
       \ }
 function! codi#load#interpreters()
-  return extend(s:codi_default_interpreters, g:codi#interpreters)
+  return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
 endfunction
 
 " Default aliases
@@ -64,5 +76,5 @@ let s:codi_default_aliases = {
       \ 'javascript.jsx': 'javascript',
       \ }
 function! codi#load#aliases()
-  return extend(s:codi_default_aliases, g:codi#aliases)
+  return s:deep_extend(s:codi_default_aliases, g:codi#aliases)
 endfunction
