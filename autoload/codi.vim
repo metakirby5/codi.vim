@@ -38,19 +38,17 @@ let s:aliases = codi#load#aliases()
 let s:async = has('job') && has('channel')
 let s:updating = 0
 let s:channels = {} " { ch_id: { bufnr: int, lines: [string] } }
+let s:magic = '' " to get out of REPL
 
 " Detect what version of script to use based on OS
 if has("unix")
   let s:uname = system("uname -s")
   if s:uname =~ "Darwin" || s:uname =~ "BSD"
-    let s:bsd = 1
     let s:script_pre = 'script -q /dev/null '
     let s:script_post = ''
   else
-    let s:async = 0 " TODO: remove this when i fix async
-    let s:bsd = 0
     let s:script_pre = 'script -qfec "'
-    let s:script_post = '" /dev/null | cat'
+    let s:script_post = '" /dev/null'
   endif
 else
   call s:err('Codi does not support Windows yet.')
@@ -165,24 +163,24 @@ function! s:codi_update()
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
-
-  " We use the magic sequence '' to get out of the REPL
-  let input = input.''
+  let input = input.s:magic
 
   " Build the command
   let cmd = s:script_pre.i['bin'].s:script_post
 
   " Async or sync
   if s:async
-    let job = job_start(cmd, {
-          \ 'callback': 'codi#__callback',
-          \ 'close_cb': 'codi#__close_cb' })
+    let job = job_start(cmd, { 'callback': 'codi#__callback' })
     let ch = job_getchannel(job)
 
     " Save the associated bufnr
     let s:channels[s:ch_get_id(ch)] = {
+          \ 'job': job,
           \ 'bufnr': bufnr,
           \ 'lines': [],
+          \ 'prompt': i['prompt'],
+          \ 'expected': line('$'),
+          \ 'received': 0,
           \ }
 
     " Send the input
@@ -195,13 +193,18 @@ endfunction
 " Callback to handle output
 function! codi#__callback(ch, msg)
   let data = s:channels[s:ch_get_id(a:ch)]
-  call add(data['lines'], a:msg)
-endfunction
 
-" Callback to finish data gathering
-function! codi#__close_cb(ch)
-  let data = s:channels[s:ch_get_id(a:ch)]
-  silent! return s:codi_handle_done(data['bufnr'], join(data['lines'], "\n"))
+  call add(data['lines'], a:msg)
+
+  " Count our prompts, and stop if we've reached the right amount
+  if match(a:msg, data['prompt']) != -1
+    let data['received'] += 1
+    if data['received'] > data['expected']
+      call job_stop(data['job'])
+      silent! return s:codi_handle_done(
+            \ data['bufnr'], join(data['lines'], "\n"))
+    endif
+  endif
 endfunction
 
 " Handle finished bin output
@@ -231,24 +234,6 @@ function! s:codi_handle_done(bufnr, output)
   " We then strip out some crap characters from script
   let output = substitute(substitute(a:output,
         \ '\|', '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
-
-  " If bsd, we need to get rid of inputted lines
-  if s:bsd
-    let output = join(split(output, "\n")[num_lines:], "\n")
-  " If not bsd, we need to add line breaks
-  else
-    " Use a loop to handle ^ achors
-    let result = []
-    for l in split(output, "\n")
-      while match(l, i['prompt']) != -1
-        let subbed = substitute(l, i['prompt'], '\0'."\n", '')
-        let [matched, l] = split(subbed, "\n", 1)
-        call add(result, matched)
-      endwhile
-      call add(result, l)
-    endfor
-    let output = join(result, "\n")
-  endif
 
   " Preprocess
   if has_key(i, 'preprocess')
