@@ -195,6 +195,8 @@ endfunction
 function! codi#__callback(ch, msg)
   let data = s:channels[s:ch_get_id(a:ch)]
 
+  if data['received'] > data['expected'] | return | endif
+
   if data['preprocess'] != 0
     let out = data['preprocess'](a:msg)
   else
@@ -244,11 +246,11 @@ function! s:codi_handle_done(bufnr, output)
   let output = substitute(substitute(a:output,
         \ '\|', '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
 
-  " Preprocess
-  if !async && has_key(i, 'preprocess')
+  " Preprocess if we didn't already
+  if !s:async && has_key(i, 'preprocess')
     let result = []
     for line in split(output, "\n")
-      call add(result, i['preprocess'](output))
+      call add(result, i['preprocess'](line))
     endfor
     let output = join(result, "\n")
   endif
@@ -314,6 +316,7 @@ function! s:codi_handle_done(bufnr, output)
 
   " Go back to original buf
   exe 'keepjumps keepalt buf '.ret_bufnr
+  redraw!
 endfunction
 
 function! s:codi_spawn(filetype)

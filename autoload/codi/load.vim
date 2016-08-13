@@ -16,15 +16,9 @@ function! s:pp_js(line)
   return substitute(a:line, '\[\d\(\a\|\dm\)', '', 'g')
 endfunction
 function! s:pp_hs(line)
-  " BSD is fine.
-  let s:uname = system('uname -s')
-  if s:uname =~ 'Darwin' || s:uname =~ 'BSD'
-    return a:line
-  endif
-
-  " On Linux, strip escape codes and add newlines where they should go
+  " Strip escape codes and add newlines where they should go
   let c = substitute(a:line, '\(\[?1[hl]\|E\)', '', 'g')
-  return substitute(c, '', "\n", 'g')
+  return substitute(c, '[=>]\?', "\n", 'g')
 endfunction
 function! s:pp_rb(line)
   " Strip fat arrows
