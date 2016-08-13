@@ -66,9 +66,10 @@ SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
 
 WARNINGS                                          *codi-introduction-warnings*
 
-Be EXTREMELY careful with lazily evaluated languages. I cannot stress this
-enough: the moment you type an infinite list, vim will freeze and your CPU
-usage will skyrocket.
+Be EXTREMELY careful with lazily evaluated languages and infinite loops. I
+cannot stress this enough: the moment you type an infinite list, your CPU
+usage will probably skyrocket. If you are running Codi without asynchronous
+support, Vim will also freeze.
 
 For example, as cool as this is, NEVER attempt the below in Codi with Haskell:
 >
@@ -81,8 +82,7 @@ leads to evaluating the infinite list, which you might not notice for a few
 seconds, but will definitely stress out your computer if you leave it going
 for much longer.
 
-Should this happen to you, kill both Vim and the interpreter.
-Seriously, I mean it.
+Should this happen to you, find and kill the interpreter. Seriously!
 
 Also, Codi will very occasionally leave interpreters running in the background
 which need to be killed. This has only been observed with Haskell (ghci), so
