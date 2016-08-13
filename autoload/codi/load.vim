@@ -1,45 +1,33 @@
 " Default interpreters
-function! s:pp_js(output)
+function! s:pp_js(line)
   " Strip escape codes
-  return substitute(a:output, '\[\d\(\a\|\dm\)', '', 'g')
+  return substitute(a:line, '\[\d\(\a\|\dm\)', '', 'g')
 endfunction
-function! s:pp_hs(output)
+function! s:pp_hs(line)
   " BSD is fine.
   let s:uname = system('uname -s')
   if s:uname =~ 'Darwin' || s:uname =~ 'BSD'
-    return a:output
+    return a:line
   endif
 
   " On Linux, strip escape codes and add newlines where they should go
-  let c = substitute(a:output, '\(\[?1[hl]\|E\)', '', 'g')
-  let c = substitute(c, '', "\n", 'g')
-
-  " Also strip first character
-  let l = []
-  for line in split(c, "\n")
-    call add(l, line[1:])
-  endfor
-  return join(l, "\n")
+  let c = substitute(a:line, '\(\[?1[hl]\|E\)', '', 'g')
+  return substitute(c, '', "\n", 'g')
 endfunction
-function! s:pp_rb(output)
+function! s:pp_rb(line)
   " Strip fat arrows
-  return substitute(a:output, "\n=> ", "\n", 'g')
+  return substitute(a:line, "=> ", '', 'g')
 endfunction
-function! s:pp_ml(output)
-  " Add newlines
-  let result = []
-  for line in split(a:output, "\n")
-    " If the line is a prompt
-    if match(line, '^# ') != -1
-      " In ocaml, the number of characters before value divided by 2 is
-      " the number of newlines.
-      let val = match(line, '[^# ]')
-      call add(result, '# '.repeat("\n# ", val / 2 - 1)."\n".line[val:])
-    else
-      call add(result, line)
-    endif
-  endfor
-  return join(result, "\n")
+function! s:pp_ml(line)
+  " If the line is a prompt
+  if match(a:line, '^# ') != -1
+    " In ocaml, the number of characters before value divided by 2 is
+    " the number of newlines.
+    let val = match(a:line, '[^# ]')
+    return '# '.repeat("\n# ", val / 2 - 1)."\n".a:line[val:]
+  else
+    return a:line
+  endif
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {

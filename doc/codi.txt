@@ -319,8 +319,8 @@ preprocess (OPTIONAL)
              the corresponding lines.
 
              The function should take a single string argument that is the
-             output of bin, and return a single string that is the adjusted
-             output of bin.
+             a line of output, and return a single string that is the adjusted
+             line of output.
 
              When creating your own preprocess, it is useful to enable
              |g:codi#raw| to see what the output initially looks like, and
@@ -330,8 +330,8 @@ preprocess (OPTIONAL)
              escape codes with a pattern of  (esc) followed by three
              characters, so we strip those with the following function:
 >
-             function! s:pp_js(evaled)
-               return substitute(a:evaled, '...', '', 'g')
+             function! s:pp_js(line)
+               return substitute(a:line, '...', '', 'g')
              endfunction
 <
              Notice that in the example, preprocess is configured as
@@ -349,7 +349,8 @@ rephrase (OPTIONAL)
 
              The function should take a single string argument that is the
              contents of the current buffer, and return a single string that
-             is the adjusted contents to send to bin.
+             is the adjusted contents to send to bin. Unlike preprocess,
+             which operates per-line, rephrase operates on the entire buffer.
 
              This attribute is actually not recommended, since it is very
              difficult to achieve desired goals without unforeseen

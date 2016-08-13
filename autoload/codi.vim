@@ -178,6 +178,7 @@ function! s:codi_update()
           \ 'job': job,
           \ 'bufnr': bufnr,
           \ 'lines': [],
+          \ 'preprocess': get(i, 'preprocess', 0),
           \ 'prompt': i['prompt'],
           \ 'expected': line('$'),
           \ 'received': 0,
@@ -194,17 +195,25 @@ endfunction
 function! codi#__callback(ch, msg)
   let data = s:channels[s:ch_get_id(a:ch)]
 
-  call add(data['lines'], a:msg)
+  if data['preprocess'] != 0
+    let out = data['preprocess'](a:msg)
+  else
+    let out = a:msg
+  end
 
-  " Count our prompts, and stop if we've reached the right amount
-  if match(a:msg, data['prompt']) != -1
-    let data['received'] += 1
-    if data['received'] > data['expected']
-      call job_stop(data['job'])
-      silent! return s:codi_handle_done(
-            \ data['bufnr'], join(data['lines'], "\n"))
+  for line in split(out, "\n")
+    call add(data['lines'], line)
+
+    " Count our prompts, and stop if we've reached the right amount
+    if match(line, data['prompt']) != -1
+      let data['received'] += 1
+      if data['received'] > data['expected']
+        call job_stop(data['job'])
+        silent! return s:codi_handle_done(
+              \ data['bufnr'], join(data['lines'], "\n"))
+      endif
     endif
-  endif
+  endfor
 endfunction
 
 " Handle finished bin output
@@ -236,8 +245,12 @@ function! s:codi_handle_done(bufnr, output)
         \ '\|', '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
 
   " Preprocess
-  if has_key(i, 'preprocess')
-    let output = i['preprocess'](output)
+  if !async && has_key(i, 'preprocess')
+    let result = []
+    for line in split(output, "\n")
+      call add(result, i['preprocess'](output))
+    endfor
+    let output = join(result, "\n")
   endif
 
   " Unless raw, parse for propmt
