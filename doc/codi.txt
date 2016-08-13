@@ -156,8 +156,8 @@ g:codi#interpreters
                        \ },
                    \ }
 <
-             This dictionary is deeply updated, so if all you want to do is
-             change the Haskell prompt to "> ", use the following:
+             The interpreter dictionary is deeply updated, so if all you want
+             to do is change the Haskell prompt to "> ", use the following:
 >
              let g:codi#interpreters = {
                    \ 'haskell': {
