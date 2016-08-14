@@ -319,7 +319,9 @@ bin (REQUIRED)
              Defines the command to use for the REPL backing the interpreter.
              For example, it would be "python" for Python, "node" for
              Javascript, and "irb" for Ruby. Can either be a string or an
-             array of strings, if your command require arguments.
+             array of strings, if the command require arguments. One possible
+             array, for example, is ["irb", "--prompt", "default"]. Array
+             arguments will not be automatically quoted.
 
                                                     *codi-interpreters-prompt*
 prompt (REQUIRED)

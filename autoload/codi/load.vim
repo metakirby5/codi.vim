@@ -51,7 +51,7 @@ let s:codi_default_interpreters = {
           \ 'preprocess': function('s:pp_hs'),
           \ },
       \ 'ruby': {
-          \ 'bin': ['irb', '--prompt', 'default'],
+          \ 'bin': 'irb',
           \ 'prompt': '^irb(\w\+):\d\+:\d\+. ',
           \ 'preprocess': function('s:pp_rb'),
           \ },
