@@ -244,7 +244,7 @@ function! s:codi_handle_done(bufnr, output)
   let ret_bufnr = bufnr('%')
 
   " Go to target buf
-  exe 'keepjumps keepalt buf '.a:bufnr
+  exe 'keepjumps keepalt buf! '.a:bufnr
   let s:updating = 1
   let codi_winwidth = winwidth(bufwinnr(b:codi_bufnr))
   let num_lines = line('$')
@@ -258,7 +258,7 @@ function! s:codi_handle_done(bufnr, output)
   keepjumps normal! gg
 
   " Go to codi buf
-  exe 'keepjumps keepalt buf '.b:codi_bufnr
+  exe 'keepjumps keepalt buf! '.b:codi_bufnr
   setlocal modifiable
   let i = b:codi_interpreter
 
@@ -327,15 +327,15 @@ function! s:codi_handle_done(bufnr, output)
   syncbind
   setlocal nomodifiable
 
-  " Restore target buf position
-  exe 'keepjumps keepalt buf '.b:codi_target_bufnr
+  " Restore target buf! position
+  exe 'keepjumps keepalt buf! '.b:codi_target_bufnr
   exe 'keepjumps '.top
   keepjumps normal! zt
   keepjumps call cursor(line, col)
   let s:updating = 0
 
   " Go back to original buf
-  exe 'keepjumps keepalt buf '.ret_bufnr
+  exe 'keepjumps keepalt buf! '.ret_bufnr
 endfunction
 
 function! s:codi_spawn(filetype)
@@ -377,7 +377,7 @@ function! s:codi_spawn(filetype)
   " Restore target buf options on codi close
   let bufnr = bufnr('%')
   let restore = 'keepjumps keepalt bdel'
-        \.' | keepjumps keepalt buf '.bufnr
+        \.' | keepjumps keepalt buf! '.bufnr
         \.' | unlet b:codi_bufnr'
   for opt in ['scrollbind', 'cursorbind', 'wrap', 'foldenable']
     if exists('&'.opt)
@@ -392,7 +392,7 @@ function! s:codi_spawn(filetype)
 
   " Spawn codi
   exe 'keepjumps keepalt '
-        \.(g:codi#rightsplit ? '' : ' leftabove ')
+        \.(g:codi#rightsplit ? 'rightbelow' : ' leftabove ')
         \.(exists('b:codi_width') ? b:codi_width : g:codi#width).'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
