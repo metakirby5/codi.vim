@@ -8,10 +8,10 @@ The interactive scratchpad for hackers.
 [shell wrapper](#shell-wrapper)*
 
 Codi is an interactive scratchpad for hackers, with a similar interface to
-Numi (https://numi.io). It opens a pane synchronized to your main buffer which
-displays the results of evaluating each line *as you type* (if Vim has `+job`
-and `+channel`, asynchronously!). It's extensible to nearly any language that
-provides a REPL (interactive interpreter)!
+[Numi](https://numi.io). It opens a pane synchronized to your main buffer
+which displays the results of evaluating each line *as you type* (if Vim has
+`+job` and `+channel`, asynchronously!). It's extensible to nearly any
+language that provides a REPL (interactive interpreter)!
 
 *Note:* without async support, evaluation will trigger on cursor hold rather
 than text change.
