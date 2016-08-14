@@ -309,7 +309,7 @@ function! codi#__callback(ch, msg)
       let data['received'] += 1
       if data['received'] > data['expected']
         call s:job_stop_and_clear(s:jobs[data['bufnr']])
-        return s:codi_handle_done(
+        silent! return s:codi_handle_done(
               \ data['bufnr'], join(data['lines'], "\n"))
       endif
     endif
