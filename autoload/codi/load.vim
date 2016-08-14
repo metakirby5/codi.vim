@@ -22,7 +22,7 @@ function! s:pp_hs(line)
 endfunction
 function! s:pp_rb(line)
   " Strip fat arrows
-  return substitute(a:line, "=> ", '', 'g')
+  return substitute(a:line, '=> ', '', 'g')
 endfunction
 function! s:pp_ml(line)
   " If the line is a prompt
@@ -34,6 +34,10 @@ function! s:pp_ml(line)
   else
     return a:line
   endif
+endfunction
+function! s:pp_r(line)
+  " Just return everything after the braces
+  return substitute(a:line, '\[\d\+\] \(.*\)$', '\1', '')
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {
@@ -60,6 +64,11 @@ let s:codi_default_interpreters = {
           \ 'prompt': '^# ',
           \ 'preprocess': function('s:pp_ml'),
           \ },
+      \ 'r': {
+          \ 'bin': 'r',
+          \ 'prompt': '^> ',
+          \ 'preprocess': function('s:pp_r'),
+          \ }
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
