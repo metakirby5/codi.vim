@@ -69,7 +69,7 @@ let s:updating = 0
 let s:codis = {} " { bufnr: { codi_bufnr, codi_width } }
 let s:jobs = {} " { bufnr: job }
 let s:channels = {} " { ch_id: { job-related data } }
-let s:magic = "\n".'' " to get out of REPL
+let s:magic = "\n\<cr>\<c-d>\<c-d>\<cr>" " to get out of REPL
 
 " Detect what version of script to use based on OS
 if has("unix")
@@ -100,7 +100,7 @@ augroup CODI
         \ | silent! setlocal cursorbind
   " Clean up when codi is killed
   au BufWinLeave *
-        \ if exists('b:codi_leave') | silent! exe b:codi_leave | endif
+        \ if exists('b:codi_leave') | silent exe b:codi_leave | endif
 augroup END
 
 " Actions on all windows
@@ -109,31 +109,31 @@ augroup CODI_TARGET
   " === g:codi#update() ===
   " Instant
   if s:async && g:codi#autocmd == 'TextChanged'
-    au TextChanged,TextChangedI * silent! call s:codi_update()
+    au TextChanged,TextChangedI * silent call s:codi_update()
   " 'updatetime'
   elseif g:codi#autocmd == 'CursorHold'
-    au CursorHold,CursorHoldI * silent! call s:codi_update()
+    au CursorHold,CursorHoldI * silent call s:codi_update()
   " Insert mode left
   elseif g:codi#autocmd == 'InsertLeave'
-    au InsertLeave * silent! call s:codi_update()
+    au InsertLeave * silent call s:codi_update()
   " Defaults
   else
     " Instant
     if s:async
-      au TextChanged,TextChangedI * silent! call s:codi_update()
+      au TextChanged,TextChangedI * silent call s:codi_update()
     " 'updatetime'
     else
-      au CursorHold,CursorHoldI * silent! call s:codi_update()
+      au CursorHold,CursorHoldI * silent call s:codi_update()
     endif
   endif
 
   " === g:codi#autoclose ===
   " Hide on buffer leave
-  au BufWinLeave * silent! call s:codi_hide()
+  au BufWinLeave * silent call s:codi_hide()
   " Show on buffer return
-  au BufWinEnter * silent! call s:codi_show()
+  au BufWinEnter * silent call s:codi_show()
   " Kill on target quit
-  au QuitPre * silent! call s:codi_autoclose()
+  au QuitPre * silent call s:codi_autoclose()
 augroup END
 
 " Gets the ID, no matter if ch is open or closed.
@@ -305,11 +305,11 @@ function! codi#__callback(ch, msg)
     call add(data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
-    if match(line, data['prompt']) != -1
+    if line =~ data['prompt']
       let data['received'] += 1
       if data['received'] > data['expected']
         call s:job_stop_and_clear(s:jobs[data['bufnr']])
-        silent! return s:codi_handle_done(
+        silent return s:codi_handle_done(
               \ data['bufnr'], join(data['lines'], "\n"))
       endif
     endif
@@ -320,6 +320,7 @@ endfunction
 function! s:codi_handle_done(bufnr, output)
   " Save for later
   let ret_bufnr = bufnr('%')
+  let ret_mode = mode()
 
   " Go to target buf
   exe 'keepjumps keepalt buf! '.a:bufnr
@@ -334,7 +335,7 @@ function! s:codi_handle_done(bufnr, output)
   let col = col('.')
 
   " So we can syncbind later
-  keepjumps normal! gg
+  exe "keepjumps normal! \<esc>gg"
 
   " Go to codi buf
   exe 'keepjumps keepalt buf! '.codi_bufnr
@@ -343,7 +344,7 @@ function! s:codi_handle_done(bufnr, output)
 
   " We then strip out some crap characters from script
   let output = substitute(substitute(a:output,
-        \ '\|', '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
+        \ "\<cr>".'\|'."\<c-h>", '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
 
   " Preprocess if we didn't already
   if !s:async && has_key(i, 'preprocess')
@@ -371,7 +372,7 @@ function! s:codi_handle_done(bufnr, output)
     " Iterate through all lines
     for l in split(output, "\n")
       " If we hit a prompt
-      if match(l, i['prompt']) != -1
+      if l =~ i['prompt']
         " If we have passed the first prompt
         if passed_first
           " Record what was taken (needs to be at least one character)
@@ -382,7 +383,7 @@ function! s:codi_handle_done(bufnr, output)
         endif
       else
         " If we have passed the first prompt and it's content worth taking
-        if passed_first && match(l, '^\S') != -1
+        if passed_first && l =~ '^\S'
           let taken = l
         endif
       endif
@@ -415,6 +416,13 @@ function! s:codi_handle_done(bufnr, output)
 
   " Go back to original buf
   exe 'keepjumps keepalt buf! '.ret_bufnr
+
+  " Restore mode
+  if ret_mode =~ '[vV]'
+    keepjumps normal! gv
+  elseif ret_mode =~ '[sS]'
+    exe "keepjumps normal! gv\<c-g>"
+  endif
 endfunction
 
 function! s:codi_spawn(filetype)
@@ -482,7 +490,7 @@ function! s:codi_spawn(filetype)
   " Return to target split
   keepjumps keepalt wincmd p
   call s:let_codi('bufnr', bufnr('$'))
-  silent! return s:codi_update()
+  silent return s:codi_update()
 endfunction
 
 " Main function
