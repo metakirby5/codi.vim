@@ -4,14 +4,12 @@
 # Usage:
 # $ ./playback | codi
 #
-# The playback was recorded with QuickTime and converted with ffmpeg and
-# gifsicle:
+# The playback was recorded with QuickTime and converted with ffmpeg:
 # $ ffmpeg -i codi.mov -vf 'fps=10,scale=iw*0.5:-1:flags=lanczos,palettegen' \
 #   palette.png
 # $ ffmpeg -i codi.mov -i palette.png -filter_complex \
 #   'fps=10,scale=iw*0.5:-1:flags=lanczos[x];[x][1:v]paletteuse' \
 #   -loop 0 codi_precrop.gif
-# $ gifsicle --crop 2,2+-2x-2 < codi_precrop.gif > codi.gif
 
 set send_human {.07 .1 infinity .07 .1}
 
