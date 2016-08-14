@@ -1,46 +1,68 @@
 #!/usr/bin/env expect -f
 # The script used to create the README gif.
-# The playback was recorded with QuickTime and converted with ffmpeg.
+#
+# Usage:
+# $ ./playback | codi
+#
+# The playback was recorded with QuickTime and converted with ffmpeg:
+# $ ffmpeg -i codi.mov -i palette.png -filter_complex \
+#   'fps=10,scale=iw*0.5:-1:flags=lanczos[x];[x][1:v]paletteuse' \
+#   -loop 0 codi.gif
+# $ ffmpeg -i codi.mov -vf 'fps=10,scale=iw*0.5:-1:flags=lanczos,palettegen' \
+#   palette.png
 
 set send_human {.07 .1 infinity .07 .1}
 
 sleep 4
-send -h -- "i"
-send -h -- "x = 2\r"
+send -h -- "i\"Watch the right side :)\""
+sleep 1
+# 3 empty lines
+send -h -- "3oA"
+send -h -- "x = 2"
 sleep 0.5
-send -h -- "y = 3\r"
+send -h -- "\ry = 3"
 sleep 0.5
-send -h -- "x"
+send -h -- "\rx"
 sleep 1
 send -h -- "y"
 sleep 1
 send -h -- "x * y + z"
 sleep 1
+# x * y + 5
 send -h -- "5"
 sleep 1
-send -h -- "\r"
-sleep 0.5
-send -h -- "\r"
-sleep 0.5
-send -h -- "def fun(z):\r"
-sleep 0.5
-send -h -- "return x + y * 2 + z * 3\r"
-sleep 0.5
-send -h -- "\r"
-sleep 0.5
-send -h -- "map(fun, range(3))\r"
+# x = 200
+send -h -- "4ggA00"
 sleep 1
-send -h -- "reduce(lambda a, n: a + n, range(10))\r"
-sleep 1
-send -h -- "\r"
+send -h -- "Go\r"
+send -h -- "from datetime import datetime"
+send -h -- "\rdatetime.now().time().isoformat()"
 sleep 0.5
-send -h -- "from datetime import datetime\r"
+send -h -- "\r\rdef fun(z):"
+send -h -- "\rreturn x + y * 2 + z * 3"
 sleep 0.5
-send -h -- "datetime.now().time().isoformat()\r"
+send -h -- "\r\rmap(fun, range(3))"
 sleep 1
-send -h -- "\r"
-sleep 0.5
-send -h -- "\"Thanks for flying Codi!\""
+# ... range(4)
+send -h -- "F3"
 sleep 1
-send -h -- ";q!\r"
+# ... range(5)
+send -h -- ""
+sleep 1
+# ... range(6)
+send -h -- ""
+sleep 1
+# y = 35
+send -h -- "5ggA5"
+sleep 1
+# y = 36
+send -h -- ""
+sleep 1
+# y = 37
+send -h -- ""
+sleep 1
+send -h -- "Go"
+send -h -- "\r\"Thanks for flying Codi!\""
+sleep 4
+send -h -- ";q\r"
 sleep 1

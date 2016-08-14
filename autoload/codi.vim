@@ -336,7 +336,6 @@ function! s:codi_handle_done(bufnr, output)
 
   " Go back to original buf
   exe 'keepjumps keepalt buf '.ret_bufnr
-  redraw!
 endfunction
 
 function! s:codi_spawn(filetype)
