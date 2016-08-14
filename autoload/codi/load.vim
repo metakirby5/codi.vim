@@ -65,7 +65,7 @@ let s:codi_default_interpreters = {
           \ 'preprocess': function('s:pp_ml'),
           \ },
       \ 'r': {
-          \ 'bin': 'r',
+          \ 'bin': 'R',
           \ 'prompt': '^> ',
           \ 'preprocess': function('s:pp_r'),
           \ }
