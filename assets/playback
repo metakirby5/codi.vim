@@ -9,7 +9,7 @@
 #   palette.png
 # $ ffmpeg -i codi.mov -i palette.png -filter_complex \
 #   'fps=10,scale=iw*0.5:-1:flags=lanczos[x];[x][1:v]paletteuse' \
-#   -loop 0 codi_precrop.gif
+#   -loop 0 codi.gif
 
 set send_human {.07 .1 infinity .07 .1}
 
