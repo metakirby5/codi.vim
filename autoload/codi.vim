@@ -37,6 +37,7 @@ let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:async = !g:codi#sync && has('job') && has('channel')
 let s:updating = 0
+let s:codis = {} " { bufnr: { codi_bufnr, codi_width } }
 let s:jobs = {} " { bufnr: job }
 let s:channels = {} " { ch_id: { job-related data } }
 let s:magic = "\n".'' " to get out of REPL
@@ -123,8 +124,54 @@ function! s:job_stop_and_clear(job, ...)
   call job_status(a:job)
 endfunction
 
+" Utility to get bufnr.
+function! s:nr_bufnr(...)
+  if a:0
+    if a:1 == '%' || a:1 == '$'
+      return bufnr(a:1)
+    else
+      return a:1
+    endif
+  else
+    return bufnr('%')
+  endif
+endfunction
+
+" Get the codi dict for a bufnr.
+" {} if doesn't exist.
+function! s:get_codi_dict(...)
+  return get(s:codis, s:nr_bufnr(a:0 ? a:1 : '%'), {})
+endfunction
+
+" Get a codi key for a buffer.
+" a:1 = default, a:2 = buffer
+" 0 if doesn't exist.
+function! s:get_codi(key, ...)
+  return get(s:get_codi_dict(a:0 > 1 ? a:2 : '%'), a:key, a:0 ? a:1 : 0)
+endfunction
+
+" Set a codi key for a buffer.
+function! s:let_codi(key, val, ...)
+  let bufnr = s:nr_bufnr(a:0 ? a:1 : '%')
+  let d = s:get_codi_dict(bufnr)
+  let d[a:key] = a:val
+
+  " Set to our dict if it isn't already there
+  if !has_key(s:codis, bufnr) | let s:codis[bufnr] = d | endif
+endfunction
+
+" Unset a codi key for a buffer.
+function! s:unlet_codi(key, ...)
+  let bufnr = s:nr_bufnr(a:0 ? a:1 : '%')
+  let d = s:codis[bufnr]
+  unlet! d[a:key]
+
+  " Unset the main key if it's empty
+  if d == {} | unlet s:codis[bufnr] | endif
+endfunction
+
 function! s:codi_toggle(filetype)
-  if exists('b:codi_bufnr')
+  if s:get_codi('bufnr')
     return s:codi_kill()
   else
     return s:codi_spawn(a:filetype)
@@ -132,18 +179,19 @@ function! s:codi_toggle(filetype)
 endfunction
 
 function! s:codi_hide()
-  if g:codi#autoclose && exists('b:codi_bufnr') && !s:updating
+  let codi_bufnr = s:get_codi('bufnr')
+  if g:codi#autoclose && codi_bufnr && !s:updating
     " Remember width for when we respawn
-    let b:codi_width = winwidth(bufwinnr(b:codi_bufnr))
+    call s:let_codi('width', winwidth(bufwinnr(codi_bufnr)))
     call s:codi_kill()
   endif
 endfunction
 
 function! s:codi_show()
   " If we saved a width, that means we hid codi earlier
-  if g:codi#autoclose && exists('b:codi_width')
+  if g:codi#autoclose && s:get_codi('width')
     call s:codi_spawn(&filetype)
-    unlet b:codi_width
+    call s:unlet_codi('width')
   endif
 endfunction
 
@@ -155,20 +203,21 @@ endfunction
 
 function! s:codi_kill()
   " If we already have a codi instance for the buffer, kill it
-  if exists('b:codi_bufnr')
+  let codi_bufnr = s:get_codi('bufnr')
+  if codi_bufnr
     " Shuffling is necessary because bdel triggers events
-    let codi_bufnr = b:codi_bufnr
-    unlet b:codi_bufnr
-    exe 'keepjumps keepalt bdel '.codi_bufnr
+    call s:unlet_codi('bufnr')
+    exe 'keepjumps keepalt bdel! '.codi_bufnr
   endif
 endfunction
 
 " Update the codi buf
 function! s:codi_update()
   " Bail if no codi buf to act on
-  if !exists('b:codi_bufnr') | return | endif
+  let codi_bufnr = s:get_codi('bufnr')
+  if !codi_bufnr | return | endif
 
-  let i = getbufvar(b:codi_bufnr, 'codi_interpreter')
+  let i = getbufvar(codi_bufnr, 'codi_interpreter')
   let bufnr = bufnr('%')
 
   " Build input
@@ -231,7 +280,7 @@ function! codi#__callback(ch, msg)
       let data['received'] += 1
       if data['received'] > data['expected']
         call s:job_stop_and_clear(s:jobs[data['bufnr']])
-        silent! return s:codi_handle_done(
+        return s:codi_handle_done(
               \ data['bufnr'], join(data['lines'], "\n"))
       endif
     endif
@@ -246,7 +295,8 @@ function! s:codi_handle_done(bufnr, output)
   " Go to target buf
   exe 'keepjumps keepalt buf! '.a:bufnr
   let s:updating = 1
-  let codi_winwidth = winwidth(bufwinnr(b:codi_bufnr))
+  let codi_bufnr = s:get_codi('bufnr')
+  let codi_winwidth = winwidth(bufwinnr(codi_bufnr))
   let num_lines = line('$')
 
   " So we can jump back later
@@ -258,7 +308,7 @@ function! s:codi_handle_done(bufnr, output)
   keepjumps normal! gg
 
   " Go to codi buf
-  exe 'keepjumps keepalt buf! '.b:codi_bufnr
+  exe 'keepjumps keepalt buf! '.codi_bufnr
   setlocal modifiable
   let i = b:codi_interpreter
 
@@ -327,7 +377,7 @@ function! s:codi_handle_done(bufnr, output)
   syncbind
   setlocal nomodifiable
 
-  " Restore target buf! position
+  " Restore target buf position
   exe 'keepjumps keepalt buf! '.b:codi_target_bufnr
   exe 'keepjumps '.top
   keepjumps normal! zt
@@ -376,9 +426,9 @@ function! s:codi_spawn(filetype)
 
   " Restore target buf options on codi close
   let bufnr = bufnr('%')
-  let restore = 'keepjumps keepalt bdel'
+  let restore = 'keepjumps keepalt bdel!'
         \.' | keepjumps keepalt buf! '.bufnr
-        \.' | unlet b:codi_bufnr'
+        \.' | call s:unlet_codi("bufnr")'
   for opt in ['scrollbind', 'cursorbind', 'wrap', 'foldenable']
     if exists('&'.opt)
       exe 'let val = &'.opt
@@ -393,7 +443,7 @@ function! s:codi_spawn(filetype)
   " Spawn codi
   exe 'keepjumps keepalt '
         \.(g:codi#rightsplit ? 'rightbelow' : ' leftabove ')
-        \.(exists('b:codi_width') ? b:codi_width : g:codi#width).'vnew'
+        \.(s:get_codi('width', g:codi#width)).'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
@@ -402,7 +452,7 @@ function! s:codi_spawn(filetype)
 
   " Return to target split
   keepjumps keepalt wincmd p
-  let b:codi_bufnr = bufnr('$')
+  call s:let_codi('bufnr', bufnr('$'))
   silent! return s:codi_update()
 endfunction
 
