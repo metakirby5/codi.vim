@@ -13,12 +13,12 @@ endfunction
 " Default interpreters
 function! s:pp_js(line)
   " Strip escape codes
-  return substitute(a:line, '\[\d\(\a\|\dm\)', '', 'g')
+  return substitute(a:line, "\<esc>".'\[\d\(\a\|\dm\)', '', 'g')
 endfunction
 function! s:pp_hs(line)
   " Strip escape codes and add newlines where they should go
-  let c = substitute(a:line, '\(\[?1[hl]\|E\)', '', 'g')
-  return substitute(c, '[=>]\?', "\n", 'g')
+  let c = substitute(a:line, "\<esc>".'\(\[?1[hl]\|E\)', '', 'g')
+  return substitute(c, "\<esc>".'[=>]\?', "\n", 'g')
 endfunction
 function! s:pp_rb(line)
   " Strip fat arrows

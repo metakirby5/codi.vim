@@ -351,11 +351,12 @@ preprocess (OPTIONAL)
              what your preprocess function does to the output.
 
              In the Javascript example, "node" has a tendency to print out
-             escape codes with a pattern of  (esc) followed by three
-             characters, so we strip those with the following function:
+             escape codes with a pattern of <esc> followed by some characters,
+             so we strip those with the following function:
 >
              function! s:pp_js(line)
-               return substitute(a:line, '...', '', 'g')
+               " Strip escape codes
+               return substitute(a:line, "\<esc>".'\[\d\(\a\|\dm\)', '', 'g')
              endfunction
 <
              Notice that in the example, preprocess is configured as
