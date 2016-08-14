@@ -99,11 +99,11 @@ are loaded on-demand. For example, if you only want to use the Python Codi
 interpreter, you will not need ghci.
 
 Default interpreter dependencies:
-             Python:    python
-             Javscript: node
-             Haskell:   ghci
-             Ruby:      irb
-             Ocaml:     ocaml
+             Python:     python
+             Javascript: node
+             Haskell:    ghci
+             Ruby:       irb
+             Ocaml:      ocaml
 
 ==============================================================================
 USAGE                                                             *codi-usage*
@@ -290,7 +290,7 @@ However, be careful of the following cases:
               2           | IGNORED (leading whitespace)
              > return_1() | prompt 2
              1            | IGNORED (next line has no leading whitespace)
-             Returned 1.  | result 2
+             Returned 1.  | result 1
 <
 If your output does not follow spec, you MUST implement
 |codi-interpreters-preprocess|.
@@ -299,7 +299,7 @@ The easiest way to check is to enable |g:codi#raw|.
 EXAMPLE INTERPRETER CONFIGURATION                  *codi-interpreters-example*
 
 A full interpreter configuration for Javascript can be found below. (Note that
-in Vimscript, you still need to add forwardslashes for continuing newlines.)
+in Vimscript, you still need to add forward slashes for continuing newlines.)
 >
              'javascript': {
                  'bin': 'node',
@@ -331,7 +331,7 @@ prompt (REQUIRED)
 
              In the Javascript example, we set prompt to match
              ">", "...", and any amount of dots greater than that to
-             accomodate further nesting levels.
+             accommodate further nesting levels.
 
                                                 *codi-interpreters-preprocess*
 preprocess (OPTIONAL)
@@ -342,9 +342,9 @@ preprocess (OPTIONAL)
              That way, output result lines can be successfully lined up with
              the corresponding lines.
 
-             The function should take a single string argument that is the
-             a line of output, and return a single string that is the adjusted
-             line of output.
+             The function should take a single string argument that is a line
+             of output, and return a single string that is the adjusted line 
+             of output.
 
              When creating your own preprocess, it is useful to enable
              |g:codi#raw| to see what the output initially looks like, and
@@ -384,7 +384,7 @@ rephrase (OPTIONAL)
              "let var x = 5" to show "5" instead of "undefined", this is the
              way to do it.
 
-             The configuration process is similar to preproccess, so just look
+             The configuration process is similar to preprocess, so just look
              at |codi-interpreters-preprocess| if you're unsure how to start.
 
              Default value is the identity function.
