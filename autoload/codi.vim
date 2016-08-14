@@ -21,8 +21,37 @@ function! s:all(predicate, required, ...)
   return s:missing
 endfunction
 
+" Get string or first element of list
+function! s:first_str(o)
+  try
+    call join(a:o)
+    return a:o[0]
+  " Not a list
+  catch E714
+    return a:o
+  " Empty list
+  catch E684
+    return ''
+  endtry
+endfunction
+
+" Get string or whole list joined by spaces
+function! s:whole_str(o)
+  try
+    return join(a:o, ' ')
+  " Not a list
+  catch E714
+    return a:o
+  endtry
+endfunction
+
+" Check if executable - can be array of strings or string
+function! s:check_exec(bin)
+  return executable(s:first_str(a:bin))
+endfunction
+
 " Check for missing commands
-let s:missing_deps = s:all(function('executable'), ['script', 'uname'])
+let s:missing_deps = s:all(function('s:check_exec'), ['script', 'uname'])
 if len(s:missing_deps)
   function! codi#run(...)
     return s:err(
@@ -228,7 +257,7 @@ function! s:codi_update()
   let input = input.s:magic
 
   " Build the command
-  let cmd = s:script_pre.i['bin'].s:script_post
+  let cmd = s:script_pre.s:whole_str(i['bin']).s:script_post
 
   " Async or sync
   if s:async
@@ -391,7 +420,7 @@ endfunction
 function! s:codi_spawn(filetype)
   try
     " Requires s: scope because of FP issues
-    let s:interpreter = s:interpreters[
+    let s:i = s:interpreters[
           \ get(s:aliases, a:filetype, a:filetype)]
   " If interpreter not found...
   catch /E71\(3\|6\)/
@@ -407,7 +436,7 @@ function! s:codi_spawn(filetype)
 
   " Check if required keys present
   function! s:interpreter_has_key(key)
-    return has_key(s:interpreter, a:key)
+    return has_key(s:i, a:key)
   endfunction
   if len(s:all(function('s:interpreter_has_key'),
         \ ['bin', 'prompt'],
@@ -415,8 +444,8 @@ function! s:codi_spawn(filetype)
         \| return | endif
 
   " Check if bin present
-  if !executable(s:interpreter['bin'])
-      return s:err(interpreter_str.' requires '.s:interpreter['bin'].'.')
+  if !s:check_exec(s:i['bin'])
+      return s:err(interpreter_str.' requires '.s:first_str(s:i['bin']).'.')
   endif
 
   call s:codi_kill()
@@ -448,7 +477,7 @@ function! s:codi_spawn(filetype)
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
   let b:codi_leave = restore
-  let b:codi_interpreter = s:interpreter
+  let b:codi_interpreter = s:i
 
   " Return to target split
   keepjumps keepalt wincmd p

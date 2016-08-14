@@ -1,7 +1,7 @@
 " User-defined interpreters (see codi-interpreters)
 " Entries are in the form of:
 "   <filetype>: {
-"     'bin': <interpreter binary name>,
+"     'bin': <interpreter binary name, str or array>,
 "     'prompt': <vim regex pattern indicating the prompt>,
 "     'preprocess': <optional function to run bin output through
 "                    before prompt parsing>,
