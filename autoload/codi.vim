@@ -64,11 +64,12 @@ endif
 " Load resources
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
-let s:async = !g:codi#sync && has('job') && has('channel')
+let s:nvim = has('nvim')
+let s:async = !g:codi#sync && (has('job') && has('channel')) || s:nvim
 let s:updating = 0
 let s:codis = {} " { bufnr: { codi_bufnr, codi_width } }
-let s:jobs = {} " { bufnr: job }
-let s:channels = {} " { ch_id: { job-related data } }
+let s:async_jobs = {} " { bufnr: job }
+let s:async_data = {} " { id (nvim -> job, vim -> ch): { data } }
 let s:magic = "\n\<cr>\<c-d>\<c-d>\<cr>" " to get out of REPL
 
 " Detect what version of script to use based on OS
@@ -148,15 +149,26 @@ function! s:ch_get_id(ch)
 endfunction
 
 " Stop the job and clear it from the process table.
-function! s:job_stop_and_clear(job, ...)
-  if a:0
-    call job_stop(a:job, a:1)
-  else
-    call job_stop(a:job)
-  end
+function! s:stop_job_for_buf(buf, ...)
+  try
+    let job = s:async_jobs[a:buf]
+    unlet s:async_jobs[a:buf]
+  catch E716
+    return
+  endtry
 
-  " Implicitly clears from process table.
-  call job_status(a:job)
+  if s:nvim
+    silent! call jobstop(job)
+  else
+    if a:0
+      call job_stop(job, a:1)
+    else
+      call job_stop(job)
+    end
+
+    " Implicitly clears from process table.
+    call job_status(job)
+  endif
 endfunction
 
 " Utility to get bufnr.
@@ -278,56 +290,87 @@ function! s:codi_do_update()
 
   " Async or sync
   if s:async
-    let job = job_start(cmd, { 'callback': 'codi#__callback' })
-    let ch = job_getchannel(job)
-
-    " Kill previously running job if necessary
-    if has_key(s:jobs, bufnr)
-      call s:job_stop_and_clear(s:jobs[bufnr])
+    " Spawn the job
+    if s:nvim
+      let job = jobstart(cmd, {
+            \ 'on_stdout': function('s:codi_nvim_callback'),
+            \ 'on_stderr': function('s:codi_nvim_callback'),
+            \ })
+      let id = job
+    else
+      let job = job_start(cmd, { 'callback': 'codi#__vim_callback' })
+      let ch = job_getchannel(job)
+      let id = s:ch_get_id(ch)
     endif
 
+    " Kill previously running job if necessary
+    call s:stop_job_for_buf(bufnr)
+
     " Save job-related information
-    let s:jobs[bufnr] = job
-    let s:channels[s:ch_get_id(ch)] = {
+    let s:async_jobs[bufnr] = job
+    let s:async_data[id] = {
           \ 'bufnr': bufnr,
           \ 'lines': [],
-          \ 'preprocess': get(i, 'preprocess', 0),
-          \ 'prompt': i['prompt'],
+          \ 'interpreter': i,
           \ 'expected': line('$'),
           \ 'received': 0,
           \ }
 
     " Send the input
-    call ch_sendraw(ch, input)
+    if s:nvim
+      call jobsend(job, input)
+    else
+      call ch_sendraw(ch, input)
+    endif
   else
     call s:codi_handle_done(bufnr, system(cmd, input))
   endif
 endfunction
 
-" Callback to handle output
-function! codi#__callback(ch, msg)
-  let data = s:channels[s:ch_get_id(a:ch)]
+" Callback to handle output (nvim)
+function! s:codi_nvim_callback(job_id, data, event)
+  try
+    for line in a:data
+      call s:codi_handle_data(s:async_data[a:job_id], line)
+    endfor
+  catch E716
+    " No-op if data isn't ready
+  endtry
+endfunction
 
+" Callback to handle output (vim)
+function! codi#__vim_callback(ch, msg)
+  try
+    call s:codi_handle_data(s:async_data[s:ch_get_id(a:ch)], a:msg)
+  catch E716
+    " No-op if data isn't ready
+  endtry
+endfunction
+
+" Generalized output handler
+function! s:codi_handle_data(data, msg)
   " Bail early if we're done
-  if data['received'] > data['expected'] | return | endif
+  if a:data['received'] > a:data['expected'] | return | endif
+
+  let i = a:data['interpreter']
 
   " Preprocess early so we can properly detect prompts
-  if data['preprocess'] != 0
-    let out = data['preprocess'](a:msg)
-  else
+  try
+    let out = i['preprocess'](a:msg)
+  catch E716
     let out = a:msg
-  end
+  endtry
 
   for line in split(out, "\n")
-    call add(data['lines'], line)
+    call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
-    if line =~ data['prompt']
-      let data['received'] += 1
-      if data['received'] > data['expected']
-        call s:job_stop_and_clear(s:jobs[data['bufnr']])
+    if line =~ i['prompt']
+      let a:data['received'] += 1
+      if a:data['received'] > a:data['expected']
+        call s:stop_job_for_buf(a:data['bufnr'])
         silent call s:codi_handle_done(
-              \ data['bufnr'], join(data['lines'], "\n"))
+              \ a:data['bufnr'], join(a:data['lines'], "\n"))
         silent do User CodiUpdatePost
       endif
     endif

@@ -26,7 +26,7 @@ function! s:pp_rb(line)
 endfunction
 function! s:pp_ml(line)
   " If the line is a prompt
-  if match(a:line, '^# ') != -1
+  if a:line =~ '^# '
     " In ocaml, the number of characters before value divided by 2 is
     " the number of newlines.
     let val = match(a:line, '[^# ]')
@@ -36,8 +36,10 @@ function! s:pp_ml(line)
   endif
 endfunction
 function! s:pp_r(line)
+  " Decolorize
+  let uncolored = substitute(a:line, "\<esc>".'\[\dm', '', 'g')
   " Just return everything after the braces
-  return substitute(a:line, '\s*\[\d\+\]\s*\(.*\)$', '\1', '')
+  return substitute(uncolored, '\s*\[\d\+\]\s*\(.*\)$', '\1', '')
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {
