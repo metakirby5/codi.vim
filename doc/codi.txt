@@ -273,15 +273,15 @@ So, the following would be valid, assuming the prompt regex is "^> ":
 >
              LANGUAGE INTERPRETER v1.0              | ignored
              > 1 + 1                                | prompt 1
-             2                                      | result 1
+             2                                      | result for prompt 1
              > make_stacktrace()                    | prompt 2
-             A BAD ERROR                            | result 2
+             A BAD ERROR                            | result for prompt 2
                stacktrace line 1                    | ignored
                stacktrace line 2                    | ignored
                stacktrace line 3                    | ignored
              > function_that_prints_and_returns_1() | prompt 3
              I printed something!                   | ignored
-             1                                      | result 3
+             1                                      | result for prompt 3
              > and so on...                         | prompt 4
 <
 However, be careful of the following cases:
@@ -290,7 +290,7 @@ However, be careful of the following cases:
               2           | IGNORED (leading whitespace)
              > return_1() | prompt 2
              1            | IGNORED (next line has no leading whitespace)
-             Returned 1.  | result 1
+             Returned 1.  | result for prompt 2
 <
 If your output does not follow spec, you MUST implement
 |codi-interpreters-preprocess|.
