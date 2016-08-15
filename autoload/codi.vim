@@ -103,9 +103,9 @@ augroup CODI
   " Clean up when codi is killed
   au BufWinLeave *
         \ if exists('b:codi_leave') 
-        \| do User CodiLeavePre
+        \| silent do User CodiLeavePre
         \| silent exe b:codi_leave 
-        \| do User CodiLeavePost
+        \| silent do User CodiLeavePost
         \| endif
 augroup END
 
@@ -248,12 +248,12 @@ endfunction
 
 " Trigger autocommands and silently update
 function! s:codi_update()
-  do User CodiUpdatePre
+  silent do User CodiUpdatePre
   silent call s:codi_do_update()
 
   " Only trigger post if sync
   if !s:async
-    do User CodiUpdatePost
+    silent do User CodiUpdatePost
   endif
 endfunction
 
@@ -328,7 +328,7 @@ function! codi#__callback(ch, msg)
         call s:job_stop_and_clear(s:jobs[data['bufnr']])
         silent call s:codi_handle_done(
               \ data['bufnr'], join(data['lines'], "\n"))
-        do User CodiUpdatePost
+        silent do User CodiUpdatePost
       endif
     endif
   endfor
@@ -475,7 +475,7 @@ function! s:codi_spawn(filetype)
   endif
 
   call s:codi_kill()
-  do User CodiEnterPre
+  silent do User CodiEnterPre
 
   " Adapted from:
   " https://github.com/tpope/vim-fugitive/blob/master/plugin/fugitive.vim#L1988
@@ -510,7 +510,7 @@ function! s:codi_spawn(filetype)
   keepjumps keepalt wincmd p
   call s:let_codi('bufnr', bufnr('$'))
   silent call s:codi_update()
-  do User CodiEnterPost
+  silent do User CodiEnterPost
 endfunction
 
 " Main function
