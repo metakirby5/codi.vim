@@ -65,7 +65,7 @@ endif
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:nvim = has('nvim')
-let s:async = !g:codi#sync && (has('job') && has('channel')) || s:nvim
+let s:async = !g:codi#sync && ((has('job') && has('channel')) || s:nvim)
 let s:updating = 0
 let s:codis = {} " { bufnr: { codi_bufnr, codi_width } }
 let s:async_jobs = {} " { bufnr: job }
