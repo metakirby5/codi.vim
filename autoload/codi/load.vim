@@ -37,7 +37,7 @@ function! s:pp_ml(line)
 endfunction
 function! s:pp_r(line)
   " Just return everything after the braces
-  return substitute(a:line, '\[\d\+\] \(.*\)$', '\1', '')
+  return substitute(a:line, '\s*\[\d\+\]\s*\(.*\)$', '\1', '')
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {
