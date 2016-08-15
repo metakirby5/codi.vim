@@ -34,6 +34,13 @@ CONFIGURATION.............................................|codi-configuration|
     g:codi#autoclose........................................|g:codi#autoclose|
     g:codi#raw....................................................|g:codi#raw|
     g:codi#sync..................................................|g:codi#sync|
+AUTOCOMMANDS...............................................|codi-autocommands|
+    CodiEnterPre................................................|CodiEnterPre|
+    CodiEnterPost..............................................|CodiEnterPost|
+    CodiUpdatePre..............................................|CodiUpdatePre|
+    CodiUpdatePost............................................|CodiUpdatePost|
+    CodiLeavePre................................................|CodiLeavePre|
+    CodiLeavePost..............................................|CodiLeavePost|
 INTERPRETERS...............................................|codi-interpreters|
     DEFAULT INTERPRETERS..........................|codi-interpreters-defaults|
     OUTPUT SPECIFICATION.......................|codi-interpreters-output-spec|
@@ -239,6 +246,33 @@ g:codi#sync
              No reason to touch this unless you want to compare async to sync.
 
              Default value is 0.
+
+==============================================================================
+AUTOCOMMANDS                                               *codi-autocommands*
+
+                                                                *CodiEnterPre*
+CodiEnterPre
+             Triggered before a Codi pane enters.
+
+                                                               *CodiEnterPost*
+CodiEnterPost
+             Triggered after a Codi pane enters.
+
+                                                               *CodiUpdatePre*
+CodiUpdatePre
+             Triggered before a Codi pane updates.
+
+                                                              *CodiUpdatePost*
+CodiUpdatePost
+             Triggered after a Codi pane updates.
+
+                                                                *CodiLeavePre*
+CodiLeavePre
+             Triggered before a Codi pane leaves.
+
+                                                               *CodiLeavePost*
+CodiLeavePost
+             Triggered after a Codi pane leaves.
 
 ==============================================================================
 INTERPRETERS                                               *codi-interpreters*

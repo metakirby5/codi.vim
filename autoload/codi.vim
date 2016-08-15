@@ -102,7 +102,11 @@ augroup CODI
         \ | silent! setlocal cursorbind
   " Clean up when codi is killed
   au BufWinLeave *
-        \ if exists('b:codi_leave') | silent exe b:codi_leave | endif
+        \ if exists('b:codi_leave') 
+        \| do User CodiLeavePre
+        \| silent exe b:codi_leave 
+        \| do User CodiLeavePost
+        \| endif
 augroup END
 
 " Actions on all windows
@@ -111,31 +115,31 @@ augroup CODI_TARGET
   " === g:codi#update() ===
   " Instant
   if s:async && g:codi#autocmd == 'TextChanged'
-    au TextChanged,TextChangedI * silent call s:codi_update()
+    au TextChanged,TextChangedI * call s:codi_update()
   " 'updatetime'
   elseif g:codi#autocmd == 'CursorHold'
-    au CursorHold,CursorHoldI * silent call s:codi_update()
+    au CursorHold,CursorHoldI * call s:codi_update()
   " Insert mode left
   elseif g:codi#autocmd == 'InsertLeave'
-    au InsertLeave * silent call s:codi_update()
+    au InsertLeave * call s:codi_update()
   " Defaults
   else
     " Instant
     if s:async
-      au TextChanged,TextChangedI * silent call s:codi_update()
+      au TextChanged,TextChangedI * call s:codi_update()
     " 'updatetime'
     else
-      au CursorHold,CursorHoldI * silent call s:codi_update()
+      au CursorHold,CursorHoldI * call s:codi_update()
     endif
   endif
 
   " === g:codi#autoclose ===
   " Hide on buffer leave
-  au BufWinLeave * silent call s:codi_hide()
+  au BufWinLeave * call s:codi_hide()
   " Show on buffer return
-  au BufWinEnter * silent call s:codi_show()
+  au BufWinEnter * call s:codi_show()
   " Kill on target quit
-  au QuitPre * silent call s:codi_autoclose()
+  au QuitPre * call s:codi_autoclose()
 augroup END
 
 " Gets the ID, no matter if ch is open or closed.
@@ -242,8 +246,19 @@ function! s:codi_kill()
   endif
 endfunction
 
-" Update the codi buf
+" Trigger autocommands and silently update
 function! s:codi_update()
+  do User CodiUpdatePre
+  silent call s:codi_do_update()
+
+  " Only trigger post if sync
+  if !s:async
+    do User CodiUpdatePost
+  endif
+endfunction
+
+" Update the codi buf
+function! s:codi_do_update()
   " Bail if no codi buf to act on
   let codi_bufnr = s:get_codi('bufnr')
   if !codi_bufnr | return | endif
@@ -311,8 +326,9 @@ function! codi#__callback(ch, msg)
       let data['received'] += 1
       if data['received'] > data['expected']
         call s:job_stop_and_clear(s:jobs[data['bufnr']])
-        silent return s:codi_handle_done(
+        silent call s:codi_handle_done(
               \ data['bufnr'], join(data['lines'], "\n"))
+        do User CodiUpdatePost
       endif
     endif
   endfor
@@ -459,6 +475,7 @@ function! s:codi_spawn(filetype)
   endif
 
   call s:codi_kill()
+  do User CodiEnterPre
 
   " Adapted from:
   " https://github.com/tpope/vim-fugitive/blob/master/plugin/fugitive.vim#L1988
@@ -492,7 +509,8 @@ function! s:codi_spawn(filetype)
   " Return to target split
   keepjumps keepalt wincmd p
   call s:let_codi('bufnr', bufnr('$'))
-  silent return s:codi_update()
+  silent call s:codi_update()
+  do User CodiEnterPost
 endfunction
 
 " Main function

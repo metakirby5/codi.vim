@@ -102,6 +102,12 @@ codi() {
 - `g:codi#sync` is whether or not to force synchronous execution. No reason to
   touch this unless you want to compare async to sync.
 
+### Autocommands
+
+- `CodiEnterPre`, `CodiEnterPost`: When a Codi pane enters.
+- `CodiUpdatePre`, `CodiUpdatePost`: When a Codi pane updates.
+- `CodiLeavePre`, `CodiLeavePost`: When a Codi pane leaves.
+
 ## Thanks to
 
 - [@DanielFGray](https://github.com/DanielFGray) and
