@@ -61,7 +61,7 @@ and |+channel|, asynchronously!). It's extensible to nearly any language that
 provides a REPL (interactive interpreter)!
 
 Languages with built-in support:
-Python, Javascript, Haskell, Ruby, Ocaml, R
+Python, JavaScript, Haskell, Ruby, OCaml, R
 
 Pull requests for new language support welcome!
 
@@ -112,10 +112,10 @@ interpreter, you will not need ghci.
 
 Default interpreter dependencies:
              Python:     python
-             Javascript: node
+             JavaScript: node
              Haskell:    ghci
              Ruby:       irb
-             Ocaml:      ocaml
+             OCaml:      ocaml
              R:          R
 
 ==============================================================================
@@ -185,7 +185,7 @@ g:codi#aliases
              A dictionary of user-defined interpreter filetype aliases.
              This allows you to use an interpreter for more than one
              filetype. For example, you can alias "javascript.jsx" to
-             "javascript" so the Javascript interpreter (node) can be used
+             "javascript" so the JavaScript interpreter (node) can be used
              for the "javascript.jsx" filetype.
 
              This will not erase the internal default aliases.
@@ -341,7 +341,7 @@ The easiest way to check is to enable |g:codi#raw|.
 
 EXAMPLE INTERPRETER CONFIGURATION                  *codi-interpreters-example*
 
-A full interpreter configuration for Javascript can be found below. (Note that
+A full interpreter configuration for JavaScript can be found below. (Note that
 in Vimscript, you still need to add forward slashes for continuing newlines.)
 >
              'javascript': {
@@ -361,7 +361,7 @@ to get your interpreter to successfully work.
 bin (REQUIRED)
              Defines the command to use for the REPL backing the interpreter.
              For example, it would be "python" for Python, "node" for
-             Javascript, and "irb" for Ruby. Can either be a string or an
+             JavaScript, and "irb" for Ruby. Can either be a string or an
              array of strings, if the command require arguments. One possible
              array, for example, is ["irb", "--prompt", "default"]. Array
              arguments will not be automatically quoted.
@@ -372,7 +372,7 @@ prompt (REQUIRED)
              bin. This will be used to correctly line up the output of bin
              with your buffer.
 
-             In the Javascript example, we set prompt to match
+             In the JavaScript example, we set prompt to match
              ">", "...", and any amount of dots greater than that to
              accommodate further nesting levels.
 
@@ -393,7 +393,7 @@ preprocess (OPTIONAL)
              |g:codi#raw| to see what the output initially looks like, and
              what your preprocess function does to the output.
 
-             In the Javascript example, "node" has a tendency to print out
+             In the JavaScript example, "node" has a tendency to print out
              escape codes with a pattern of <esc> followed by some characters,
              so we strip those with the following function:
 >
