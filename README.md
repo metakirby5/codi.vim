@@ -2,7 +2,7 @@
 
 The interactive scratchpad for hackers.
 
-![Codi Screenshot](https://ptpb.pw/TsaW.gif)
+![Codi Demo](https://ptpb.pw/TsaW.gif)
 
 _Using Codi as a Python scratchpad through the
 [shell wrapper](#shell-wrapper)_
