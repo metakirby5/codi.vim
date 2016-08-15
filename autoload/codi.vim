@@ -75,11 +75,13 @@ let s:magic = "\n\<cr>\<c-d>\<c-d>\<cr>" " to get out of REPL
 if has("unix")
   let s:uname = system("uname -s")
   if s:uname =~ "Darwin" || s:uname =~ "BSD"
-    let s:script_pre = 'script -q /dev/null '
-    let s:script_post = ''
+    function! s:scriptify(bin)
+      return 'script -q /dev/null '.a:bin
+    endfunction
   else
-    let s:script_pre = 'script -qfec "'
-    let s:script_post = '" /dev/null'
+    function! s:scriptify(bin)
+      return 'script -qfec '.shellescape(a:bin, 1).' /dev/null'
+    endfunction
   endif
 else
   call s:err('Codi does not support Windows yet.')
@@ -257,7 +259,7 @@ function! s:codi_update()
   let input = input.s:magic
 
   " Build the command
-  let cmd = s:script_pre.s:whole_str(i['bin']).s:script_post
+  let cmd = s:scriptify(s:whole_str(i['bin']))
 
   " Async or sync
   if s:async
