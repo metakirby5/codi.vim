@@ -4,13 +4,13 @@ The interactive scratchpad for hackers.
 
 ![Codi Screenshot](https://ptpb.pw/TsaW.gif)
 
-*Using Codi as a Python scratchpad through the
-[shell wrapper](#shell-wrapper)*
+_Using Codi as a Python scratchpad through the
+[shell wrapper](#shell-wrapper)_
 
 Codi is an interactive scratchpad for hackers, with a similar interface to
 [Numi](https://numi.io). It opens a pane synchronized to your main buffer
 which displays the results of evaluating each line *as you type* (if Vim has
-`+job` and `+channel`, asynchronously!). It's extensible to nearly any
+`+job` and `+channel`, asynchronously). It's extensible to nearly any
 language that provides a REPL (interactive interpreter)!
 
 Languages with built-in support:
@@ -107,6 +107,14 @@ codi() {
 - `CodiEnterPre`, `CodiEnterPost`: When a Codi pane enters.
 - `CodiUpdatePre`, `CodiUpdatePost`: When a Codi pane updates.
 - `CodiLeavePre`, `CodiLeavePost`: When a Codi pane leaves.
+
+## FAQ
+
+- _Why doesn't X work in Codi, when it works in a normal source file?_
+  - Codi is not meant to be a replacement for actually running your program;
+    it supports nothing more than what the underlying REPL supports. This is
+    why Haskell language pragmas don't work and OCaml statements must end with
+    `;;`.
 
 ## Thanks to
 
