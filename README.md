@@ -13,6 +13,12 @@ which displays the results of evaluating each line *as you type* (if Vim has
 `+job` and `+channel`, asynchronously!). It's extensible to nearly any
 language that provides a REPL (interactive interpreter)!
 
+Languages with built-in support:
+Python, Javascript, Haskell, Ruby, Ocaml, R
+
+[Pull requests](https://github.com/metakirby5/codi.vim/pulls)
+for new language support welcome!
+
 *Note:* without async support, evaluation will trigger on cursor hold rather
 than text change.
 
@@ -45,11 +51,12 @@ need `ghci`.
 
 Default interpreter dependencies:
 
-  - Python:    `python`
-  - Javscript: `node`
-  - Haskell:   `ghci` (be really careful with lazy evaluation!)
-  - Ruby:      `irb`
-  - Ocaml:     `ocaml`
+  - Python:     `python`
+  - Javascript: `node`
+  - Haskell:    `ghci` (be really careful with lazy evaluation!)
+  - Ruby:       `irb`
+  - Ocaml:      `ocaml`
+  - R:          `R`
 
 ## Usage
 
@@ -99,3 +106,6 @@ codi() {
 
 - [@DanielFGray](https://github.com/DanielFGray) and
   [@purag](https://github.com/purag) for testing, feedback, and suggestions
+- [@Joaquin-V](https://github.com/Joaquin-V) for helping me discover critical
+  bugs with vanilla settings
+- Everyone who has reported an issue or sent in a pull request :)

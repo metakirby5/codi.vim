@@ -53,6 +53,11 @@ displays the results of evaluating each line as you type (if Vim has |+job|
 and |+channel|, asynchronously!). It's extensible to nearly any language that
 provides a REPL (interactive interpreter)!
 
+Languages with built-in support:
+Python, Javascript, Haskell, Ruby, Ocaml, R
+
+Pull requests for new language support welcome!
+
 Watch a screencast at https://ptpb.pw/t/~codi!
 
 SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
@@ -104,6 +109,7 @@ Default interpreter dependencies:
              Haskell:    ghci
              Ruby:       irb
              Ocaml:      ocaml
+             R:          R
 
 ==============================================================================
 USAGE                                                             *codi-usage*
@@ -240,6 +246,9 @@ INTERPRETERS                                               *codi-interpreters*
 Codi relies on interpreter configurations to understand how to evaluate your
 buffer's contents. A number of default interpreters are bundled in, but you
 can easily create your own configurations to add support for more filetypes.
+
+If you add support for a new language, please consider sending in a pull
+request at https://github.com/metakirby5/codi.vim/pulls!
 
 DEFAULT INTERPRETERS                              *codi-interpreters-defaults*
 
