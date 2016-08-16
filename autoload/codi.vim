@@ -497,7 +497,7 @@ function! s:codi_spawn(filetype)
 
   " Spawn codi
   exe 'keepjumps keepalt '
-        \.(g:codi#rightsplit ? 'rightbelow' : ' leftabove ')
+        \.(g:codi#rightsplit ? 'rightbelow' : 'leftabove').' '
         \.(s:get_codi('width', g:codi#width)).'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
