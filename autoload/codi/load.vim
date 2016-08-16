@@ -53,7 +53,7 @@ let s:codi_default_interpreters = {
           \ },
       \ 'haskell': {
           \ 'bin': 'ghci',
-          \ 'prompt': '^Prelude> ',
+          \ 'prompt': '^Prelude[^>|]*[>|] ',
           \ 'preprocess': function('s:pp_hs'),
           \ },
       \ 'ruby': {
