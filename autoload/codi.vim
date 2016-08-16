@@ -249,7 +249,10 @@ function! s:codi_kill()
 endfunction
 
 " Trigger autocommands and silently update
-function! s:codi_update()
+function! codi#update()
+  " Bail if no codi buf to act on
+  if !s:get_codi('bufnr') | return | endif
+
   silent do User CodiUpdatePre
   silent call s:codi_do_update()
 
@@ -261,10 +264,7 @@ endfunction
 
 " Update the codi buf
 function! s:codi_do_update()
-  " Bail if no codi buf to act on
   let codi_bufnr = s:get_codi('bufnr')
-  if !codi_bufnr | return | endif
-
   let i = s:get_codi('interpreter')
   let bufnr = bufnr('%')
 
@@ -503,29 +503,31 @@ function! s:codi_spawn(filetype)
   " Set up autocommands
   let opt_async = s:get_opt('async')
   let opt_autocmd = s:get_opt('autocmd')
-  exe 'augroup CODI_TARGET_'.bufnr
-    au!
-    " === g:codi#update() ===
-    " Instant
-    if opt_async && opt_autocmd == 'TextChanged'
-      au TextChanged,TextChangedI <buffer> call s:codi_update()
-    " 'updatetime'
-    elseif opt_autocmd == 'CursorHold'
-      au CursorHold,CursorHoldI <buffer> call s:codi_update()
-    " Insert mode left
-    elseif opt_autocmd == 'InsertLeave'
-      au InsertLeave <buffer> call s:codi_update()
-    " Defaults
-    else
+  if opt_autocmd != 'None'
+    exe 'augroup CODI_TARGET_'.bufnr
+      au!
+      " === g:codi#update() ===
       " Instant
-      if opt_async
-        au TextChanged,TextChangedI <buffer> call s:codi_update()
+      if opt_async && opt_autocmd == 'TextChanged'
+        au TextChanged,TextChangedI <buffer> call codi#update()
       " 'updatetime'
+      elseif opt_autocmd == 'CursorHold'
+        au CursorHold,CursorHoldI <buffer> call codi#update()
+      " Insert mode left
+      elseif opt_autocmd == 'InsertLeave'
+        au InsertLeave <buffer> call codi#update()
+      " Defaults
       else
-        au CursorHold,CursorHoldI <buffer> call s:codi_update()
+        " Instant
+        if opt_async
+          au TextChanged,TextChangedI <buffer> call codi#update()
+        " 'updatetime'
+        else
+          au CursorHold,CursorHoldI <buffer> call codi#update()
+        endif
       endif
-    endif
-  augroup END
+    augroup END
+  endif
 
   " Spawn codi
   exe 'keepjumps keepalt '
@@ -538,7 +540,7 @@ function! s:codi_spawn(filetype)
   " Return to target split and save codi bufnr
   keepjumps keepalt wincmd p
   call s:let_codi('bufnr', bufnr('$'))
-  silent call s:codi_update()
+  silent call codi#update()
   silent do User CodiEnterPost
 endfunction
 

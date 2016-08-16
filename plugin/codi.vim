@@ -30,7 +30,7 @@ endif
 
 " What autocmds trigger updates
 if !exists('g:codi#autocmd')
-  let g:codi#autocmd = 0
+  let g:codi#autocmd = ''
 endif
 
 " Width of Codi split
@@ -64,3 +64,4 @@ if !exists('g:codi#sync')
 endif
 
 command! -nargs=? -bang -bar -complete=filetype Codi call codi#run(<bang>0, <f-args>)
+command! -bar CodiUpdate call codi#update()
