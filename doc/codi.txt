@@ -57,13 +57,10 @@ INTRODUCTION                                               *codi-introduction*
 Codi is an interactive scratchpad for hackers, with a similar interface to
 Numi (https://numi.io). It opens a pane synchronized to your main buffer which
 displays the results of evaluating each line as you type (if Vim has |+job|
-and |+channel|, asynchronously!). It's extensible to nearly any language that
+and |+channel|, asynchronously). It's extensible to nearly any language that
 provides a REPL (interactive interpreter)!
 
-Languages with built-in support:
-Python, Javascript, Haskell, Ruby, Ocaml, R
-
-Pull requests for new language support welcome!
+See |codi-interpreters-defaults| for languages with built-in support.
 
 Watch a screencast at https://ptpb.pw/t/~codi!
 
@@ -102,6 +99,9 @@ if your fans spin up, you may need to investigate.
 
 DEPENDENCIES                                               *codi-dependencies*
 
+Windows is currently not supported, but check back soon!
+https://github.com/metakirby5/codi.vim/issues/14
+
 Asynchronous evaluation requires |+job| and |+channel|.
 
 Command line utilities (BSD and Linux are both fine): script, uname.
@@ -110,13 +110,7 @@ Each interpreter also depends on its bin; see |codi-interpreters-bin|. These
 are loaded on-demand. For example, if you only want to use the Python Codi
 interpreter, you will not need ghci.
 
-Default interpreter dependencies:
-             Python:     python
-             Javascript: node
-             Haskell:    ghci
-             Ruby:       irb
-             Ocaml:      ocaml
-             R:          R
+See |codi-interpreters-defaults| for default interpreter dependencies.
 
 ==============================================================================
 USAGE                                                             *codi-usage*
@@ -185,7 +179,7 @@ g:codi#aliases
              A dictionary of user-defined interpreter filetype aliases.
              This allows you to use an interpreter for more than one
              filetype. For example, you can alias "javascript.jsx" to
-             "javascript" so the Javascript interpreter (node) can be used
+             "javascript" so the JavaScript interpreter (node) can be used
              for the "javascript.jsx" filetype.
 
              This will not erase the internal default aliases.
@@ -293,10 +287,15 @@ Codi currently has default support for the following filetypes:
           +------------+--------+----------------------------------+
           | python     | python |                                  |
           | javascript | node   |                                  |
-          | haskell    | ghci   |                                  |
+          | haskell    | ghci   | Language pragmas don't work      |
           | ruby       | irb    |                                  |
           | ocaml      | ocaml  | Must end every statement with ;; |
           +------------+--------+----------------------------------+
+
+Note that Codi is not meant to be a replacement for actually running your
+program; it supports nothing more than what the underlying bin supports. This
+is why Haskell language pragmas don't work and OCaml statements must end with
+;;.
 
 OUTPUT SPECIFICATION                           *codi-interpreters-output-spec*
 
@@ -341,7 +340,7 @@ The easiest way to check is to enable |g:codi#raw|.
 
 EXAMPLE INTERPRETER CONFIGURATION                  *codi-interpreters-example*
 
-A full interpreter configuration for Javascript can be found below. (Note that
+A full interpreter configuration for JavaScript can be found below. (Note that
 in Vimscript, you still need to add forward slashes for continuing newlines.)
 >
              'javascript': {
@@ -361,7 +360,7 @@ to get your interpreter to successfully work.
 bin (REQUIRED)
              Defines the command to use for the REPL backing the interpreter.
              For example, it would be "python" for Python, "node" for
-             Javascript, and "irb" for Ruby. Can either be a string or an
+             JavaScript, and "irb" for Ruby. Can either be a string or an
              array of strings, if the command require arguments. One possible
              array, for example, is ["irb", "--prompt", "default"]. Array
              arguments will not be automatically quoted.
@@ -372,7 +371,7 @@ prompt (REQUIRED)
              bin. This will be used to correctly line up the output of bin
              with your buffer.
 
-             In the Javascript example, we set prompt to match
+             In the JavaScript example, we set prompt to match
              ">", "...", and any amount of dots greater than that to
              accommodate further nesting levels.
 
@@ -393,7 +392,7 @@ preprocess (OPTIONAL)
              |g:codi#raw| to see what the output initially looks like, and
              what your preprocess function does to the output.
 
-             In the Javascript example, "node" has a tendency to print out
+             In the JavaScript example, "node" has a tendency to print out
              escape codes with a pattern of <esc> followed by some characters,
              so we strip those with the following function:
 >

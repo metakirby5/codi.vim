@@ -2,19 +2,19 @@
 
 The interactive scratchpad for hackers.
 
-![Codi Screenshot](https://ptpb.pw/TsaW.gif)
+![Codi Demo](https://ptpb.pw/TsaW.gif)
 
-*Using Codi as a Python scratchpad through the
-[shell wrapper](#shell-wrapper)*
+_Using Codi as a Python scratchpad through the
+[shell wrapper](#shell-wrapper)_
 
 Codi is an interactive scratchpad for hackers, with a similar interface to
 [Numi](https://numi.io). It opens a pane synchronized to your main buffer
 which displays the results of evaluating each line *as you type* (if Vim has
-`+job` and `+channel`, asynchronously!). It's extensible to nearly any
+`+job` and `+channel`, asynchronously). It's extensible to nearly any
 language that provides a REPL (interactive interpreter)!
 
 Languages with built-in support:
-Python, Javascript, Haskell, Ruby, Ocaml, R
+Python, JavaScript, Haskell, Ruby, OCaml, R
 
 [Pull requests](https://github.com/metakirby5/codi.vim/pulls)
 for new language support welcome!
@@ -41,6 +41,9 @@ Plug 'metakirby5/codi.vim'
 
 ### Dependencies
 
+Windows is currently not supported, but
+[check back soon](https://github.com/metakirby5/codi.vim/issues/14)!
+
 Asynchronous evaluation requires `+job` and `+channel`.
 
 Command line utilities (BSD and Linux are both fine): `script`, `uname`.
@@ -52,10 +55,10 @@ need `ghci`.
 Default interpreter dependencies:
 
   - Python:     `python`
-  - Javascript: `node`
+  - JavaScript: `node`
   - Haskell:    `ghci` (be really careful with lazy evaluation!)
   - Ruby:       `irb`
-  - Ocaml:      `ocaml`
+  - OCaml:      `ocaml`
   - R:          `R`
 
 ## Usage
@@ -107,6 +110,14 @@ codi() {
 - `CodiEnterPre`, `CodiEnterPost`: When a Codi pane enters.
 - `CodiUpdatePre`, `CodiUpdatePost`: When a Codi pane updates.
 - `CodiLeavePre`, `CodiLeavePost`: When a Codi pane leaves.
+
+## FAQ
+
+- _Why doesn't X work in Codi, when it works in a normal source file?_
+  - Codi is not meant to be a replacement for actually running your program;
+    it supports nothing more than what the underlying REPL supports. This is
+    why Haskell language pragmas don't work and OCaml statements must end with
+    `;;`.
 
 ## Thanks to
 
