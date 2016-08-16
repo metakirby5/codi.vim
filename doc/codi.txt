@@ -23,6 +23,7 @@ USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
     :Codi!............................................................|:Codi!|
     :Codi!! {filetype}...............................................|:Codi!!|
+    :CodiUpdate..................................................|:CodiUpdate|
     SHELL WRAPPER.........................................|codi-usage-wrapper|
 CONFIGURATION.............................................|codi-configuration|
     g:codi#interpreters..................................|g:codi#interpreters|
@@ -129,6 +130,11 @@ USAGE                                                             *codi-usage*
 :Codi!! {filetype}
              Toggles Codi for the current buffer.
 
+                                                                 *:CodiUpdate*
+:CodiUpdate
+             Manually triggers a Codi update. Useful in conjunction with the
+             "None" setting for |g:codi#autocmd|.
+
 SHELL WRAPPER                                             *codi-usage-wrapper*
 
              A nice way to use Codi is through a shell wrapper that you can
@@ -172,6 +178,16 @@ g:codi#interpreters
                        \ },
                    \ }
 <
+             You may also set any of the |per-interpreter| options here. For
+             example, if you want to left-align all JavaScript Codi instances,
+             but keep right-align as the default:
+>
+             let g:codi#interpreters = {
+                   \ 'javascript': {
+                       \ 'rightalign': 0,
+                       \ },
+                   \ }
+<
              Default value is {}.
 
                                                               *g:codi#aliases*
@@ -190,12 +206,17 @@ g:codi#aliases
 <
              Default value is {}.
 
+The below options can also be set on a *per-interpreter* basis via
+|g:codi#interpreters|.
+
                                                              *g:codi#autocmd*
 g:codi#autocmd
              What |autocommand|s trigger updates. Possible values:
-             |TextChanged|, |CursorHold|, |InsertLeave|
+             |TextChanged|, |CursorHold|, |InsertLeave|, None.
 
              These will also register the insert mode variants.
+             "None" will make no autocommand trigger updates; use this if you
+             only want updates to be manually triggered on `:CodiUpdate`.
 
              Default value is 'TextChanged' for async, 'CursorHold' for sync.
 

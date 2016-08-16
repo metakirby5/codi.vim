@@ -65,7 +65,7 @@ endif
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:nvim = has('nvim')
-let s:async = !g:codi#sync && ((has('job') && has('channel')) || s:nvim)
+let s:async_ok = has('job') && has('channel') || s:nvim
 let s:updating = 0
 let s:codis = {} " { bufnr: { codi_bufnr, codi_width, codi_restore } }
 let s:async_jobs = {} " { bufnr: job }
@@ -111,27 +111,6 @@ augroup END
 " Actions on all windows
 augroup CODI_TARGET
   au!
-  " === g:codi#update() ===
-  " Instant
-  if s:async && g:codi#autocmd == 'TextChanged'
-    au TextChanged,TextChangedI * call s:codi_update()
-  " 'updatetime'
-  elseif g:codi#autocmd == 'CursorHold'
-    au CursorHold,CursorHoldI * call s:codi_update()
-  " Insert mode left
-  elseif g:codi#autocmd == 'InsertLeave'
-    au InsertLeave * call s:codi_update()
-  " Defaults
-  else
-    " Instant
-    if s:async
-      au TextChanged,TextChangedI * call s:codi_update()
-    " 'updatetime'
-    else
-      au CursorHold,CursorHoldI * call s:codi_update()
-    endif
-  endif
-
   " === g:codi#autoclose ===
   " Hide on buffer leave
   au BufWinLeave * call s:codi_hide()
@@ -140,6 +119,24 @@ augroup CODI_TARGET
   " Kill on target quit
   au QuitPre * call s:codi_autoclose()
 augroup END
+
+" Gets an interpreter option, and if not available, global option.
+" Pulls from get_codi('interpreter').
+function! s:get_opt(option, ...)
+  if a:0
+    let i = s:get_codi('interpreter', {}, a:1)
+  else
+    let i = s:get_codi('interpreter', {})
+  endif
+
+  " Async is a special case
+  if a:option == 'async'
+    return !get(i, 'sync', g:codi#sync) && s:async_ok
+  endif
+
+  exe 'let default = g:codi#'.a:option
+  return get(i, a:option, default)
+endfunction
 
 " Gets the ID, no matter if ch is open or closed.
 function! s:ch_get_id(ch)
@@ -225,7 +222,7 @@ endfunction
 
 function! s:codi_hide()
   let codi_bufnr = s:get_codi('bufnr')
-  if g:codi#autoclose && codi_bufnr && !s:updating
+  if s:get_opt('autoclose') && codi_bufnr && !s:updating
     " Remember width for when we respawn
     call s:let_codi('width', winwidth(bufwinnr(codi_bufnr)))
     call s:codi_kill()
@@ -234,14 +231,14 @@ endfunction
 
 function! s:codi_show()
   " If we saved a width, that means we hid codi earlier
-  if g:codi#autoclose && s:get_codi('width')
+  if s:get_opt('autoclose') && s:get_codi('width')
     call s:codi_spawn(&filetype)
     call s:unlet_codi('width')
   endif
 endfunction
 
 function! s:codi_autoclose()
-  if g:codi#autoclose
+  if s:get_opt('autoclose')
     return s:codi_kill()
   endif
 endfunction
@@ -251,31 +248,36 @@ function! s:codi_kill()
   let codi_bufnr = s:get_codi('bufnr')
   if codi_bufnr
     silent do User CodiLeavePre
-    call s:unlet_codi('bufnr')
+    " Clear autocommands
+    exe 'augroup CODI_TARGET_'.bufnr('%')
+      au!
+    augroup END
     exe s:get_codi('restore')
+    call s:unlet_codi('interpreter')
+    call s:unlet_codi('bufnr')
     exe 'keepjumps keepalt bdel! '.codi_bufnr
     silent do User CodiLeavePost
   endif
 endfunction
 
 " Trigger autocommands and silently update
-function! s:codi_update()
+function! codi#update()
+  " Bail if no codi buf to act on
+  if !s:get_codi('bufnr') | return | endif
+
   silent do User CodiUpdatePre
   silent call s:codi_do_update()
 
   " Only trigger post if sync
-  if !s:async
+  if !s:get_opt('async')
     silent do User CodiUpdatePost
   endif
 endfunction
 
 " Update the codi buf
 function! s:codi_do_update()
-  " Bail if no codi buf to act on
   let codi_bufnr = s:get_codi('bufnr')
-  if !codi_bufnr | return | endif
-
-  let i = getbufvar(codi_bufnr, 'codi_interpreter')
+  let i = s:get_codi('interpreter')
   let bufnr = bufnr('%')
 
   " Build input
@@ -289,7 +291,7 @@ function! s:codi_do_update()
   let cmd = s:scriptify(s:whole_str(i['bin']))
 
   " Async or sync
-  if s:async
+  if s:get_opt('async')
     " Spawn the job
     if s:nvim
       let job = jobstart(cmd, {
@@ -386,6 +388,7 @@ function! s:codi_handle_done(bufnr, output)
   " Go to target buf
   exe 'keepjumps keepalt buf! '.a:bufnr
   let s:updating = 1
+  let i = s:get_codi('interpreter')
   let codi_bufnr = s:get_codi('bufnr')
   let codi_winwidth = winwidth(bufwinnr(codi_bufnr))
   let num_lines = line('$')
@@ -401,14 +404,13 @@ function! s:codi_handle_done(bufnr, output)
   " Go to codi buf
   exe 'keepjumps keepalt buf! '.codi_bufnr
   setlocal modifiable
-  let i = b:codi_interpreter
 
   " We then strip out some crap characters from script
   let output = substitute(substitute(a:output,
         \ "\<cr>".'\|'."\<c-h>", '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
 
   " Preprocess if we didn't already
-  if !s:async && has_key(i, 'preprocess')
+  if !s:get_opt('async', b:codi_target_bufnr) && has_key(i, 'preprocess')
     let result = []
     for line in split(output, "\n")
       call add(result, i['preprocess'](line))
@@ -425,7 +427,7 @@ function! s:codi_handle_done(bufnr, output)
   "     If we have passed the first prompt,
   "       If the line has no leading whitespace (usually stacktraces),
   "         Save the line as taken.
-  if !g:codi#raw
+  if !s:get_opt('raw', b:codi_target_bufnr)
     let result = []      " Overall result list
     let passed_first = 0 " Whether we have passed the first prompt
     let taken = ''       " What to print at the prompt
@@ -459,7 +461,7 @@ function! s:codi_handle_done(bufnr, output)
   " Read the result into the codi buf
   1,$d _ | 0put =lines
   exe 'setlocal textwidth='.codi_winwidth
-  if g:codi#rightalign
+  if s:get_opt('rightalign', b:codi_target_bufnr)
     1,$right
   endif
 
@@ -488,8 +490,7 @@ endfunction
 
 function! s:codi_spawn(filetype)
   try
-    " Requires s: scope because of FP issues
-    let s:i = s:interpreters[
+    let i = s:interpreters[
           \ get(s:aliases, a:filetype, a:filetype)]
   " If interpreter not found...
   catch /E71\(3\|6\)/
@@ -504,8 +505,9 @@ function! s:codi_spawn(filetype)
   let interpreter_str = 'Codi interpreter for '.a:filetype
 
   " Check if required keys present
+  let s:spawn_interpreter = i
   function! s:interpreter_has_key(key)
-    return has_key(s:i, a:key)
+    return has_key(s:spawn_interpreter, a:key)
   endfunction
   if len(s:all(function('s:interpreter_has_key'),
         \ ['bin', 'prompt'],
@@ -513,12 +515,15 @@ function! s:codi_spawn(filetype)
         \| return | endif
 
   " Check if bin present
-  if !s:check_exec(s:i['bin'])
-      return s:err(interpreter_str.' requires '.s:first_str(s:i['bin']).'.')
+  if !s:check_exec(i['bin'])
+      return s:err(interpreter_str.' requires '.s:first_str(i['bin']).'.')
   endif
 
   call s:codi_kill()
   silent do User CodiEnterPre
+
+  " Store the interpreter we're using
+  call s:let_codi('interpreter', i)
 
   " Save bufnr
   let bufnr = bufnr('%')
@@ -538,19 +543,47 @@ function! s:codi_spawn(filetype)
   setlocal scrollbind nowrap nofoldenable
   silent! setlocal cursorbind
 
+  " Set up autocommands
+  let opt_async = s:get_opt('async')
+  let opt_autocmd = s:get_opt('autocmd')
+  if opt_autocmd != 'None'
+    exe 'augroup CODI_TARGET_'.bufnr
+      au!
+      " === g:codi#update() ===
+      " Instant
+      if opt_async && opt_autocmd == 'TextChanged'
+        au TextChanged,TextChangedI <buffer> call codi#update()
+      " 'updatetime'
+      elseif opt_autocmd == 'CursorHold'
+        au CursorHold,CursorHoldI <buffer> call codi#update()
+      " Insert mode left
+      elseif opt_autocmd == 'InsertLeave'
+        au InsertLeave <buffer> call codi#update()
+      " Defaults
+      else
+        " Instant
+        if opt_async
+          au TextChanged,TextChangedI <buffer> call codi#update()
+        " 'updatetime'
+        else
+          au CursorHold,CursorHoldI <buffer> call codi#update()
+        endif
+      endif
+    augroup END
+  endif
+
   " Spawn codi
   exe 'keepjumps keepalt '
-        \.(g:codi#rightsplit ? 'rightbelow' : ' leftabove ')
-        \.(s:get_codi('width', g:codi#width)).'vnew'
+        \.(s:get_opt('rightsplit') ? 'rightbelow' : 'leftabove').' '
+        \.(s:get_codi('width', s:get_opt('width'))).'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
-  let b:codi_interpreter = s:i
 
   " Return to target split and save codi bufnr
   keepjumps keepalt wincmd p
   call s:let_codi('bufnr', bufnr('$'))
-  silent call s:codi_update()
+  silent call codi#update()
   silent do User CodiEnterPost
 endfunction
 
