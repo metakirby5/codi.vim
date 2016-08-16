@@ -41,6 +41,9 @@ Plug 'metakirby5/codi.vim'
 
 ### Dependencies
 
+Windows is currently not supported, but
+[check back soon](https://github.com/metakirby5/codi.vim/issues/14)!
+
 Asynchronous evaluation requires `+job` and `+channel`.
 
 Command line utilities (BSD and Linux are both fine): `script`, `uname`.
