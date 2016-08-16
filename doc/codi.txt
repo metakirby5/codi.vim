@@ -172,6 +172,16 @@ g:codi#interpreters
                        \ },
                    \ }
 <
+             You may also set any of the |per-interpreter| options here. For
+             example, if you want to left-align all JavaScript Codi instances,
+             but keep right-align as the default:
+>
+             let g:codi#interpreters = {
+                   \ 'javascript': {
+                       \ 'rightalign': 0,
+                       \ },
+                   \ }
+<
              Default value is {}.
 
                                                               *g:codi#aliases*
@@ -189,6 +199,9 @@ g:codi#aliases
                    \ }
 <
              Default value is {}.
+
+The below options can also be set on a *per-interpreter* basis via
+|g:codi#interpreters|.
 
                                                              *g:codi#autocmd*
 g:codi#autocmd

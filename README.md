@@ -93,6 +93,10 @@ codi() {
   See the [documentation](doc/codi.txt) for more information.
 - `g:codi#aliases` is a list of user-defined interpreter filetype aliases.
   See the [documentation](doc/codi.txt) for more information.
+
+The below options can also be set on a per-interpreter basis via
+`g:codi#interpreters`:
+
 - `g:codi#autocmd` determines what autocommands trigger updates.
   See the [documentation](doc/codi.txt) for more information.
 - `g:codi#width` is the width of the Codi split.
