@@ -66,7 +66,7 @@ let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:async = !g:codi#sync && has('job') && has('channel')
 let s:updating = 0
-let s:codis = {} " { bufnr: { codi_bufnr, codi_width } }
+let s:codis = {} " { bufnr: { codi_bufnr, codi_width, codi_restore } }
 let s:jobs = {} " { bufnr: job }
 let s:channels = {} " { ch_id: { job-related data } }
 let s:magic = "\n\<cr>\<c-d>\<c-d>\<cr>" " to get out of REPL
@@ -100,12 +100,10 @@ augroup CODI
         \ scrollbind
         \ | noremap <buffer> <silent> q <esc>:q<cr>
         \ | silent! setlocal cursorbind
-  " Clean up when codi is killed
-  au BufWinLeave *
-        \ if exists('b:codi_leave') 
-        \| silent do User CodiLeavePre
-        \| silent exe b:codi_leave 
-        \| silent do User CodiLeavePost
+  " Clean up when codi is closed
+  au BufWinLeave * if exists('b:codi_target_bufnr')
+        \| exe 'keepjumps keepalt buf! '.b:codi_target_bufnr
+        \| call s:codi_kill()
         \| endif
 augroup END
 
@@ -199,7 +197,7 @@ endfunction
 function! s:unlet_codi(key, ...)
   let bufnr = s:nr_bufnr(a:0 ? a:1 : '%')
   let d = s:codis[bufnr]
-  unlet! d[a:key]
+  unlet d[a:key]
 
   " Unset the main key if it's empty
   if d == {} | unlet s:codis[bufnr] | endif
@@ -240,9 +238,11 @@ function! s:codi_kill()
   " If we already have a codi instance for the buffer, kill it
   let codi_bufnr = s:get_codi('bufnr')
   if codi_bufnr
-    " Shuffling is necessary because bdel triggers events
+    silent do User CodiLeavePre
     call s:unlet_codi('bufnr')
+    exe s:get_codi('restore')
     exe 'keepjumps keepalt bdel! '.codi_bufnr
+    silent do User CodiLeavePost
   endif
 endfunction
 
@@ -477,20 +477,19 @@ function! s:codi_spawn(filetype)
   call s:codi_kill()
   silent do User CodiEnterPre
 
-  " Adapted from:
-  " https://github.com/tpope/vim-fugitive/blob/master/plugin/fugitive.vim#L1988
-
-  " Restore target buf options on codi close
+  " Save bufnr
   let bufnr = bufnr('%')
-  let restore = 'keepjumps keepalt bdel!'
-        \.' | keepjumps keepalt buf! '.bufnr
-        \.' | call s:unlet_codi("bufnr")'
+
+  " Save settings to restore later
+  let winnr = winnr()
+  let restore = 'call s:unlet_codi("restore")'
   for opt in ['scrollbind', 'cursorbind', 'wrap', 'foldenable']
     if exists('&'.opt)
-      exe 'let val = &'.opt
-      let restore .= '| let &'.opt.'='.val.''
+      let val = getwinvar(winnr, '&'.opt)
+      let restore .= ' | call setwinvar('.winnr.', "&'.opt.'", '.val.')'
     endif
   endfor
+  call s:let_codi('restore', restore)
 
   " Set target buf options
   setlocal scrollbind nowrap nofoldenable
@@ -503,10 +502,9 @@ function! s:codi_spawn(filetype)
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
-  let b:codi_leave = restore
   let b:codi_interpreter = s:i
 
-  " Return to target split
+  " Return to target split and save codi bufnr
   keepjumps keepalt wincmd p
   call s:let_codi('bufnr', bufnr('$'))
   silent call s:codi_update()
