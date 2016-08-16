@@ -356,7 +356,7 @@ function! s:codi_handle_done(bufnr, output)
   let col = col('.')
 
   " So we can syncbind later
-  exe "keepjumps normal! \<esc>gg"
+  silent! exe "keepjumps normal! \<esc>gg"
 
   " Go to codi buf
   exe 'keepjumps keepalt buf! '.codi_bufnr
