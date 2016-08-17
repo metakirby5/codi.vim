@@ -70,13 +70,13 @@ Default interpreter dependencies:
 ### Shell wrapper
 
 A nice way to use Codi is through a shell wrapper that you can stick in your
-~/.bashrc:
+`~/.bashrc`:
 
 ```sh
 # Codi
 # Usage: codi [filetype] [filename]
 codi() {
-  vim $2 -c \
+  vim "$2" -c \
     "let g:startify_disable_at_vimenter = 1 |\
     set bt=nofile ls=0 noru nonu nornu |\
     hi ColorColumn ctermbg=NONE |\
