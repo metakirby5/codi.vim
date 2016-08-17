@@ -1,11 +1,12 @@
 " Utils
 function! s:deep_extend(d, e)
   for [k, v] in items(a:e)
-    try
+    if type(v) == type({})
       let a:d[k] = s:deep_extend(get(a:d, k, {}), v)
-    catch E715
+    else
       let a:d[k] = v
-    endtry
+    endif
+    unlet v
   endfor
   return a:d
 endfunction
