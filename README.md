@@ -41,12 +41,11 @@ Plug 'metakirby5/codi.vim'
 
 ### Dependencies
 
-Windows is currently not supported, but
-[check back soon](https://github.com/metakirby5/codi.vim/issues/14)!
-
-Asynchronous evaluation requires `+job` and `+channel`.
-
-Command line utilities (BSD and Linux are both fine): `script`, `uname`.
+- OS X or Linux (Windows support coming
+  [soon](https://github.com/metakirby5/codi.vim/issues/14)!)
+- Vim 7.4 (with `+job` and `+channel` for asynchronous evaluation)
+- `uname`
+- `script` (BSD or Linux, manpage should say at least 2013)
 
 Each interpreter also depends on its REPL. These are loaded on-demand. For
 example, if you only want to use the Python Codi interpreter, you will not

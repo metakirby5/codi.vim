@@ -103,9 +103,11 @@ DEPENDENCIES                                               *codi-dependencies*
 Windows is currently not supported, but check back soon!
 https://github.com/metakirby5/codi.vim/issues/14
 
-Asynchronous evaluation requires |+job| and |+channel|.
-
-Command line utilities (BSD and Linux are both fine): script, uname.
+- OS X or Linux (Windows support coming soon!)
+  https://github.com/metakirby5/codi.vim/issues/14
+- Vim 7.4 (with |+job| and |+channel| for asynchronous evaluation)
+- "uname"
+- "script" (BSD or Linux, manpage should say at least 2013)
 
 Each interpreter also depends on its bin; see |codi-interpreters-bin|. These
 are loaded on-demand. For example, if you only want to use the Python Codi
@@ -306,8 +308,8 @@ Codi currently has default support for the following filetypes:
           +------------+--------+----------------------------------+
           | Filetype   | bin    | Notes                            |
           +------------+--------+----------------------------------+
-          | python     | python |                                  |
-          | javascript | node   |                                  |
+          | python     | python | Cannot leave empty lines in defs |
+          | javascript | node   | "var" and "let" show undefined   |
           | haskell    | ghci   | Language pragmas don't work      |
           | ruby       | irb    |                                  |
           | ocaml      | ocaml  | Must end every statement with ;; |
@@ -316,7 +318,16 @@ Codi currently has default support for the following filetypes:
 Note that Codi is not meant to be a replacement for actually running your
 program; it supports nothing more than what the underlying bin supports. This
 is why Haskell language pragmas don't work and OCaml statements must end with
-;;.
+;;. Also, in most whitespace-sensitive languages, an empty line represents
+the end of a definition, so the below Python class will not work in Codi:
+>
+             class Test(object):
+                 def __init__(self):
+                     pass
+
+                 def oops_theres_an_empty_line_above_this(self):
+                     return 1
+<
 
 OUTPUT SPECIFICATION                           *codi-interpreters-output-spec*
 
