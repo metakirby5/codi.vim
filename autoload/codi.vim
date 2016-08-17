@@ -3,6 +3,14 @@ function! s:err(msg)
   echohl ErrorMsg | echom a:msg | echohl None
 endfunction
 
+" Version check - can't guarantee anything for < 704
+if v:version < 704
+  function! codi#run(...)
+    return s:err('Codi requires Vim 7.4 or higher.')
+  endfunction
+  finish
+endif
+
 " Returns the array of items not satisfying a:predicate.
 " Optional error printed in the format of
 " [msg]: [items].
@@ -23,26 +31,17 @@ endfunction
 
 " Get string or first element of list
 function! s:first_str(o)
-  try
-    call join(a:o)
-    return a:o[0]
+  if type(a:o) == type([])
+    try
+      return a:o[0]
+    " Empty list
+    catch E684
+      return ''
+    endtry
   " Not a list
-  catch E714
+  else
     return a:o
-  " Empty list
-  catch E684
-    return ''
-  endtry
-endfunction
-
-" Get string or whole list joined by spaces
-function! s:whole_str(o)
-  try
-    return join(a:o, ' ')
-  " Not a list
-  catch E714
-    return a:o
-  endtry
+  endif
 endfunction
 
 " Check if executable - can be array of strings or string
@@ -72,16 +71,27 @@ let s:async_jobs = {} " { bufnr: job }
 let s:async_data = {} " { id (nvim -> job, vim -> ch): { data } }
 let s:magic = "\n\<cr>\<c-d>\<c-d>\<cr>" " to get out of REPL
 
+" Shell escape on a list to make one string
+function! s:shellescape_list(l)
+  let result = []
+  for arg in a:l
+    call add(result, shellescape(arg, 1))
+  endfor
+  return join(result, ' ')
+endfunction
+
 " Detect what version of script to use based on OS
 if has("unix")
   let s:uname = system("uname -s")
   if s:uname =~ "Darwin" || s:uname =~ "BSD"
     function! s:scriptify(bin)
-      return 'script -q /dev/null '.a:bin
+      " We need to keep the arguments plain
+      return ['script', '-q', '/dev/null'] + a:bin
     endfunction
   else
     function! s:scriptify(bin)
-      return 'script -qfec '.shellescape(a:bin, 1).' /dev/null'
+      " We need to make bin one string argument
+      return ['script', '-qfec'] + [s:shellescape_list(a:bin)] + ['/dev/null']
     endfunction
   endif
 else
@@ -119,6 +129,23 @@ augroup CODI_TARGET
   " Kill on target quit
   au QuitPre * call s:codi_autoclose()
 augroup END
+
+" If list, return the same list
+" Else, return an array containing just o
+function! s:to_list(o)
+  if type(a:o) == type([])
+    return a:o
+  else
+    return [a:o]
+  endif
+endfunction
+
+" Does a user autocmd if exists
+function! s:user_au(au)
+  if exists('#User#'.a:au)
+    exe 'do <nomodeline> User '.a:au
+  endif
+endfunction
 
 " Gets an interpreter option, and if not available, global option.
 " Pulls from get_codi('interpreter').
@@ -247,7 +274,7 @@ function! s:codi_kill()
   " If we already have a codi instance for the buffer, kill it
   let codi_bufnr = s:get_codi('bufnr')
   if codi_bufnr
-    silent do User CodiLeavePre
+    call s:user_au('CodiLeavePre')
     " Clear autocommands
     exe 'augroup CODI_TARGET_'.bufnr('%')
       au!
@@ -256,7 +283,7 @@ function! s:codi_kill()
     call s:unlet_codi('interpreter')
     call s:unlet_codi('bufnr')
     exe 'keepjumps keepalt bdel! '.codi_bufnr
-    silent do User CodiLeavePost
+    call s:user_au('CodiLeavePost')
   endif
 endfunction
 
@@ -265,12 +292,12 @@ function! codi#update()
   " Bail if no codi buf to act on
   if !s:get_codi('bufnr') | return | endif
 
-  silent do User CodiUpdatePre
+  call s:user_au('CodiUpdatePre')
   silent call s:codi_do_update()
 
   " Only trigger post if sync
   if !s:get_opt('async')
-    silent do User CodiUpdatePost
+    call s:user_au('CodiUpdatePost')
   endif
 endfunction
 
@@ -288,7 +315,7 @@ function! s:codi_do_update()
   let input = input.s:magic
 
   " Build the command
-  let cmd = s:scriptify(s:whole_str(i['bin']))
+  let cmd = s:scriptify(s:to_list(i['bin']))
 
   " Async or sync
   if s:get_opt('async')
@@ -325,7 +352,8 @@ function! s:codi_do_update()
       call ch_sendraw(ch, input)
     endif
   else
-    call s:codi_handle_done(bufnr, system(cmd, input))
+    " Convert command to string
+    call s:codi_handle_done(bufnr, system(s:shellescape_list(cmd), input))
   endif
 endfunction
 
@@ -373,7 +401,7 @@ function! s:codi_handle_data(data, msg)
         call s:stop_job_for_buf(a:data['bufnr'])
         silent call s:codi_handle_done(
               \ a:data['bufnr'], join(a:data['lines'], "\n"))
-        silent do User CodiUpdatePost
+        call s:user_au('CodiUpdatePost')
       endif
     endif
   endfor
@@ -520,7 +548,7 @@ function! s:codi_spawn(filetype)
   endif
 
   call s:codi_kill()
-  silent do User CodiEnterPre
+  call s:user_au('CodiEnterPre')
 
   " Store the interpreter we're using
   call s:let_codi('interpreter', i)
@@ -584,7 +612,7 @@ function! s:codi_spawn(filetype)
   keepjumps keepalt wincmd p
   call s:let_codi('bufnr', bufnr('$'))
   silent call codi#update()
-  silent do User CodiEnterPost
+  call s:user_au('CodiEnterPost')
 endfunction
 
 " Main function
