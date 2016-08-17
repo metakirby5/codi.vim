@@ -31,26 +31,17 @@ endfunction
 
 " Get string or first element of list
 function! s:first_str(o)
-  try
-    call join(a:o)
-    return a:o[0]
+  if type(a:o) == type([])
+    try
+      return a:o[0]
+    " Empty list
+    catch E684
+      return ''
+    endtry
   " Not a list
-  catch E714
+  else
     return a:o
-  " Empty list
-  catch E684
-    return ''
-  endtry
-endfunction
-
-" Get string or whole list joined by spaces
-function! s:whole_str(o)
-  try
-    return join(a:o, ' ')
-  " Not a list
-  catch E714
-    return a:o
-  endtry
+  endif
 endfunction
 
 " Check if executable - can be array of strings or string
@@ -79,16 +70,27 @@ let s:jobs = {} " { bufnr: job }
 let s:channels = {} " { ch_id: { job-related data } }
 let s:magic = "\n\<cr>\<c-d>\<c-d>\<cr>" " to get out of REPL
 
+" Shell escape on a list to make one string
+function! s:shellescape_list(l)
+  let result = []
+  for arg in a:l
+    call add(result, shellescape(arg, 1))
+  endfor
+  return join(result, ' ')
+endfunction
+
 " Detect what version of script to use based on OS
 if has("unix")
   let s:uname = system("uname -s")
   if s:uname =~ "Darwin" || s:uname =~ "BSD"
     function! s:scriptify(bin)
-      return 'script -q /dev/null '.a:bin
+      " We need to keep the arguments plain
+      return ['script', '-q', '/dev/null'] + a:bin
     endfunction
   else
     function! s:scriptify(bin)
-      return 'script -qfec '.shellescape(a:bin, 1).' /dev/null'
+      " We need to make bin one string argument
+      return ['script', '-qfec'] + [s:shellescape_list(a:bin)] + ['/dev/null']
     endfunction
   endif
 else
@@ -126,6 +128,16 @@ augroup CODI_TARGET
   " Kill on target quit
   au QuitPre * call s:codi_autoclose()
 augroup END
+
+" If list, return the same list
+" Else, return an array containing just o
+function! s:to_list(o)
+  if type(a:o) == type([])
+    return a:o
+  else
+    return [a:o]
+  endif
+endfunction
 
 " Gets an interpreter option, and if not available, global option.
 " Pulls from get_codi('interpreter').
@@ -284,7 +296,7 @@ function! s:codi_do_update()
   let input = input.s:magic
 
   " Build the command
-  let cmd = s:scriptify(s:whole_str(i['bin']))
+  let cmd = s:scriptify(s:to_list(i['bin']))
 
   " Async or sync
   if s:get_opt('async')
@@ -310,7 +322,8 @@ function! s:codi_do_update()
     " Send the input
     call ch_sendraw(ch, input)
   else
-    call s:codi_handle_done(bufnr, system(cmd, input))
+    " Convert command to string
+    call s:codi_handle_done(bufnr, system(s:shellescape_list(cmd), input))
   endif
 endfunction
 
