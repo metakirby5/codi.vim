@@ -3,6 +3,14 @@ function! s:err(msg)
   echohl ErrorMsg | echom a:msg | echohl None
 endfunction
 
+" Version check - can't guarantee anything for < 704
+if v:version < 704
+  function! codi#run(...)
+    return s:err('Codi requires Vim 7.4 or higher.')
+  endfunction
+  finish
+endif
+
 " Returns the array of items not satisfying a:predicate.
 " Optional error printed in the format of
 " [msg]: [items].
