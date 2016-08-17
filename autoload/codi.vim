@@ -139,6 +139,13 @@ function! s:to_list(o)
   endif
 endfunction
 
+" Does a user autocmd if exists
+function! s:user_au(au)
+  if exists('#User#'.a:au)
+    exe 'do <nomodeline> User '.a:au
+  endif
+endfunction
+
 " Gets an interpreter option, and if not available, global option.
 " Pulls from get_codi('interpreter').
 function! s:get_opt(option, ...)
@@ -255,7 +262,7 @@ function! s:codi_kill()
   " If we already have a codi instance for the buffer, kill it
   let codi_bufnr = s:get_codi('bufnr')
   if codi_bufnr
-    silent do User CodiLeavePre
+    call s:user_au('CodiLeavePre')
     " Clear autocommands
     exe 'augroup CODI_TARGET_'.bufnr('%')
       au!
@@ -264,7 +271,7 @@ function! s:codi_kill()
     call s:unlet_codi('interpreter')
     call s:unlet_codi('bufnr')
     exe 'keepjumps keepalt bdel! '.codi_bufnr
-    silent do User CodiLeavePost
+    call s:user_au('CodiLeavePost')
   endif
 endfunction
 
@@ -273,12 +280,12 @@ function! codi#update()
   " Bail if no codi buf to act on
   if !s:get_codi('bufnr') | return | endif
 
-  silent do User CodiUpdatePre
+  call s:user_au('CodiUpdatePre')
   silent call s:codi_do_update()
 
   " Only trigger post if sync
   if !s:get_opt('async')
-    silent do User CodiUpdatePost
+    call s:user_au('CodiUpdatePost')
   endif
 endfunction
 
@@ -351,7 +358,7 @@ function! codi#__callback(ch, msg)
         call s:job_stop_and_clear(s:jobs[data['bufnr']])
         silent call s:codi_handle_done(
               \ data['bufnr'], join(data['lines'], "\n"))
-        silent do User CodiUpdatePost
+        call s:user_au('CodiUpdatePost')
       endif
     endif
   endfor
@@ -498,7 +505,7 @@ function! s:codi_spawn(filetype)
   endif
 
   call s:codi_kill()
-  silent do User CodiEnterPre
+  call s:user_au('CodiEnterPre')
 
   " Store the interpreter we're using
   call s:let_codi('interpreter', i)
@@ -562,7 +569,7 @@ function! s:codi_spawn(filetype)
   keepjumps keepalt wincmd p
   call s:let_codi('bufnr', bufnr('$'))
   silent call codi#update()
-  silent do User CodiEnterPost
+  call s:user_au('CodiEnterPost')
 endfunction
 
 " Main function
