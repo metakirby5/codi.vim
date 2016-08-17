@@ -358,14 +358,28 @@ function! s:codi_do_update()
 endfunction
 
 " Callback to handle output (nvim)
+let s:nvim_async_lines = {} " to hold partially built lines
 function! s:codi_nvim_callback(job_id, data, event)
-  try
-    for line in a:data
-      call s:codi_handle_data(s:async_data[a:job_id], line)
-    endfor
-  catch E716
-    " No-op if data isn't ready
-  endtry
+
+  " Initialize storage
+  if !has_key(s:nvim_async_lines, a:job_id)
+    let s:nvim_async_lines[a:job_id] = ''
+  endif
+
+  for line in a:data
+    let s:nvim_async_lines[a:job_id] .= line
+
+    " If ends in newline, we're ready to handle the data
+    if s:nvim_async_lines[a:job_id][-1:] == "\<cr>"
+      let input = s:nvim_async_lines[a:job_id]
+      let s:nvim_async_lines[a:job_id] = ''
+      try
+        call s:codi_handle_data(s:async_data[a:job_id], input)
+      catch E716
+        " No-op if data isn't ready
+      endtry
+    endif
+  endfor
 endfunction
 
 " Callback to handle output (vim)
