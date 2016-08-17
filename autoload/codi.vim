@@ -369,10 +369,11 @@ function! s:codi_nvim_callback(job_id, data, event)
   for line in a:data
     let s:nvim_async_lines[a:job_id] .= line
 
-    " If ends in newline, we're ready to handle the data
-    if s:nvim_async_lines[a:job_id][-1:] == "\<cr>"
-      let input = s:nvim_async_lines[a:job_id]
-      let s:nvim_async_lines[a:job_id] = ''
+    " If we hit a newline, we're ready to handle the data
+    let parts = split(s:nvim_async_lines[a:job_id], "\<cr>", 1)
+    if len(parts) > 1
+      let input = parts[0]
+      let s:nvim_async_lines[a:job_id] = join(parts[1:], '')
       try
         call s:codi_handle_data(s:async_data[a:job_id], input)
       catch E716
