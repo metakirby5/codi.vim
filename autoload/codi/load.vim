@@ -12,15 +12,6 @@ function! s:deep_extend(d, e)
 endfunction
 
 " Default interpreters
-function! s:pp_js(line)
-  " Strip escape codes
-  return substitute(a:line, "\<esc>".'\[\d\(\a\|\dm\)', '', 'g')
-endfunction
-function! s:pp_hs(line)
-  " Strip escape codes and add newlines where they should go
-  let c = substitute(a:line, "\<esc>".'\(\[?1[hl]\|E\)', '', 'g')
-  return substitute(c, "\<esc>".'[=>]\?', "\n", 'g')
-endfunction
 function! s:pp_rb(line)
   " Strip fat arrows
   return substitute(a:line, '=> ', '', 'g')
@@ -48,12 +39,10 @@ let s:codi_default_interpreters = {
       \ 'javascript': {
           \ 'bin': 'node',
           \ 'prompt': '^\(>\|\.\.\.\+\) ',
-          \ 'preprocess': function('s:pp_js'),
           \ },
       \ 'haskell': {
           \ 'bin': 'ghci',
           \ 'prompt': '^Prelude[^>|]*[>|] ',
-          \ 'preprocess': function('s:pp_hs'),
           \ },
       \ 'ruby': {
           \ 'bin': 'irb',

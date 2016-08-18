@@ -227,6 +227,19 @@ function! s:unlet_codi(key, ...)
   if d == {} | unlet s:codis[bufnr] | endif
 endfunction
 
+" Preprocess (default + interpreter)
+function! s:preprocess(text, ...)
+  " Default pre-process
+  let out = substitute(substitute(substitute(a:text,
+        \ "\<cr>".'\|'."\<c-h>", '', 'g'),
+        \ '\(^\|\n\)\(\^D\)\+', '\1', 'g'),
+        \ "\<esc>".'\[[0-9]*\a', '', 'g')
+  if a:0 && has_key(a:1, 'preprocess')
+    let out = a:1['preprocess'](out)
+  endif
+  return out
+endfunction
+
 function! s:codi_toggle(filetype)
   if s:get_codi('bufnr')
     return s:codi_kill()
@@ -320,8 +333,7 @@ function! s:codi_do_update()
     let s:channels[s:ch_get_id(ch)] = {
           \ 'bufnr': bufnr,
           \ 'lines': [],
-          \ 'preprocess': get(i, 'preprocess', 0),
-          \ 'prompt': i['prompt'],
+          \ 'interpreter': i,
           \ 'expected': line('$'),
           \ 'received': 0,
           \ }
@@ -340,19 +352,16 @@ function! codi#__callback(ch, msg)
 
   " Bail early if we're done
   if data['received'] > data['expected'] | return | endif
+  let i = data['interpreter']
 
   " Preprocess early so we can properly detect prompts
-  if data['preprocess'] != 0
-    let out = data['preprocess'](a:msg)
-  else
-    let out = a:msg
-  end
+  let out = s:preprocess(a:msg, i)
 
   for line in split(out, "\n")
     call add(data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
-    if line =~ data['prompt']
+    if line =~ i['prompt']
       let data['received'] += 1
       if data['received'] > data['expected']
         call s:job_stop_and_clear(s:jobs[data['bufnr']])
@@ -390,17 +399,15 @@ function! s:codi_handle_done(bufnr, output)
   exe 'keepjumps keepalt buf! '.codi_bufnr
   setlocal modifiable
 
-  " We then strip out some crap characters from script
-  let output = substitute(substitute(a:output,
-        \ "\<cr>".'\|'."\<c-h>", '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
-
   " Preprocess if we didn't already
-  if !s:get_opt('async', b:codi_target_bufnr) && has_key(i, 'preprocess')
+  if !s:get_opt('async', b:codi_target_bufnr)
     let result = []
-    for line in split(output, "\n")
-      call add(result, i['preprocess'](line))
+    for line in split(a:output, "\n")
+      call add(result, s:preprocess(line, i))
     endfor
     let output = join(result, "\n")
+  else
+    let output = a:output
   endif
 
   " Unless raw, parse for propmt
