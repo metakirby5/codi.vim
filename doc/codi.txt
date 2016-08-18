@@ -100,9 +100,6 @@ if your fans spin up, you may need to investigate.
 
 DEPENDENCIES                                               *codi-dependencies*
 
-Windows is currently not supported, but check back soon!
-https://github.com/metakirby5/codi.vim/issues/14
-
 - OS X or Linux (Windows support coming soon!)
   https://github.com/metakirby5/codi.vim/issues/14
 - Vim 7.4 (with |+job| and |+channel| for asynchronous evaluation)
