@@ -14,7 +14,7 @@ which displays the results of evaluating each line *as you type* (if Vim has
 language that provides a REPL (interactive interpreter)!
 
 Languages with built-in support:
-Python, JavaScript, Haskell, Ruby, OCaml, R
+Python, JavaScript, CoffeeScript, Haskell, Ruby, OCaml, R
 
 [Pull requests](https://github.com/metakirby5/codi.vim/pulls)
 for new language support welcome!
@@ -53,12 +53,13 @@ need `ghci`.
 
 Default interpreter dependencies:
 
-  - Python:     `python`
-  - JavaScript: `node`
-  - Haskell:    `ghci` (be really careful with lazy evaluation!)
-  - Ruby:       `irb`
-  - OCaml:      `ocaml`
-  - R:          `R`
+  - Python:       `python`
+  - JavaScript:   `node`
+  - CoffeeScript: `coffee`
+  - Haskell:      `ghci` (be really careful with lazy evaluation!)
+  - Ruby:         `irb`
+  - OCaml:        `ocaml`
+  - R:            `R`
 
 ## Usage
 

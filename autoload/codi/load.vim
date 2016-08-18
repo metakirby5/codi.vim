@@ -40,6 +40,10 @@ let s:codi_default_interpreters = {
           \ 'bin': 'node',
           \ 'prompt': '^\(>\|\.\.\.\+\) ',
           \ },
+      \ 'coffee': {
+          \ 'bin': 'coffee',
+          \ 'prompt': '^coffee> ',
+          \ },
       \ 'haskell': {
           \ 'bin': 'ghci',
           \ 'prompt': '^Prelude[^>|]*[>|] ',
