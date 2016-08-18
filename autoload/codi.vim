@@ -315,19 +315,21 @@ function! s:codi_do_update()
   let input = input.s:magic
 
   " Build the command
-  let cmd = s:scriptify(s:to_list(i['bin']))
+  let cmd = s:to_list(i['bin'])
 
   " Async or sync
   if s:get_opt('async')
     " Spawn the job
     if s:nvim
       let job = jobstart(cmd, {
+            \ 'pty': 1,
             \ 'on_stdout': function('s:codi_nvim_callback'),
             \ 'on_stderr': function('s:codi_nvim_callback'),
             \ })
       let id = job
     else
-      let job = job_start(cmd, { 'callback': 'codi#__vim_callback' })
+      let job = job_start(s:scriptify(cmd),
+            \ { 'callback': 'codi#__vim_callback' })
       let ch = job_getchannel(job)
       let id = s:ch_get_id(ch)
     endif
