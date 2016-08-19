@@ -233,7 +233,7 @@ function! s:preprocess(text, ...)
   let out = substitute(substitute(substitute(a:text,
         \ "\<cr>".'\|'."\<c-h>", '', 'g'),
         \ '\(^\|\n\)\(\^D\)\+', '\1', 'g'),
-        \ "\<esc>".'\[[0-9]*\a', '', 'g')
+        \ "\<esc>".'\[[0-9;]*\a', '', 'g')
   if a:0 && has_key(a:1, 'preprocess')
     let out = a:1['preprocess'](out)
   endif
