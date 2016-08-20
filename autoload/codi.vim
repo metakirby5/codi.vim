@@ -239,6 +239,19 @@ function! s:unlet_codi(key, ...)
   if d == {} | unlet s:codis[bufnr] | endif
 endfunction
 
+" Preprocess (default + interpreter)
+function! s:preprocess(text, ...)
+  " Default pre-process
+  let out = substitute(substitute(substitute(a:text,
+        \ "\<cr>".'\|'."\<c-h>", '', 'g'),
+        \ '\(^\|\n\)\(\^D\)\+', '\1', 'g'),
+        \ "\<esc>".'\[[0-9;]*\a', '', 'g')
+  if a:0 && has_key(a:1, 'preprocess')
+    let out = a:1['preprocess'](out)
+  endif
+  return out
+endfunction
+
 function! s:codi_toggle(filetype)
   if s:get_codi('bufnr')
     return s:codi_kill()
@@ -398,15 +411,10 @@ endfunction
 function! s:codi_handle_data(data, msg)
   " Bail early if we're done
   if a:data['received'] > a:data['expected'] | return | endif
-
   let i = a:data['interpreter']
 
   " Preprocess early so we can properly detect prompts
-  try
-    let out = i['preprocess'](a:msg)
-  catch E716
-    let out = a:msg
-  endtry
+  let out = s:preprocess(a:msg, i)
 
   for line in split(out, "\n")
     call add(a:data['lines'], line)
@@ -450,17 +458,15 @@ function! s:codi_handle_done(bufnr, output)
   exe 'keepjumps keepalt buf! '.codi_bufnr
   setlocal modifiable
 
-  " We then strip out some crap characters from script
-  let output = substitute(substitute(a:output,
-        \ "\<cr>".'\|'."\<c-h>", '', 'g'), '\(^\|\n\)\(\^D\)\+', '\1', 'g')
-
   " Preprocess if we didn't already
-  if !s:get_opt('async', b:codi_target_bufnr) && has_key(i, 'preprocess')
+  if !s:get_opt('async', b:codi_target_bufnr)
     let result = []
-    for line in split(output, "\n")
-      call add(result, i['preprocess'](line))
+    for line in split(a:output, "\n")
+      call add(result, s:preprocess(line, i))
     endfor
     let output = join(result, "\n")
+  else
+    let output = a:output
   endif
 
   " Unless raw, parse for propmt

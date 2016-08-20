@@ -100,9 +100,6 @@ if your fans spin up, you may need to investigate.
 
 DEPENDENCIES                                               *codi-dependencies*
 
-Windows is currently not supported, but check back soon!
-https://github.com/metakirby5/codi.vim/issues/14
-
 - OS X or Linux (Windows support coming soon!)
   https://github.com/metakirby5/codi.vim/issues/14
 - Vim 7.4 (with |+job| and |+channel| for asynchronous evaluation)
@@ -312,6 +309,7 @@ Codi currently has default support for the following filetypes:
           +------------+--------+----------------------------------+
           | python     | python | Cannot leave empty lines in defs |
           | javascript | node   | "var" and "let" show undefined   |
+          | coffee     | coffee | Blank lines show undefined       |
           | haskell    | ghci   | Language pragmas don't work      |
           | ruby       | irb    |                                  |
           | ocaml      | ocaml  | Must end every statement with ;; |
