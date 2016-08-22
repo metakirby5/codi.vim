@@ -162,7 +162,7 @@ g:codi#interpreters
              A dictionary of user-defined interpreters.
              See |codi-interpreters| for the format specification.
 
-             This will not erase the internal default interpreters.
+             Example configuration for Python:
 >
              let g:codi#interpreters = {
                    \ 'python': {
@@ -171,8 +171,7 @@ g:codi#interpreters
                        \ },
                    \ }
 <
-             The interpreter dictionary is deeply updated, so if all you want
-             to do is change the Haskell prompt to "> ", use the following:
+             Example configuration to change just the Haskell prompt:
 >
              let g:codi#interpreters = {
                    \ 'haskell': {
@@ -190,6 +189,7 @@ g:codi#interpreters
                        \ },
                    \ }
 <
+             Configuration is deeply applied over the default interpreters.
              Default value is {}.
 
                                                               *g:codi#aliases*
@@ -199,13 +199,12 @@ g:codi#aliases
              filetype. For example, you can alias "javascript.jsx" to
              "javascript" so the JavaScript interpreter (node) can be used
              for the "javascript.jsx" filetype.
-
-             This will not erase the internal default aliases.
 >
              let g:codi#aliases = {
                    \ 'javascript.jsx': 'javascript',
                    \ }
 <
+             Configuration is applied over the default aliases.
              Default value is {}.
 
 The below options can also be set on a *per-interpreter* basis via
