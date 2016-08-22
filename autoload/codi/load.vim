@@ -28,10 +28,8 @@ function! s:pp_ml(line)
   endif
 endfunction
 function! s:pp_r(line)
-  " Decolorize
-  let uncolored = substitute(a:line, "\<esc>".'\[\dm', '', 'g')
   " Just return everything after the braces
-  return substitute(uncolored, '\s*\[\d\+\]\s*\(.*\)$', '\1', '')
+  return substitute(a:line, '\s*\[\d\+\]\s*\(.*\)$', '\1', '')
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {
