@@ -46,7 +46,8 @@ Plug 'metakirby5/codi.vim'
 - Vim 7.4 (with `+job` and `+channel` for asynchronous evaluation) or
   NeoVim (still in its infancy - please report bugs!)
 - `uname`
-- `script` (BSD or Linux, manpage should say at least 2013)
+- If not using NeoVim, `script` (BSD or Linux, man page should say at least
+  2013)
 
 Each interpreter also depends on its REPL. These are loaded on-demand. For
 example, if you only want to use the Python Codi interpreter, you will not
