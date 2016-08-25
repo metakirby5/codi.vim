@@ -1,4 +1,4 @@
-# codi.vim [![Join the chat at https://gitter.im/metakirby5/codi.vim](https://badges.gitter.im/metakirby5/codi.vim.svg)](https://gitter.im/metakirby5/codi.vim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# codi.vim [![Gitter](https://badges.gitter.im/codi-vim/Lobby.svg)](https://gitter.im/codi-vim/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 The interactive scratchpad for hackers.
 
