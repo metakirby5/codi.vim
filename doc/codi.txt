@@ -35,7 +35,7 @@ CONFIGURATION.............................................|codi-configuration|
     g:codi#autoclose........................................|g:codi#autoclose|
     g:codi#raw....................................................|g:codi#raw|
     g:codi#sync..................................................|g:codi#sync|
-	g:codi#use_buffer_dir..............................g:codi#use_buffer_dir
+	g:codi#use_buffer_dir..............................|g:codi#use_buffer_dir|
 AUTOCOMMANDS...............................................|codi-autocommands|
     CodiEnterPre................................................|CodiEnterPre|
     CodiEnterPost..............................................|CodiEnterPost|
