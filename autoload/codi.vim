@@ -333,19 +333,25 @@ function! s:codi_do_update()
   " The purpose of this is to make the REPL start from the buffer directory
   if g:codi#use_buffer_dir
     let buf_dir = expand("%:p:h")
-    let cwd = getcwd()
-    exe 'cd '.fnameescape(buf_dir)
+    if !s:nvim
+      let cwd = getcwd()
+      exe 'cd '.fnameescape(buf_dir)
+    endif
   endif
 
   " Async or sync
   if s:get_opt('async')
     " Spawn the job
     if s:nvim
-      let job = jobstart(cmd, {
+      let job_options = {
             \ 'pty': 1,
             \ 'on_stdout': function('s:codi_nvim_callback'),
             \ 'on_stderr': function('s:codi_nvim_callback'),
-            \ })
+            \}
+      if g:codi#use_buffer_dir
+        let job_options.cwd = buf_dir
+      endif
+      let job = jobstart(cmd, job_options)
       let id = job
     else
       let job = job_start(s:scriptify(cmd),
@@ -379,7 +385,7 @@ function! s:codi_do_update()
   endif
 
   " Change back to original cwd to avoid side effects
-  if g:codi#use_buffer_dir
+  if g:codi#use_buffer_dir && !s:nvim
     exe 'cd '.fnameescape(cwd)
   endif
 endfunction
