@@ -330,7 +330,7 @@ function! s:codi_do_update()
   " Build the command
   let cmd = s:to_list(i['bin'])
 
-  " the purpose of this is to make the REPL start from buffer directory
+  " The purpose of this is to make the REPL start from the buffer directory
   if g:codi#use_buffer_dir
     let buf_dir = expand("%:p:h")
     let cwd = getcwd()
@@ -377,7 +377,8 @@ function! s:codi_do_update()
     " Convert command to string
     call s:codi_handle_done(bufnr, system(s:shellescape_list(cmd), input))
   endif
-  " change back to original cwd to avoid side effects
+
+  " Change back to original cwd to avoid side effects
   if g:codi#use_buffer_dir
     exe 'cd '.fnameescape(cwd)
   endif
