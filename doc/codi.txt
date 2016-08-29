@@ -35,6 +35,7 @@ CONFIGURATION.............................................|codi-configuration|
     g:codi#autoclose........................................|g:codi#autoclose|
     g:codi#raw....................................................|g:codi#raw|
     g:codi#sync..................................................|g:codi#sync|
+	g:codi#use_buffer_dir..............................g:codi#use_buffer_dir
 AUTOCOMMANDS...............................................|codi-autocommands|
     CodiEnterPre................................................|CodiEnterPre|
     CodiEnterPost..............................................|CodiEnterPost|
@@ -263,6 +264,15 @@ g:codi#sync
              No reason to touch this unless you want to compare async to sync.
 
              Default value is 0.
+
+                                                       *g:codi#use_buffer_dir*
+g:codi#use_buffer_dir
+             Whether or not switch to switch to the directory of the buffer
+			 being edited before starting the REPL. This allows the REPL to
+			 start from that directory which can make it easier to use
+			 relative paths from your code.
+
+             Default value is 1.
 
 ==============================================================================
 AUTOCOMMANDS                                               *codi-autocommands*
