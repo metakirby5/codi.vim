@@ -267,10 +267,9 @@ g:codi#sync
 
                                                        *g:codi#use_buffer_dir*
 g:codi#use_buffer_dir
-             Whether or not switch to switch to the directory of the buffer
-             being edited before starting the REPL. This allows the REPL to
-             start from that directory which can make it easier to use
-             relative paths from your code.
+             Start the REPL with the working directory of the buffer being
+             edited instead of Vim's current working directory. This can make
+             it easier for your code to use paths relative to the script path.
 
              Default value is 1.
 
