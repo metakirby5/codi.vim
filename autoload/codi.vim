@@ -331,7 +331,8 @@ function! s:codi_do_update()
   let cmd = s:to_list(i['bin'])
 
   " The purpose of this is to make the REPL start from the buffer directory
-  if g:codi#use_buffer_dir
+  let opt_use_buffer_dir = s:get_opt('use_buffer_dir')
+  if opt_use_buffer_dir
     let buf_dir = expand("%:p:h")
     if !s:nvim
       let cwd = getcwd()
@@ -348,7 +349,7 @@ function! s:codi_do_update()
             \ 'on_stdout': function('s:codi_nvim_callback'),
             \ 'on_stderr': function('s:codi_nvim_callback'),
             \}
-      if g:codi#use_buffer_dir
+      if opt_use_buffer_dir
         let job_options.cwd = buf_dir
       endif
       let job = jobstart(cmd, job_options)
@@ -385,7 +386,7 @@ function! s:codi_do_update()
   endif
 
   " Change back to original cwd to avoid side effects
-  if g:codi#use_buffer_dir && !s:nvim
+  if opt_use_buffer_dir && !s:nvim
     exe 'cd '.fnameescape(cwd)
   endif
 endfunction
