@@ -63,5 +63,10 @@ if !exists('g:codi#sync')
   let g:codi#sync = 0
 endif
 
+" Start REPL from the directory of the buffer being edited?
+if !exists('g:codi#use_buffer_dir')
+  let g:codi#use_buffer_dir = 1
+endif
+
 command! -nargs=? -bang -bar -complete=filetype Codi call codi#run(<bang>0, <f-args>)
 command! -bar CodiUpdate call codi#update()
