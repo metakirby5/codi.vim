@@ -436,6 +436,7 @@ function! s:codi_handle_data(data, msg)
   let out = s:preprocess(a:msg, i)
 
   for line in split(out, "\n")
+    call codi#log('s:codi_handle_data(): inside out for loop: line: '.line)
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
@@ -692,4 +693,10 @@ function! codi#run(bang, ...)
   else
     return s:codi_spawn(filetype)
   endif
+endfunction
+
+function! codi#log(message)
+    if g:codi#log_filepath != ''
+      call writefile([a:message], g:codi#log_filepath, 'a')
+    endif
 endfunction
