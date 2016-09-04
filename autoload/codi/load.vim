@@ -62,6 +62,10 @@ let s:codi_default_interpreters = {
           \ 'bin': 'R',
           \ 'prompt': '^> ',
           \ 'preprocess': function('s:pp_r'),
+          \ },
+      \ 'clojure': {
+          \ 'bin': ['grench', 'repl'],
+          \ 'prompt': '^\(user=>\|#_=>\) ',
           \ }
       \ }
 function! codi#load#interpreters()
