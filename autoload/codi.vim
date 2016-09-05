@@ -5,7 +5,7 @@ endfunction
 
 function! s:log(message)
     if g:codi#log != ''
-      call writefile([a:message], g:codi#log, 'a')
+      call writefile([expand('<sfile>').': '.a:message], g:codi#log, 'a')
     endif
 endfunction
 
@@ -442,7 +442,7 @@ function! s:codi_handle_data(data, msg)
   let out = s:preprocess(a:msg, i)
 
   for line in split(out, "\n")
-    call s:log('s:codi_handle_data(): inside out for loop: line: '.line)
+    call s:log('inside out for loop: line: '.line)
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
