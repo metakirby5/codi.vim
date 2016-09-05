@@ -5,7 +5,7 @@ endfunction
 
 function! s:log(message)
     if g:codi#log != ''
-      call writefile([strftime("%c").'. '.expand('<sfile>').': '.a:message], g:codi#log, 'a')
+      call writefile([strftime("%F %T").'. '.expand('<sfile>').': '.a:message], g:codi#log, 'a')
     endif
 endfunction
 
