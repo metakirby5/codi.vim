@@ -323,6 +323,7 @@ Codi currently has default support for the following filetypes:
           | haskell    | ghci   | Language pragmas don't work      |
           | ruby       | irb    |                                  |
           | ocaml      | ocaml  | Must end every statement with ;; |
+          | clojure    | planck |                                  |
           +------------+--------+----------------------------------+
 
 Note that Codi is not meant to be a replacement for actually running your

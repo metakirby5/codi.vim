@@ -62,7 +62,11 @@ let s:codi_default_interpreters = {
           \ 'bin': 'R',
           \ 'prompt': '^> ',
           \ 'preprocess': function('s:pp_r'),
-          \ }
+          \ },
+      \ 'clojure': {
+          \ 'bin': ['planck', '--verbose', '--dumb-terminal'],
+          \ 'prompt': '^.\{-}=> ',
+          \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
