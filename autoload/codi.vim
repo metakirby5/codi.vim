@@ -5,7 +5,13 @@ endfunction
 
 function! s:log(message)
     let stacktrace = expand('<sfile>')
-    let stacktrace = stacktrace[0 : strridx(stacktrace, "..") - 1] " remove this function from the stacktrace
+    " remove this function from the stacktrace
+    let stacktrace = stacktrace[0 : strridx(stacktrace, '..') - 1]
+    let i= strridx(stacktrace, '..')
+    if i != -1
+        " remove everything except the last function
+        let stacktrace = stacktrace[i + 2 : ]
+    endif
     if g:codi#log != ''
       call writefile([strftime("%T").'. '.stacktrace.': '.a:message], g:codi#log, 'a')
     endif
