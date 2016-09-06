@@ -66,7 +66,7 @@ let s:codi_default_interpreters = {
       \ 'clojure': {
           \ 'bin': ['planck', '--verbose', '--dumb-terminal'],
           \ 'prompt': '^.\{-}=> ',
-          \ }
+          \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
