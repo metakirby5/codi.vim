@@ -17,7 +17,7 @@ function! s:log(message)
     let seconds = seconds_and_microseconds[ : decimal_i - 1]
     let microseconds = seconds_and_microseconds[decimal_i + 1 : ]
     if g:codi#log != ''
-      call writefile([strftime("%T.".microseconds, seconds).'. '.stacktrace.': '.a:message], g:codi#log, 'a')
+      call writefile([strftime("%T.".microseconds, seconds).' '.stacktrace.': '.a:message], g:codi#log, 'a')
     endif
 endfunction
 
