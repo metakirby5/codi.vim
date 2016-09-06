@@ -4,8 +4,10 @@ function! s:err(msg)
 endfunction
 
 function! s:log(message)
+    let stacktrace = expand('<sfile>')
+    let stacktrace = stacktrace[0 : strridx(stacktrace, "..") - 1] " remove this function from the stacktrace
     if g:codi#log != ''
-      call writefile([strftime("%T").'. '.expand('<sfile>').': '.a:message], g:codi#log, 'a')
+      call writefile([strftime("%T").'. '.stacktrace.': '.a:message], g:codi#log, 'a')
     endif
 endfunction
 
