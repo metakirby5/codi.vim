@@ -1,6 +1,25 @@
 " Display an error message
 function! s:err(msg)
+  call s:log('ERROR: '.a:msg)
   echohl ErrorMsg | echom a:msg | echohl None
+endfunction
+
+function! s:log(message)
+    let stacktrace = expand('<sfile>')
+    " remove this function from the stacktrace
+    let stacktrace = stacktrace[0:strridx(stacktrace, '..') - 1]
+    let i = strridx(stacktrace, '..')
+    if i != -1
+        " remove everything except the last function
+        let stacktrace = stacktrace[i + 2:]
+    endif
+    let seconds_and_microseconds = reltimestr(reltime())
+    let decimal_i = stridx(seconds_and_microseconds, '.')
+    let seconds = seconds_and_microseconds[:decimal_i - 1]
+    let microseconds = seconds_and_microseconds[decimal_i + 1:]
+    if g:codi#log != ''
+      call writefile([strftime("%T.".microseconds, seconds).' '.stacktrace.': '.a:message], g:codi#log, 'a')
+    endif
 endfunction
 
 " Version check - can't guarantee anything for < 704
@@ -436,6 +455,7 @@ function! s:codi_handle_data(data, msg)
   let out = s:preprocess(a:msg, i)
 
   for line in split(out, "\n")
+    call s:log('async line: '.line)
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount

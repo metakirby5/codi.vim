@@ -68,5 +68,10 @@ if !exists('g:codi#use_buffer_dir')
   let g:codi#use_buffer_dir = 1
 endif
 
+" Path for the file where Codi log information. Logging is disabled by default 
+if !exists('g:codi#log')
+  let g:codi#log = ''
+endif
+
 command! -nargs=? -bang -bar -complete=filetype Codi call codi#run(<bang>0, <f-args>)
 command! -bar CodiUpdate call codi#update()

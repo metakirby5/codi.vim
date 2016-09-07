@@ -36,6 +36,7 @@ CONFIGURATION.............................................|codi-configuration|
     g:codi#raw....................................................|g:codi#raw|
     g:codi#sync..................................................|g:codi#sync|
     g:codi#use_buffer_dir..............................|g:codi#use_buffer_dir|
+    g:codi#log....................................................|g:codi#log|
 AUTOCOMMANDS...............................................|codi-autocommands|
     CodiEnterPre................................................|CodiEnterPre|
     CodiEnterPost..............................................|CodiEnterPost|
@@ -272,6 +273,15 @@ g:codi#use_buffer_dir
              it easier for your code to use paths relative to the script path.
 
              Default value is 1.
+
+                                                                  *g:codi#log*
+g:codi#log
+             Path for the file where Codi logs information. This can be useful
+             for debugging during normal development and when fixing reported
+             issues. It is also useful to post the log contents when
+             submitting issues.
+
+             Default value is '' which disbles all logging.
 
 ==============================================================================
 AUTOCOMMANDS                                               *codi-autocommands*
