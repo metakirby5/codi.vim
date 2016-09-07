@@ -10,7 +10,10 @@ function! s:log(message)
   " Remove everything except the last function
   let i = strridx(stacktrace, '..')
   if i != -1
-      let stacktrace = stacktrace[i + 2:]
+    let fname = stacktrace[i + 2:]
+  else
+    " Strip 'function '
+    let fname = stacktrace[9:]
   endif
 
   " Create timestamp with microseconds
@@ -21,7 +24,7 @@ function! s:log(message)
   let timestamp = strftime("%T.".microseconds, seconds)
 
   " Write to log file
-  call writefile(['['.timestamp.'] '.stacktrace.': '.a:message],
+  call writefile(['['.timestamp.'] '.fname.': '.a:message],
         \ g:codi#log, 'a')
 endfunction
 
@@ -112,17 +115,20 @@ endfunction
 if has("unix")
   let s:uname = system("uname -s")
   if s:uname =~ "Darwin" || s:uname =~ "BSD"
+    call s:log('Darwin/BSD detected, using `script -q /dev/null $bin`')
     function! s:scriptify(bin)
       " We need to keep the arguments plain
       return ['script', '-q', '/dev/null'] + a:bin
     endfunction
   else
+    call s:log('Linux detected, using `script -qfec "$bin" /dev/null`')
     function! s:scriptify(bin)
       " We need to make bin one string argument
       return ['script', '-qfec'] + [s:shellescape_list(a:bin)] + ['/dev/null']
     endfunction
   endif
 else
+  call s:log ('Windows detected, erroring out')
   call s:err('Codi does not support Windows yet.')
 endif
 
@@ -170,6 +176,7 @@ endfunction
 
 " Does a user autocmd if exists
 function! s:user_au(au)
+  call s:log('Doing autocommand '.a:au)
   if exists('#User#'.a:au)
     exe 'do <nomodeline> User '.a:au
   endif
@@ -206,6 +213,8 @@ function! s:stop_job_for_buf(buf, ...)
   catch E716
     return
   endtry
+
+  call s:log('Stopping job for buffer '.a:buf)
 
   if s:nvim
     silent! call jobstop(job)
@@ -367,6 +376,8 @@ function! s:codi_do_update()
       exe 'cd '.fnameescape(buf_dir)
     endif
   endif
+
+  call s:log('Starting job for buffer '.bufnr)
 
   " Async or sync
   if s:get_opt('async')
