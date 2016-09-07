@@ -42,7 +42,7 @@ endif
 " Returns the array of items not satisfying a:predicate.
 " Optional error printed in the format of
 " [msg]: [items].
-function! s:all(predicate, required, ...)
+function! s:require(predicate, required, ...)
   let s:missing = []
   for bin in a:required
     if a:predicate(bin) != 1
@@ -78,7 +78,7 @@ function! s:check_exec(bin)
 endfunction
 
 " Check for missing commands
-let s:missing_deps = s:all(function('s:check_exec'), ['script', 'uname'])
+let s:missing_deps = s:require(function('s:check_exec'), ['script', 'uname'])
 if len(s:missing_deps)
   function! codi#run(...)
     return s:err(
@@ -608,7 +608,7 @@ function! s:codi_spawn(filetype)
   function! s:interpreter_has_key(key)
     return has_key(s:spawn_interpreter, a:key)
   endfunction
-  if len(s:all(function('s:interpreter_has_key'),
+  if len(s:require(function('s:interpreter_has_key'),
         \ ['bin', 'prompt'],
         \ interpreter_str.' requires these missing keys'))
         \| return | endif
