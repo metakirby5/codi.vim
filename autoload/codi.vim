@@ -1,25 +1,34 @@
+" Log a message
+function! s:log(message)
+  " Bail if not logging
+  if g:codi#log == '' | return | endif
+
+  " Grab stack trace not including log function
+  let stacktrace = expand('<sfile>')
+  let stacktrace = stacktrace[0:strridx(stacktrace, '..') - 1]
+
+  " Remove everything except the last function
+  let i = strridx(stacktrace, '..')
+  if i != -1
+      let stacktrace = stacktrace[i + 2:]
+  endif
+
+  " Create timestamp with microseconds
+  let seconds_and_microseconds = reltimestr(reltime())
+  let decimal_i = stridx(seconds_and_microseconds, '.')
+  let seconds = seconds_and_microseconds[:decimal_i - 1]
+  let microseconds = seconds_and_microseconds[decimal_i + 1:]
+  let timestamp = strftime("%T.".microseconds, seconds)
+
+  " Write to log file
+  call writefile(['['.timestamp.'] '.stacktrace.': '.a:message],
+        \ g:codi#log, 'a')
+endfunction
+
 " Display an error message
 function! s:err(msg)
   call s:log('ERROR: '.a:msg)
   echohl ErrorMsg | echom a:msg | echohl None
-endfunction
-
-function! s:log(message)
-    let stacktrace = expand('<sfile>')
-    " remove this function from the stacktrace
-    let stacktrace = stacktrace[0:strridx(stacktrace, '..') - 1]
-    let i = strridx(stacktrace, '..')
-    if i != -1
-        " remove everything except the last function
-        let stacktrace = stacktrace[i + 2:]
-    endif
-    let seconds_and_microseconds = reltimestr(reltime())
-    let decimal_i = stridx(seconds_and_microseconds, '.')
-    let seconds = seconds_and_microseconds[:decimal_i - 1]
-    let microseconds = seconds_and_microseconds[decimal_i + 1:]
-    if g:codi#log != ''
-      call writefile([strftime("%T.".microseconds, seconds).' '.stacktrace.': '.a:message], g:codi#log, 'a')
-    endif
 endfunction
 
 " Version check - can't guarantee anything for < 704
