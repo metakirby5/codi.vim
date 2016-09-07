@@ -455,7 +455,7 @@ function! s:codi_handle_data(data, msg)
   let out = s:preprocess(a:msg, i)
 
   for line in split(out, "\n")
-    call s:log('inside out for loop: line: '.line)
+    call s:log('async line: '.line)
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
