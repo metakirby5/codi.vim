@@ -1,5 +1,6 @@
 " Display an error message
 function! s:err(msg)
+  call s:log('ERROR: '.a:msg)
   echohl ErrorMsg | echom a:msg | echohl None
 endfunction
 
