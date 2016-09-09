@@ -421,7 +421,8 @@ function! s:codi_do_update()
     endif
   else
     " Convert command to string
-    call s:codi_handle_done(bufnr, system(s:shellescape_list(cmd), input))
+    call s:codi_handle_done(bufnr,
+          \ system(s:shellescape_list(s:scriptify(cmd)), input))
   endif
 
   " Change back to original cwd to avoid side effects
@@ -496,6 +497,8 @@ function! s:codi_handle_done(bufnr, output)
   " Save for later
   let ret_bufnr = bufnr('%')
   let ret_mode = mode()
+  let ret_line = line('.')
+  let ret_col = col('.')
 
   " Go to target buf
   exe 'keepjumps keepalt buf! '.a:bufnr
@@ -590,12 +593,13 @@ function! s:codi_handle_done(bufnr, output)
   " Go back to original buf
   exe 'keepjumps keepalt buf! '.ret_bufnr
 
-  " Restore mode
+  " Restore mode and position
   if ret_mode =~ '[vV]'
     keepjumps normal! gv
   elseif ret_mode =~ '[sS]'
     exe "keepjumps normal! gv\<c-g>"
   endif
+  keepjumps call cursor(ret_line, ret_col)
 endfunction
 
 function! s:codi_spawn(filetype)
