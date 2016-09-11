@@ -1,4 +1,6 @@
-Please include the following:
+If you only have a quick question, consider posting it on the Gitter.
+
+Otherwise, please include the following:
 
 ## Issue description
 - Brief description
