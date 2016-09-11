@@ -4,14 +4,7 @@ Thanks for deciding to contribute to codi.vim!
 
 ## Submitting an issue
 
-Please include the following:
-
-- OS
-- Version of `script` (if you don't know, just paste the last line of the
-  man page)
-- Entire output of `vim --version`
-- Log lines (see `:h g:codi#log`), preferably in a pastebin
-- Exact steps to reproduce the issue
+Please follow the issue template.
 
 ## Adding new language support
 
