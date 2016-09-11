@@ -276,12 +276,11 @@ g:codi#use_buffer_dir
 
                                                                   *g:codi#log*
 g:codi#log
-             Path for the file where Codi logs information. This can be useful
-             for debugging during normal development and when fixing reported
-             issues. It is also useful to post the log contents when
-             submitting issues.
+             Path to the file where Codi logs information. This can be useful
+             for debugging (e.g. |codi-interpreters-preprocess|) and when
+             fixing or submitting issues.
 
-             Default value is '' which disbles all logging.
+             Default value is '', which disbles all logging.
 
 ==============================================================================
 AUTOCOMMANDS                                               *codi-autocommands*
@@ -353,8 +352,7 @@ the end of a definition, so the below Python class will not work in Codi:
 OUTPUT SPECIFICATION                           *codi-interpreters-output-spec*
 
 To ensure evaluated lines align with the corresponding buffer's lines, the
-output prior to formatting (as if you had enabled |g:codi#raw|) must follow
-this spec:
+interpreter output (as if you had enabled |g:codi#raw|) must follow this spec:
 >
              [any number of lines]
              [first prompt][any text]
@@ -387,8 +385,9 @@ However, be careful of the following cases:
              1            | IGNORED (next line has no leading whitespace)
              Returned 1.  | result for prompt 2
 <
-If your output does not follow spec, you MUST implement
+If your interpreter's output does not follow this spec, you MUST implement
 |codi-interpreters-preprocess|.
+
 The easiest way to check is to enable |g:codi#raw|.
 
 EXAMPLE INTERPRETER CONFIGURATION                  *codi-interpreters-example*
@@ -442,8 +441,8 @@ preprocess (OPTIONAL)
              of output.
 
              When creating your own preprocess, it is useful to enable
-             |g:codi#raw| to see what the output initially looks like, and
-             what your preprocess function does to the output.
+             |g:codi#raw| and/or |g:codi#log| to see what the output initially
+             looks like, and what your preprocess function does to the output.
 
              In the JavaScript example, "node" has a tendency to print out
              escape codes with a pattern of <esc> followed by some characters,
