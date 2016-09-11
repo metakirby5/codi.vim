@@ -10,7 +10,7 @@ Please include the following:
 - Version of `script` (if you don't know, just paste the last line of the
   man page)
 - Entire output of `vim --version`
-- Log lines (see `:h g:codi#log`)
+- Log lines (see `:h g:codi#log`), preferably in a pastebin
 - Exact steps to reproduce the issue
 
 ## Adding new language support
@@ -24,4 +24,7 @@ following places:
 - `README.md`, line 16 and 57
 - `doc/codi.txt`, line 327
 
-## Submitting a feature
+## Adding a new feature
+
+Follow existing conventions (e.g. style and configuration access patterns) and
+add relevant documentation in `doc/codi.txt`.
