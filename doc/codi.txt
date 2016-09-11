@@ -18,7 +18,7 @@ TABLE OF CONTENTS                                              *codi-contents*
 INTRODUCTION...............................................|codi-introduction|
     SYNCHRONOUS VS ASYNCHRONOUS.................|codi-introduction-sync-diffs|
     WARNINGS......................................|codi-introduction-warnings|
-    DEPENDENCIES...........................................|codi-dependencies|
+    DEPENDENCIES..............................|codi-introduction-dependencies|
 USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
     :Codi!............................................................|:Codi!|
@@ -78,6 +78,8 @@ SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
 
 WARNINGS                                          *codi-introduction-warnings*
 
+Be wary of infinity~
+
 Be EXTREMELY careful with lazily evaluated languages and infinite loops. I
 cannot stress this enough: the moment you type an infinite list, your CPU
 usage will probably skyrocket. If you are running Codi without asynchronous
@@ -96,11 +98,19 @@ for much longer.
 
 Should this happen to you, find and kill the interpreter. Seriously!
 
-Also, Codi will very occasionally leave interpreters running in the background
-which need to be killed. This has only been observed with Haskell (ghci), so
-if your fans spin up, you may need to investigate.
+Lingering processes~
 
-DEPENDENCIES                                               *codi-dependencies*
+Codi will occasionally leave interpreters running in the background which need
+to be killed. This has only been observed with Haskell (ghci), so if your fans
+spin up, you may need to investigate. The reason is unknown, but it happens
+infrequently enough that it's not an issue.
+
+Codi has also been observed to leave lingering processes with "csh". If you
+use "csh", you may need to add the following line to your .vimrc:
+>
+             let $SHELL='/bin/sh'
+<
+DEPENDENCIES                                  *codi-introduction-dependencies*
 
 - OS X or Linux (Windows support coming soon!)
   https://github.com/metakirby5/codi.vim/issues/14

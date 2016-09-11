@@ -128,6 +128,9 @@ The below options can also be set on a per-interpreter basis via
     it supports nothing more than what the underlying REPL supports. This is
     why Haskell language pragmas don't work and OCaml statements must end with
     `;;`.
+- _Codi leaves a bunch of old processes running, what's going on?_
+  - The cause of this issue is still unknown, but it happens infrequently. See
+    `:h codi-introduction-warnings` for more information.
 
 ## Thanks to
 
