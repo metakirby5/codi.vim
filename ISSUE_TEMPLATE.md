@@ -8,6 +8,7 @@ Otherwise, please include the following:
 - Actual results
 - Exact steps to reproduce the issue, starting with the command used to open
   `vim`
+- If it's not too much trouble, a screencast (e.g. asciinema) of the issue
 
 ## Environment
 - Operating system
