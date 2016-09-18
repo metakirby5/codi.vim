@@ -6,8 +6,10 @@ Otherwise, please include the following:
 - Brief description
 - Expected results
 - Actual results
+- A minimal `.vimrc` that will reproduce the issue
 - Exact steps to reproduce the issue, starting with the command used to open
   `vim`
+- Any relevant screenshots
 - If it's not too much trouble, a screencast (e.g. asciinema) of the issue
 
 ## Environment
