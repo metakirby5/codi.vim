@@ -140,7 +140,7 @@ augroup CODI
         \ buftype=nofile bufhidden=hide nobuflisted
         \ nomodifiable nomodified
         \ nonu nornu nolist nomodeline nowrap
-        \ statusline=\  nocursorline nocursorcolumn nocolorcolumn
+        \ statusline=\  nocursorline nocursorcolumn colorcolumn=
         \ foldcolumn=0 nofoldenable winfixwidth
         \ scrollbind
         \ | noremap <buffer> <silent> q <esc>:q<cr>
