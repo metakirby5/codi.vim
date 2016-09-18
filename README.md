@@ -15,7 +15,7 @@ any language that provides a REPL (interactive interpreter)!
 
 Languages with built-in support:
 Python, JavaScript, CoffeeScript, Haskell, Ruby, OCaml, R,
-Clojure/ClojureScript
+Clojure/ClojureScript, PHP
 
 [Pull requests](https://github.com/metakirby5/codi.vim/pulls)
 for new language support welcome!
@@ -64,6 +64,7 @@ Default interpreter dependencies:
   - OCaml:        `ocaml`
   - R:            `R`
   - Clojure:      `planck`
+  - PHP:          `psysh`
 
 ## Usage
 

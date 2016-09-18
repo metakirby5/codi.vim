@@ -343,6 +343,7 @@ Codi currently has default support for the following filetypes:
           | ruby       | irb    |                                  |
           | ocaml      | ocaml  | Must end every statement with ;; |
           | clojure    | planck |                                  |
+          | php        | psysh  |
           +------------+--------+----------------------------------+
 
 Note that Codi is not meant to be a replacement for actually running your
