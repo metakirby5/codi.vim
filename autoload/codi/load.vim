@@ -67,6 +67,10 @@ let s:codi_default_interpreters = {
           \ 'bin': ['planck', '--verbose', '--dumb-terminal'],
           \ 'prompt': '^.\{-}=> ',
           \ },
+      \ 'php': {
+          \ 'bin': ['psysh'],
+          \ 'prompt': '^\(>>>\|\.\.\.\) ',
+          \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)

@@ -64,6 +64,7 @@ Default interpreter dependencies:
   - OCaml:        `ocaml`
   - R:            `R`
   - Clojure:      `planck`
+  - PHP:          `psysh`
 
 ## Usage
 
