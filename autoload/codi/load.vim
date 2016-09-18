@@ -12,7 +12,7 @@ function! s:deep_extend(d, e)
 endfunction
 
 " Default interpreters
-function! s:pp_rb(line)
+function! s:pp_remove_fat_arrow(line)
   " Strip fat arrows
   return substitute(a:line, '=> ', '', 'g')
 endfunction
@@ -51,7 +51,7 @@ let s:codi_default_interpreters = {
       \ 'ruby': {
           \ 'bin': 'irb',
           \ 'prompt': '^irb(\w\+):\d\+:\d\+. ',
-          \ 'preprocess': function('s:pp_rb'),
+          \ 'preprocess': function('s:pp_remove_fat_arrow'),
           \ },
       \ 'ocaml': {
           \ 'bin': 'ocaml',
@@ -70,7 +70,7 @@ let s:codi_default_interpreters = {
       \ 'php': {
           \ 'bin': ['psysh'],
           \ 'prompt': '^\(>>>\|\.\.\.\) ',
-          \ 'preprocess': function('s:pp_rb'),
+          \ 'preprocess': function('s:pp_remove_fat_arrow'),
           \ },
       \ }
 function! codi#load#interpreters()
