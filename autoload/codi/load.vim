@@ -70,6 +70,7 @@ let s:codi_default_interpreters = {
       \ 'php': {
           \ 'bin': ['psysh'],
           \ 'prompt': '^\(>>>\|\.\.\.\) ',
+          \ 'preprocess': function('s:pp_rb'),
           \ },
       \ }
 function! codi#load#interpreters()
