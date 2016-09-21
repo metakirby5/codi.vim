@@ -72,6 +72,10 @@ let s:codi_default_interpreters = {
           \ 'prompt': '^\(>>>\|\.\.\.\) ',
           \ 'preprocess': function('s:pp_remove_fat_arrow'),
           \ },
+      \ 'lua': {
+          \ 'bin': ['lua'],
+          \ 'prompt': '^\(>\|>>\) ',
+          \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
