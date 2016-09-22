@@ -11,11 +11,14 @@ Please follow the issue template.
 It's helpful to use `g:codi#raw` and `g:codi#log` to get an idea of what the
 output looks like. Once you know how to implement the interpreter
 configuration, please add it to `s:codi_default_interpreters` in
-`autoload/codi/codi.vim`. Finally, please add relevant documentation to the
+`autoload/codi/load.vim`. Finally, please add relevant documentation to the
 following places:
 
-- `README.md`, line 16 and 57
-- `doc/codi.txt`, line 327
+- `README.md`:
+  - Line after "Languages with built-in support:"
+  - Line after "Default interpreter dependencies:"
+- `doc/codi.txt`:
+  - Table in *codi-interpreters-defaults*
 
 ## Adding a new feature
 
