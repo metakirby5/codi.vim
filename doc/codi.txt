@@ -337,7 +337,7 @@ Codi currently has default support for the following filetypes:
           | Filetype   | bin    | Notes                            |
           +------------+--------+----------------------------------+
           | python     | python | Cannot leave empty lines in defs |
-          | javascript | node   | "var" and "let" show undefined   |
+          | javascript | node   | ignoreUndefined by default       |
           | coffee     | coffee | Blank lines show undefined       |
           | haskell    | ghci   | Language pragmas don't work      |
           | ruby       | irb    |                                  |
