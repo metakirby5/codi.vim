@@ -344,6 +344,7 @@ Codi currently has default support for the following filetypes:
           | ocaml      | ocaml  | Must end every statement with ;; |
           | clojure    | planck |                                  |
           | php        | psysh  |
+          | lua        | lua    | Use a = or return to display val |
           +------------+--------+----------------------------------+
 
 Note that Codi is not meant to be a replacement for actually running your
