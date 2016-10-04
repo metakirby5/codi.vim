@@ -37,7 +37,7 @@ let s:codi_default_interpreters = {
           \ 'prompt': '^\(>>>\|\.\.\.\) ',
           \ },
       \ 'javascript': {
-          \ 'bin': ['node', '-e', 'require("repl").start({ignoreUndefined: true})'],
+          \ 'bin': ['node', '-e', 'require("repl").start({ignoreUndefined: true, useGlobal: true})'],
           \ 'prompt': '^\(>\|\.\.\.\+\) ',
           \ },
       \ 'coffee': {
