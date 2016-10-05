@@ -33,7 +33,7 @@ function! s:pp_r(line)
 endfunction
 let s:codi_default_interpreters = {
       \ 'python': {
-          \ 'bin': 'python',
+          \ 'bin': ['env', 'PYTHONSTARTUP=', 'python'],
           \ 'prompt': '^\(>>>\|\.\.\.\) ',
           \ },
       \ 'javascript': {
@@ -49,7 +49,7 @@ let s:codi_default_interpreters = {
           \ 'prompt': '^Prelude[^>|]*[>|] ',
           \ },
       \ 'ruby': {
-          \ 'bin': 'irb',
+          \ 'bin': ['irb', '-f'],
           \ 'prompt': '^irb(\w\+):\d\+:\d\+. ',
           \ 'preprocess': function('s:pp_remove_fat_arrow'),
           \ },
