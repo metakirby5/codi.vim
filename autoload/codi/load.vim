@@ -1,12 +1,12 @@
 " Utils
 function! s:deep_extend(d, e)
-  for [k, v] in items(a:e)
-    if type(v) == type({})
-      let a:d[k] = s:deep_extend(get(a:d, k, {}), v)
+  for [k, V] in items(a:e)
+    if type(V) == type({})
+      let a:d[k] = s:deep_extend(get(a:d, k, {}), V)
     else
-      let a:d[k] = v
+      let a:d[k] = V
     endif
-    unlet v
+    unlet V
   endfor
   return a:d
 endfunction
