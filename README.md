@@ -72,7 +72,7 @@ Default interpreter dependencies:
 - `Codi [filetype]` activates Codi for the current buffer, using the provided
   filetype or the buffer's filetype.
 - `Codi!` deactivates Codi for the current buffer.
-- `Codi!! [filetype]` toggles Codi for the current buffer.
+- `Codi!! [filetype]` toggles Codi for the current buffer (auto-detecting the buffer filetype if one isn't supplied).
 
 ### Shell wrapper
 
