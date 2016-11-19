@@ -66,7 +66,7 @@ Default interpreter dependencies:
   - Clojure:      `planck`
   - PHP:          `psysh`
   - Lua:          `lua`
-  - C++           `cling`
+  - C++:          `cling`
 
 ## Usage
 
