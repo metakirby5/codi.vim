@@ -345,6 +345,7 @@ Codi currently has default support for the following filetypes:
           | clojure    | planck |                                  |
           | php        | psysh  |
           | lua        | lua    | Use a = or return to display val |
+          | cpp        | cling  |                                  |
           +------------+--------+----------------------------------+
 
 Note that Codi is not meant to be a replacement for actually running your
