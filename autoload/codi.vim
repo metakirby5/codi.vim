@@ -362,7 +362,11 @@ function! s:codi_do_update()
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
-  let input = input.s:magic
+  if has_key(i, 'quitcmd')
+    let input = input."\n".i['quitcmd']."\n"
+  else
+    let input = input.s:magic
+  endif
 
   " Build the command
   let cmd = s:to_list(i['bin'])
