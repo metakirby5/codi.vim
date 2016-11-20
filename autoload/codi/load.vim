@@ -79,6 +79,7 @@ let s:codi_default_interpreters = {
        \ 'cpp': {
           \ 'bin': 'cling',
           \ 'prompt': '^\[cling\]\$ ?\?',
+          \ 'quitcmd': '.q',
           \ },
       \ }
 function! codi#load#interpreters()
