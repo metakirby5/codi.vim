@@ -363,7 +363,7 @@ function! s:codi_do_update()
     let input = i['rephrase'](input)
   endif
   if has_key(i, 'quitcmd')
-    let input = input."\n".i['quitcmd']."<cr>"
+    let input = input."\n".i['quitcmd']."\n"
   else
     let input = input.s:magic
   endif
