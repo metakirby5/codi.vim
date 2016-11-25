@@ -73,8 +73,8 @@ SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
      +---------------+-----------------------------------+-------------+
      | Asynchronous? | Default autocommands for updates  | Blocking?   |
      +---------------+-----------------------------------+-------------+
-     | yes           | |TextChanged|, |TextChangedI|     | no          |
-     | no            | |CursorHold|, |CursorHoldI|       | yes         |
+     | yes           | |TextChanged|, |TextChangedI|         | no          |
+     | no            | |CursorHold|, |CursorHoldI|           | yes         |
      +---------------+-----------------------------------+-------------+
 
 WARNINGS                                          *codi-introduction-warnings*
