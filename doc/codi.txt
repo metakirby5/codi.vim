@@ -53,6 +53,7 @@ INTERPRETERS...............................................|codi-interpreters|
         prompt......................................|codi-interpreters-prompt|
         preprocess..............................|codi-interpreters-preprocess|
         rephrase..................................|codi-interpreters-rephrase|
+        quitcmd....................................|codi-interpreters-quitcmd|
 
 ==============================================================================
 INTRODUCTION                                               *codi-introduction*
@@ -72,8 +73,8 @@ SYNCHRONOUS VS ASYNCHRONOUS                     *codi-introduction-sync-diffs*
      +---------------+-----------------------------------+-------------+
      | Asynchronous? | Default autocommands for updates  | Blocking?   |
      +---------------+-----------------------------------+-------------+
-     | yes           | |TextChanged|, |TextChangedI|         | no          |
-     | no            | |CursorHold|, |CursorHoldI|           | yes         |
+     | yes           | |TextChanged|, |TextChangedI|     | no          |
+     | no            | |CursorHold|, |CursorHoldI|       | yes         |
      +---------------+-----------------------------------+-------------+
 
 WARNINGS                                          *codi-introduction-warnings*
@@ -345,6 +346,7 @@ Codi currently has default support for the following filetypes:
           | clojure    | planck |                                  |
           | php        | psysh  |
           | lua        | lua    | Use a = or return to display val |
+          | cpp        | cling  |                                  |
           +------------+--------+----------------------------------+
 
 Note that Codi is not meant to be a replacement for actually running your
@@ -494,5 +496,14 @@ rephrase (OPTIONAL)
              at |codi-interpreters-preprocess| if you're unsure how to start.
 
              Default value is the identity function.
+             
+                                                    *codi-interpreters-quitcmd*
+quitcmd (OPTIONAL)
+             A command to quit. 
+             
+             If the interpreter does not support <C-d> to quit, the field is
+             required, otherwise it's optional. 
+             
+             A keybind can also be provided as a value for this field.
 
 vim:ft=help:tw=78:sw=13:norl:

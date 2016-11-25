@@ -76,6 +76,11 @@ let s:codi_default_interpreters = {
           \ 'bin': ['lua'],
           \ 'prompt': '^\(>\|>>\) ',
           \ },
+       \ 'cpp': {
+          \ 'bin': 'cling',
+          \ 'prompt': '^\[cling\]\$ ?\?',
+          \ 'quitcmd': '.q',
+          \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
