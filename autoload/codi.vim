@@ -417,6 +417,8 @@ function! s:codi_do_update()
           \ 'received': 0,
           \ }
 
+    call s:log('Expecting '.line('$').' prompts')
+
     " Send the input
     if s:nvim
       call jobsend(job, input)
@@ -480,13 +482,15 @@ function! s:codi_handle_data(data, msg)
   let out = s:preprocess(a:msg, i)
 
   for line in split(out, "\n")
-    call s:log('async line: '.line)
+    call s:log('[DATA] '.line)
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
     if line =~ i['prompt']
+      call s:log('Matched prompt')
       let a:data['received'] += 1
       if a:data['received'] > a:data['expected']
+        call s:log('All prompts received')
         call s:stop_job_for_buf(a:data['bufnr'])
         silent call s:codi_handle_done(
               \ a:data['bufnr'], join(a:data['lines'], "\n"))
