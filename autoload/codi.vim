@@ -417,6 +417,7 @@ function! s:codi_do_update()
           \ 'received': 0,
           \ }
 
+    call s:log('[INPUT] '.input)
     call s:log('Expecting '.(line('$') + 1).' prompts')
 
     " Send the input
