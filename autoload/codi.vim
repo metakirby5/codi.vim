@@ -417,7 +417,7 @@ function! s:codi_do_update()
           \ 'received': 0,
           \ }
 
-    call s:log('Expecting '.line('$').' prompts')
+    call s:log('Expecting '.(line('$') + 1).' prompts')
 
     " Send the input
     if s:nvim
