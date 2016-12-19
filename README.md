@@ -135,6 +135,8 @@ The below options can also be set on a per-interpreter basis via
 - _Codi leaves a bunch of old processes running, what's going on?_
   - The cause of this issue is still unknown, but it happens infrequently. See
     `:h codi-introduction-warnings` for more information.
+- _Codi doesn't seem to work on my setup._
+  - Check `:h codi-introduction-gotchas`.
 
 ## Thanks to
 

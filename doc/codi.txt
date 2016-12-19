@@ -19,6 +19,7 @@ INTRODUCTION...............................................|codi-introduction|
     SYNCHRONOUS VS ASYNCHRONOUS.................|codi-introduction-sync-diffs|
     WARNINGS......................................|codi-introduction-warnings|
     DEPENDENCIES..............................|codi-introduction-dependencies|
+    GOTCHAS........................................|codi-introduction-gotchas|
 USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
     :Codi!............................................................|:Codi!|
@@ -126,6 +127,13 @@ are loaded on-demand. For example, if you only want to use the Python Codi
 interpreter, you will not need ghci.
 
 See |codi-interpreters-defaults| for default interpreter dependencies.
+
+GOTCHAS                                            *codi-introduction-gotchas*
+
+- Because Codi directly sends keystrokes to the interpreter, it may not work
+  with some readline configurations. For example, binding <c-j> to
+  "vi-movement-mode" in ~/.inputrc will not send input as expected, since
+  <c-j> is '\n'.
 
 ==============================================================================
 USAGE                                                             *codi-usage*
