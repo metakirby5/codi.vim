@@ -95,12 +95,21 @@ endif
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:nvim = has('nvim')
-let s:async_ok = has('job') && has('channel') || s:nvim
+let s:async_ok = has('python')
 let s:updating = 0
 let s:codis = {} " { bufnr: { codi_bufnr, codi_width, codi_restore } }
-let s:async_jobs = {} " { bufnr: job }
-let s:async_data = {} " { id (nvim -> job, vim -> ch): { data } }
 let s:magic = "\n\<cr>\<c-d>\<c-d>\<cr>" " to get out of REPL
+
+" Python globals
+python << endpython
+import codi, vim
+codi_mgr = codi.CodiMgr()
+def codi_cb(bufnr):
+  def fun(output):
+    # TODO: This call doesn't work. Output is the correct value, though.
+    vim.command('call s:codi_handle_done({}, {})'.format(bufnr, repr(output)))
+  return fun
+endpython
 
 " Shell escape on a list to make one string
 function! s:shellescape_list(l)
@@ -203,31 +212,6 @@ endfunction
 " Gets the ID, no matter if ch is open or closed.
 function! s:ch_get_id(ch)
   let id = substitute(a:ch, '^channel \(\d\+\) \(open\|closed\)$', '\1', '')
-endfunction
-
-" Stop the job and clear it from the process table.
-function! s:stop_job_for_buf(buf, ...)
-  try
-    let job = s:async_jobs[a:buf]
-    unlet s:async_jobs[a:buf]
-  catch E716
-    return
-  endtry
-
-  call s:log('Stopping job for buffer '.a:buf)
-
-  if s:nvim
-    silent! call jobstop(job)
-  else
-    if a:0
-      call job_stop(job, a:1)
-    else
-      call job_stop(job)
-    end
-
-    " Implicitly clears from process table.
-    call job_status(job)
-  endif
 endfunction
 
 " Utility to get bufnr.
@@ -382,50 +366,20 @@ function! s:codi_do_update()
   endif
 
   call s:log('Starting job for buffer '.bufnr)
+  call s:log('[INPUT] '.input)
 
   " Async or sync
   if s:get_opt('async')
-    " Spawn the job
-    if s:nvim
-      let job_options = {
-            \ 'pty': 1,
-            \ 'on_stdout': function('s:codi_nvim_callback'),
-            \ 'on_stderr': function('s:codi_nvim_callback'),
-            \}
-      if opt_use_buffer_dir
-        let job_options.cwd = buf_dir
-      endif
-      let job = jobstart(cmd, job_options)
-      let id = job
-    else
-      let job = job_start(s:scriptify(cmd),
-            \ { 'callback': 'codi#__vim_callback' })
-      let ch = job_getchannel(job)
-      let id = s:ch_get_id(ch)
-    endif
+    python codi_bufnr = vim.eval('bufnr')
 
     " Kill previously running job if necessary
-    call s:stop_job_for_buf(bufnr)
+    python codi_mgr.stop(codi_bufnr)
 
-    " Save job-related information
-    let s:async_jobs[bufnr] = job
-    let s:async_data[id] = {
-          \ 'bufnr': bufnr,
-          \ 'lines': [],
-          \ 'interpreter': i,
-          \ 'expected': line('$'),
-          \ 'received': 0,
-          \ }
-
-    call s:log('[INPUT] '.input)
-    call s:log('Expecting '.(line('$') + 1).' prompts')
-
-    " Send the input
-    if s:nvim
-      call jobsend(job, input)
-    else
-      call ch_sendraw(ch, input)
-    endif
+    " Spawn the job
+python << endpython
+codi_mgr.start(
+  codi_bufnr, vim.eval('cmd'), vim.eval('input'), codi_cb(codi_bufnr))
+endpython
   else
     " Convert command to string
     call s:codi_handle_done(bufnr,
@@ -436,69 +390,6 @@ function! s:codi_do_update()
   if opt_use_buffer_dir && !s:nvim
     exe 'cd '.fnameescape(cwd)
   endif
-endfunction
-
-" Callback to handle output (nvim)
-let s:nvim_async_lines = {} " to hold partially built lines
-function! s:codi_nvim_callback(job_id, data, event)
-
-  " Initialize storage
-  if !has_key(s:nvim_async_lines, a:job_id)
-    let s:nvim_async_lines[a:job_id] = ''
-  endif
-
-  for line in a:data
-    let s:nvim_async_lines[a:job_id] .= line
-
-    " If we hit a newline, we're ready to handle the data
-    let parts = split(s:nvim_async_lines[a:job_id], "\<cr>", 1)
-    if len(parts) > 1
-      let input = parts[0]
-      let s:nvim_async_lines[a:job_id] = join(parts[1:], '')
-      try
-        call s:codi_handle_data(s:async_data[a:job_id], input)
-      catch E716
-        " No-op if data isn't ready
-      endtry
-    endif
-  endfor
-endfunction
-
-" Callback to handle output (vim)
-function! codi#__vim_callback(ch, msg)
-  try
-    call s:codi_handle_data(s:async_data[s:ch_get_id(a:ch)], a:msg)
-  catch E716
-    " No-op if data isn't ready
-  endtry
-endfunction
-
-" Generalized output handler
-function! s:codi_handle_data(data, msg)
-  " Bail early if we're done
-  if a:data['received'] > a:data['expected'] | return | endif
-  let i = a:data['interpreter']
-
-  " Preprocess early so we can properly detect prompts
-  let out = s:preprocess(a:msg, i)
-
-  for line in split(out, "\n")
-    call s:log('[DATA] '.line)
-    call add(a:data['lines'], line)
-
-    " Count our prompts, and stop if we've reached the right amount
-    if line =~ i['prompt']
-      call s:log('Matched prompt')
-      let a:data['received'] += 1
-      if a:data['received'] > a:data['expected']
-        call s:log('All prompts received')
-        call s:stop_job_for_buf(a:data['bufnr'])
-        silent call s:codi_handle_done(
-              \ a:data['bufnr'], join(a:data['lines'], "\n"))
-        call s:user_au('CodiUpdatePost')
-      endif
-    endif
-  endfor
 endfunction
 
 " Handle finished bin output
