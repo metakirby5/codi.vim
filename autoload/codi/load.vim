@@ -31,6 +31,15 @@ function! s:pp_r(line)
   " Just return everything after the braces
   return substitute(a:line, '\s*\[\d\+\]\s*\(.*\)$', '\1', '')
 endfunction
+
+" Default rephrasers
+function! s:rp_purs(buf)
+  " Literal Ctrl-d needs to be preceded by literal Ctrl-v
+  " let r = substitute(a:buf, '[^]\zs\ze', '', 'g')
+  " Alternative ":endpaste" to terminate multi-line continuations in psci
+  return substitute(a:buf, ':endpaste\>', '', 'g')
+endfunction
+
 let s:codi_default_interpreters = {
       \ 'python': {
           \ 'bin': ['env', 'PYTHONSTARTUP=', 'python'],
@@ -51,6 +60,7 @@ let s:codi_default_interpreters = {
       \ 'purescript': {
           \ 'bin': ['pulp', 'psci'],
           \ 'prompt': '^[^>…]*[>…] ',
+          \ 'rephrase': function('s:rp_purs'),
           \ 'quitcmd': ':q',
           \ },
       \ 'ruby': {
