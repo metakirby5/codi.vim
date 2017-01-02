@@ -14,7 +14,7 @@ or Vim with `+job` and `+channel`, asynchronously). It's extensible to nearly
 any language that provides a REPL (interactive interpreter)!
 
 Languages with built-in support:
-Python, JavaScript, CoffeeScript, Haskell, Ruby, OCaml, R,
+Python, JavaScript, CoffeeScript, Haskell, PureScript, Ruby, OCaml, R,
 Clojure/ClojureScript, PHP, Lua, C++
 
 [Pull requests](https://github.com/metakirby5/codi.vim/pulls)
@@ -60,6 +60,7 @@ Default interpreter dependencies:
   - JavaScript:   `node`
   - CoffeeScript: `coffee`
   - Haskell:      `ghci` (be really careful with lazy evaluation!)
+  - PureScript    `pulp psci`
   - Ruby:         `irb`
   - OCaml:        `ocaml`
   - R:            `R`

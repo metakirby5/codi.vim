@@ -48,6 +48,11 @@ let s:codi_default_interpreters = {
           \ 'bin': 'ghci',
           \ 'prompt': '^Prelude[^>|]*[>|] ',
           \ },
+      \ 'purescript': {
+          \ 'bin': ['pulp', 'psci'],
+          \ 'prompt': '^[^>…]*[>…] ',
+          \ 'quitcmd': ':q',
+          \ },
       \ 'ruby': {
           \ 'bin': ['irb', '-f'],
           \ 'prompt': '^irb(\w\+):\d\+:\d\+. ',
