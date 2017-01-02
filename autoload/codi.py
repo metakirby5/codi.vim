@@ -16,18 +16,19 @@ class Codi(Thread):
         Thread.__init__(self)
         self.data = data
         self.cb = cb
+        self.p = None
 
     def run(self):
         # Open a pseudoterminal
         master, slave = pty.openpty()
-        p = subprocess.Popen('python',
+        self.p = subprocess.Popen('python',
                              stdin=slave,
                              stdout=slave,
                              stderr=subprocess.STDOUT)
         output = ''
 
         # Loop for chances at I/O
-        while p.poll() is None:
+        while self.p.poll() is None:
             r, w, _ = select.select([master], [master], [], 0)
             if r:
                 output += ESCAPE.sub('', os.read(master, BUFSIZ))
@@ -36,3 +37,8 @@ class Codi(Thread):
 
         # Run the callback
         vim.command(self.cb)
+
+    def stop(self):
+        if self.p:
+            self.p.terminate()
+            self.p = None
