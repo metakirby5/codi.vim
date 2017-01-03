@@ -540,7 +540,7 @@ function! s:codi_handle_done(bufnr, output)
     let output = a:output
   endif
 
-  " Unless raw, parse for propmt
+  " Unless raw, parse for prompt
   " Basic algorithm, for all lines:
   "   If we hit a prompt,
   "     If we have already passed the first prompt, record our taken line.
