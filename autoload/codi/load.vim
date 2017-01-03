@@ -40,10 +40,10 @@ function! s:pp_purs(line)
     let rgx_prompt = g:codi#interpreters.purescript.prompt
   endif
   let rgxs_ignore = [
-      \ '\s*See.*',
-      \ '\s*or to contribute.*',
+      \ '\s*See https://github.com/purescript.* for more information,',
+      \ '\s*or to contribute content related to this error.',
       \ ]
-  let rgx_trimlast = '\s*See.*'
+  let rgx_trimlast = '\s*See https://github.com/purescript.* for more information,'
   if l =~ rgx_prompt
     " If line saved, send through before next prompt
     if exists('s:pp_purs_state.lastline')
