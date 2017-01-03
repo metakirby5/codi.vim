@@ -342,21 +342,64 @@ DEFAULT INTERPRETERS                              *codi-interpreters-defaults*
 
 Codi currently has default support for the following filetypes:
 
-    +------------+--------+---------------------------------------------+
-    | Filetype   | bin    | Notes                                       |
-    +------------+--------+---------------------------------------------+
-    | python     | python | Cannot leave empty lines in defs            |
-    | javascript | node   | ignoreUndefined by default                  |
-    | coffee     | coffee | Blank lines show undefined                  |
-    | haskell    | ghci   | Language pragmas don't work                 |
-    | purescript | psci   | End multi-line continuations with :endpaste |
-    | ruby       | irb    |                                             |
-    | ocaml      | ocaml  | Must end every statement with ;;            |
-    | clojure    | planck |                                             |
-    | php        | psysh  |                                             |
-    | lua        | lua    | Use a = or return to display val            |
-    | cpp        | cling  |                                             |
-    +------------+--------+---------------------------------------------+
+clojure~
+bin: planck
+maintainer: @cirqueit
+
+coffee~
+bin: coffee
+maintainer: @metakirby5
+notes:
+  - Blank lines show undefined
+
+cpp~
+bin: cling
+maintainer: @AlesTsurko
+
+haskell~
+bin: ghci
+maintainer: @metakirby5
+notes:
+  - Language pragmas don't work
+
+javascript~
+bin: node
+maintainer: @metakirby5
+notes:
+  - ignoreUndefined by default
+
+lua~
+bin: lua
+maintainer: @dbrodie
+notes:
+  - Use a = or return to display val
+
+ocaml~
+bin: ocaml
+maintainer: @metakirby5
+notes:
+  - Must end every statement with ;;
+
+php~
+bin: psysh
+maintainer: @AW3i
+
+purescript~
+bin: psci
+maintainer: @bdellaterra
+notes:
+  - Only works inside a purescript project folder
+  - End multi-line continuations with :endpaste
+
+python~
+bin: python
+maintainer: @metakirby5
+notes:
+  - Cannot leave empty lines in defs
+
+ruby~
+maintainer: @metakirby5
+bin: irb
 
 Note that Codi is not meant to be a replacement for actually running your
 program; it supports nothing more than what the underlying bin supports.
