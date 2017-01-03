@@ -359,10 +359,11 @@ Codi currently has default support for the following filetypes:
     +------------+--------+---------------------------------------------+
 
 Note that Codi is not meant to be a replacement for actually running your
-program; it supports nothing more than what the underlying bin supports. This
-is why Haskell language pragmas don't work and OCaml statements must end with
-;;. Also, in most whitespace-sensitive languages, an empty line represents
-the end of a definition, so the below Python class will not work in Codi:
+program; it supports nothing more than what the underlying bin supports.
+This is why Haskell language pragmas don't work, PurseScript only works
+inside a project folder, and OCaml statements must end with ;;. Also, in
+most whitespace-sensitive languages, an empty line represents the end of a
+definition, so the below Python class will not work in Codi:
 >
              class Test(object):
                  def __init__(self):
