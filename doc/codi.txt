@@ -496,10 +496,11 @@ rephrase (OPTIONAL)
 
              This attribute is actually not recommended, since it is very
              difficult to achieve desired goals without unforeseen
-             side-effects. None of the default interpreters actually use
-             rephrase. However, for example, if you REALLY want
-             "let var x = 5" to show "5" instead of "undefined", this is the
-             way to do it.
+             side-effects. The PureScript interpreter uses rephrase so
+             multi-line continuations can be terminated with ":endpaste"
+             instead of Ctrl-D, which is awkard to type literally.
+             As another example, if you REALLY want "let var x = 5" to
+             show "5" instead of "undefined", this is the way to do it.
 
              The configuration process is similar to preprocess, so just look
              at |codi-interpreters-preprocess| if you're unsure how to start.
