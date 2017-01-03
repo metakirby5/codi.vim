@@ -79,10 +79,15 @@ endfunction
 
 " Default rephrasers
 function! s:rp_purs(buf)
-  " Literal Ctrl-d needs to be preceded by literal Ctrl-v
-  " let r = substitute(a:buf, '[^]\zs\ze', '', 'g')
-  " Alternative ":endpaste" to terminate multi-line continuations in psci
-  return substitute(a:buf, ':endpaste\>', '', 'g')
+  let b = a:buf
+  " Alternative to Ctrl-d, ":endpaste" will terminate
+  " multi-line continuations in psci
+  let b = substitute(b, ':endpaste\>', '', 'g')
+  " Remove comments. In PSCi they produce an error
+  " (Multi-line comments not supported here)
+  let b = substitute(b, '\%(^\|[\n\r\x00]\)\s*--[^\n\r\x00]*', '', 'g')
+  " Extra newline to flush any remaining 'lastline' from preprocess
+  return b . "\n"
 endfunction
 
 let s:codi_default_interpreters = {
