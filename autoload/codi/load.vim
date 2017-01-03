@@ -32,7 +32,6 @@ function! s:pp_r(line)
   return substitute(a:line, '\s*\[\d\+\]\s*\(.*\)$', '\1', '')
 endfunction
 let s:pp_purs_state = {}
-let g:log = []
 function! s:pp_purs(line)
   let l = a:line
   let rgx_prompt = s:codi_default_interpreters.purescript.prompt
@@ -46,10 +45,8 @@ function! s:pp_purs(line)
       \ ]
   let rgx_trimlast = '\s*See.*'
   if l =~ rgx_prompt
-    let g:log += ['PROMPT']
     " If line saved, send through before next prompt
     if exists('s:pp_purs_state.lastline')
-      let g:log[-1] .= ', RELEASING: ' . s:pp_purs_state.lastline
       let l = s:pp_purs_state.lastline . "\n" . l
       unlet s:pp_purs_state.lastline
     endif
@@ -63,12 +60,10 @@ function! s:pp_purs(line)
       let tmp = s:pp_purs_state.lastline
     endif
     if max(map(copy(rgxs_ignore), 'l =~ v:val'))
-      let g:log += ['IGNORED: ' . l]
       " Send empty-string if line matched regexes to ignore
       let l = ''
     endif
     if len(l)
-      let g:log += ['SAVED: ' . l . ', REPLACING:' . tmp]
       let s:pp_purs_state.lastline = l
       let l = tmp
     endif
