@@ -31,6 +31,51 @@ function! s:pp_r(line)
   " Just return everything after the braces
   return substitute(a:line, '\s*\[\d\+\]\s*\(.*\)$', '\1', '')
 endfunction
+let s:pp_purs_state = {}
+let g:log = []
+function! s:pp_purs(line)
+  let l = a:line
+  let rgx_prompt = s:codi_default_interpreters.purescript.prompt
+  if exists('g:codi#interpreters.purescript.prompt')
+    " Prompt regex overridden by user
+    let rgx_prompt = g:codi#interpreters.purescript.prompt
+  endif
+  let rgxs_ignore = [
+      \ '\s*See.*',
+      \ '\s*or to contribute.*',
+      \ ]
+  let rgx_trimlast = '\s*See.*'
+  if l =~ rgx_prompt
+    let g:log += ['PROMPT']
+    " If line saved, send through before next prompt
+    if exists('s:pp_purs_state.lastline')
+      let g:log[-1] .= ', RELEASING: ' . s:pp_purs_state.lastline
+      let l = s:pp_purs_state.lastline . "\n" . l
+      unlet s:pp_purs_state.lastline
+    endif
+  else
+    let tmp = ''
+    if exists('s:pp_purs_state.lastline')
+      if l =~ rgx_trimlast
+        " Trim (un-indent) last saved line if special regex matches
+        let s:pp_purs_state.lastline = substitute(s:pp_purs_state.lastline, '^\s*', '', '')
+      endif
+      let tmp = s:pp_purs_state.lastline
+    endif
+    if max(map(copy(rgxs_ignore), 'l =~ v:val'))
+      let g:log += ['IGNORED: ' . l]
+      " Send empty-string if line matched regexes to ignore
+      let l = ''
+    endif
+    if len(l)
+      let g:log += ['SAVED: ' . l . ', REPLACING:' . tmp]
+      let s:pp_purs_state.lastline = l
+      let l = tmp
+    endif
+    unlet tmp
+  endif
+  return l
+endfunction
 
 " Default rephrasers
 function! s:rp_purs(buf)
@@ -61,6 +106,7 @@ let s:codi_default_interpreters = {
           \ 'bin': ['pulp', 'psci'],
           \ 'prompt': '^[^>…]*[>…] ',
           \ 'rephrase': function('s:rp_purs'),
+          \ 'preprocess': function('s:pp_purs'),
           \ 'quitcmd': ':q',
           \ },
       \ 'ruby': {
