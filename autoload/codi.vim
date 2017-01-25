@@ -560,7 +560,7 @@ function! s:codi_handle_done(bufnr, output)
       if l =~ i['prompt']
         " If we have passed the first prompt
         if passed_first
-          " Record what was taken, empty if nothing happends
+          " Record what was taken, empty if nothing happens
           call add(result, len(taken) ? taken : '')
           let taken = ''
         else
