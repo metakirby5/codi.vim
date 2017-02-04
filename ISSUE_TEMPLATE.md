@@ -16,5 +16,6 @@ Otherwise, please include the following:
 - Operating system
 - Version of `script` (if you don't know, just paste the last line of the
   man page)
-- Entire output of `vim --version`
-- Log lines (see `:h g:codi#log`), preferably in a pastebin
+- The following **in a pastebin**, to reduce visual clutter:
+  - Entire output of `vim --version`
+  - Log lines (see `:h g:codi#log`)
