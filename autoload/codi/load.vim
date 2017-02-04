@@ -81,6 +81,9 @@ function! s:rp_purs(buf)
   " Remove comments. In PSCi they produce an error
   " (Multi-line comments not supported here)
   let b = substitute(b, '\%(^\|[\n\r\x00]\)\s*--[^\n\r\x00]*', '', 'g')
+  " Insert # in the blank lines above Python's class methods definition to avoid
+  " `IndentationError`.
+  let b = substitute(b, '\(\s*\n\)\+\(\n\s\+def\)\@=', '\=substitute(submatch(0), "\s*\n", "\r#", "g")', 'g')
   " Extra newline to flush any remaining 'lastline' from preprocess
   return b . "\n"
 endfunction
@@ -89,6 +92,7 @@ let s:codi_default_interpreters = {
       \ 'python': {
           \ 'bin': ['env', 'PYTHONSTARTUP=', 'python'],
           \ 'prompt': '^\(>>>\|\.\.\.\) ',
+          \ 'rephrase': function('s:rp_purs'),
           \ },
       \ 'javascript': {
           \ 'bin': ['node', '-e', 'require("repl").start({ignoreUndefined: true, useGlobal: true})'],
