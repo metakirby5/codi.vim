@@ -88,9 +88,9 @@ endfunction
 " Python rephrasers
 function! s:rp_py(buf)
   let b = a:buf
-  " Insert # in the blank lines above Python's class methods definition to avoid
+  " Insert # in the blank lines above Python's indention line to avoid
   " `IndentationError`.
-  let b = substitute(b, '\(\s*\n\)\+\(\n\s\+def\)\@=', '\=substitute(submatch(0), "\s*\n", "\r#", "g")', 'g')
+  let b = substitute(b, '\(\s*\n\)\+\(\n\s\+\w\+\)\@=', '\=substitute(submatch(0), "\s*\n", "\r#", "g")', 'g')
   return b
 endfunction
 
