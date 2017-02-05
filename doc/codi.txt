@@ -394,8 +394,6 @@ notes:
 python~
 bin: python
 maintainer: @metakirby5
-notes:
-  - Cannot leave empty lines in defs
 
 ruby~
 maintainer: @metakirby5
@@ -406,15 +404,7 @@ program; it supports nothing more than what the underlying bin supports.
 This is why Haskell language pragmas don't work, PureScript only works
 inside a project folder, and OCaml statements must end with ;;. Also, in
 most whitespace-sensitive languages, an empty line represents the end of a
-definition, so the below Python class will not work in Codi:
->
-             class Test(object):
-                 def __init__(self):
-                     pass
-
-                 def oops_theres_an_empty_line_above_this(self):
-                     return 1
-<
+definition. 
 
 OUTPUT SPECIFICATION                           *codi-interpreters-output-spec*
 
