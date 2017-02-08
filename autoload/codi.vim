@@ -124,7 +124,8 @@ if has("unix")
     call s:log('Linux detected, using `script -qfec "$bin" /dev/null`')
     function! s:scriptify(bin)
       " We need to make bin one string argument
-      return ['script', '-qfec'] + [s:shellescape_list(a:bin)] + ['/dev/null']
+      call system('echo ' . s:shellescape_list(a:bin) . ' > /tmp/cmd')
+      return ['script', '-qfec', '/tmp/cmd', '/dev/null']
     endfunction
   endif
 else
