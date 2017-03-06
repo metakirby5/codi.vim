@@ -23,7 +23,7 @@ for new language support welcome!
 *Note:* without async support, evaluation will trigger on cursor hold rather
 than text change.
 
-For more information, check out the [documentation](https://github.com/metakirby5/codi.vim/blob/master/doc/codi.txt).
+For more information, check out the [documentation](doc/codi.txt).
 Watch a [screencast](https://ptpb.pw/t/~codi)!
 
 ## Installation
