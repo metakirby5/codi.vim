@@ -16,6 +16,10 @@ function! s:pp_remove_fat_arrow(line)
   " Strip fat arrows
   return substitute(a:line, '=> ', '', 'g')
 endfunction
+function! s:pp_remove_esc(line)
+  " Strip [?2004l
+  return substitute(a:line, '[?2004l', '', 'g')
+endfunction
 function! s:pp_ml(line)
   " If the line is a prompt
   if a:line =~ '^# '
@@ -151,6 +155,11 @@ let s:codi_default_interpreters = {
           \ 'bin': 'cling',
           \ 'prompt': '^\[cling\]\$ ?\?',
           \ 'quitcmd': '.q',
+          \ },
+       \ 'julia': {
+          \ 'bin': ['julia', '-qi', '--color=no', '--history-file=no'],
+          \ 'prompt': '^julia> ',
+          \ 'preprocess': function('s:pp_remove_esc'),
           \ },
       \ }
 function! codi#load#interpreters()
