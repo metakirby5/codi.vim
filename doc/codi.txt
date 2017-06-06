@@ -368,6 +368,12 @@ maintainer: @metakirby5
 notes:
   - ignoreUndefined by default
 
+julia~
+bin: julia
+maintainer: @originalsouth
+notes:
+  - Requires: 'set filetype=julia'
+
 lua~
 bin: lua
 maintainer: @dbrodie
