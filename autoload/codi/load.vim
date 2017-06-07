@@ -158,7 +158,7 @@ let s:codi_default_interpreters = {
           \ },
        \ 'julia': {
           \ 'bin': ['julia', '-qi', '--color=no', '--history-file=no'],
-          \ 'prompt': '^julia> ',
+          \ 'prompt': '\(julia> \)',
           \ 'preprocess': function('s:pp_remove_esc'),
           \ },
       \ }
