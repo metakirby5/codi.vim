@@ -89,6 +89,16 @@ function! s:rp_purs(buf)
   return b . "\n"
 endfunction
 
+" Php rephrasers
+function! s:rp_php(buf)
+  if a:buf[0:4] ==# '<?php'
+    let b = a:buf[5:]
+  else
+    let b = a:buf
+  endif
+  return b
+endfunction
+
 " Python rephrasers
 function! s:rp_py(buf)
   let b = a:buf
@@ -145,6 +155,7 @@ let s:codi_default_interpreters = {
       \ 'php': {
           \ 'bin': ['psysh'],
           \ 'prompt': '^\(>>>\|\.\.\.\) ',
+          \ 'rephrase': function('s:rp_php'),
           \ 'preprocess': function('s:pp_remove_fat_arrow'),
           \ },
       \ 'lua': {
