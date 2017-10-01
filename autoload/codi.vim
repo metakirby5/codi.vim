@@ -124,8 +124,10 @@ if has("unix")
     call s:log('Linux detected, using `script -qfec "$bin" /dev/null`')
     function! s:scriptify(bin)
       " We need to make bin one string argument
-      call writefile([s:shellescape_list(a:bin)], '/tmp/cmd')
-      return ['script', '-qfec', '/tmp/cmd', '/dev/null']
+      let tmp_bin = '/tmp/cmd'
+      call writefile([s:shellescape_list(a:bin)], tmp_bin)
+      call setfperm(tmp_bin, 'rwx------')
+      return ['script', '-qfec', tmp_bin, '/dev/null']
     endfunction
   endif
 else
