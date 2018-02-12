@@ -144,7 +144,7 @@ augroup CODI
         \ nomodifiable nomodified
         \ nonu nornu nolist nomodeline nowrap
         \ statusline=\  nocursorline nocursorcolumn colorcolumn=
-        \ foldcolumn=0 nofoldenable winfixwidth
+        \ foldcolumn=0 nofoldenable winfixwidth signcolumn=no
         \ scrollbind
         \ | noremap <buffer> <silent> q <esc>:q<cr>
         \ | silent! setlocal cursorbind
