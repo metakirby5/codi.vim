@@ -89,6 +89,13 @@ function! s:rp_purs(buf)
   return b . "\n"
 endfunction
 
+" Haskell rephrasers
+function! s:rp_hs(buf)
+    let printer = 'let codiPrettyPrint = putStrLn . take 50 . show'
+    let setprint = ':set -interactive-print codiPrettyPrint'
+    return "\n".printer."\n".setprint."\n".a:buf
+endfunction
+
 " Php rephrasers
 function! s:rp_php(buf)
   if a:buf[0:4] ==# '<?php'
@@ -123,8 +130,9 @@ let s:codi_default_interpreters = {
           \ 'prompt': '^coffee> ',
           \ },
       \ 'haskell': {
-          \ 'bin': 'ghci',
+          \ 'bin': ['ghci', '-ignore-dot-ghci'],
           \ 'prompt': '^Prelude[^>|]*[>|] ',
+          \ 'rephrase': function('s:rp_hs'),
           \ },
       \ 'purescript': {
           \ 'bin': ['pulp', 'psci'],
