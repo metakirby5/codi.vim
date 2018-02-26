@@ -93,7 +93,8 @@ endfunction
 function! s:rp_hs(buf)
     let printer = 'let codiPrettyPrint = putStrLn . take 50 . show'
     let setprint = ':set -interactive-print codiPrettyPrint'
-    return "\n".printer."\n".setprint."\n".a:buf
+    let prompt1 = ':set prompt "Codi Prompt"'
+    return printer."\n".setprint."\n".prompt1."\n".a:buf
 endfunction
 
 " Php rephrasers
@@ -131,7 +132,7 @@ let s:codi_default_interpreters = {
           \ },
       \ 'haskell': {
           \ 'bin': ['ghci', '-ignore-dot-ghci'],
-          \ 'prompt': '^Prelude[^>|]*[>|] ',
+          \ 'prompt': '^Codi Prompt',
           \ 'rephrase': function('s:rp_hs'),
           \ },
       \ 'purescript': {
