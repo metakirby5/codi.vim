@@ -144,10 +144,11 @@ augroup CODI
         \ nomodifiable nomodified
         \ nonu nornu nolist nomodeline nowrap
         \ statusline=\  nocursorline nocursorcolumn colorcolumn=
-        \ foldcolumn=0 nofoldenable winfixwidth signcolumn=no
+        \ foldcolumn=0 nofoldenable winfixwidth
         \ scrollbind
         \ | noremap <buffer> <silent> q <esc>:q<cr>
         \ | silent! setlocal cursorbind
+        \ | silent! setlocal signcolumn=no
   " Clean up when codi is closed
   au BufWinLeave * if exists('b:codi_target_bufnr')
         \| exe 'keepjumps keepalt buf! '.b:codi_target_bufnr
