@@ -171,16 +171,20 @@ let s:codi_default_interpreters = {
           \ 'bin': ['lua'],
           \ 'prompt': '^\(>\|>>\) ',
           \ },
-       \ 'cpp': {
-          \ 'bin': 'cling',
-          \ 'prompt': '^\[cling\]\$ ?\?',
-          \ 'quitcmd': '.q',
-          \ },
-       \ 'julia': {
-          \ 'bin': ['julia', '-qi', '--color=no', '--history-file=no'],
-          \ 'prompt': '\(julia> \)',
-          \ 'preprocess': function('s:pp_remove_esc'),
-          \ },
+      \ 'cpp': {
+         \ 'bin': 'cling',
+         \ 'prompt': '^\[cling\]\$ ?\?',
+         \ 'quitcmd': '.q',
+         \ },
+      \ 'julia': {
+         \ 'bin': ['julia', '-qi', '--color=no', '--history-file=no'],
+         \ 'prompt': '\(julia> \)',
+         \ 'preprocess': function('s:pp_remove_esc'),
+         \ },
+      \ 'elm': {
+         \ 'bin': ['elm', 'repl'],
+         \ 'prompt': '^> '
+         \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)

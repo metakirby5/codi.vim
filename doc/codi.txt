@@ -356,6 +356,10 @@ cpp~
 bin: cling
 maintainer: @AlesTsurko
 
+elm~
+bin: elm
+maintainer: @metakirby5
+
 haskell~
 bin: ghci
 maintainer: @metakirby5
