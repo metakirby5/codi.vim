@@ -198,7 +198,7 @@ function! s:pane_width()
   if match(width, '[.%]') > -1
     let raw          = str2float(substitute(width, '%', '', 'g'))
     let clamped      = raw > 100.0 ? 100.0 : (raw < 0.0 ? 0.0 : raw)
-    let min_width    = exists('&winwidth') ? &winwidth : 10
+    let min_width    = exists('&winwidth') ? &winwidth : 20
     let buffer_width = winwidth(bufwinnr('%'))
     let result       = ceil((buffer_width / 100.0) * clamped)
 
