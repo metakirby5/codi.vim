@@ -186,6 +186,34 @@ function! s:user_au(au)
   endif
 endfunction
 
+" If percent / float width, calculate based on buf width
+" If result leaves less than 10 columns of working space,
+" return a width that leaves 10 columns to write code in
+" Else, return absolute width as given
+function! s:pane_width()
+  let width = s:get_opt('width')
+  let width = type(width) == type('') ? width : string(width)
+
+
+  if match(width, '[.%]') > -1
+    let raw          = str2float(substitute(width, '%', '', 'g'))
+    let clamped      = raw > 100.0 ? 100.0 : (raw < 0.0 ? 0.0 : raw)
+    let min_width    = exists('&winwidth') ? &winwidth : 10
+    let buffer_width = winwidth(bufwinnr('%'))
+    let result       = ceil((buffer_width / 100.0) * clamped)
+
+    if (buffer_width - result) < min_width
+      return buffer_width - min_width
+    elseif result < min_width
+      return min_width
+    else
+      return float2nr(result)
+    endif
+  else
+    return str2nr(width)
+  endif
+endfunction
+
 " Gets an interpreter option, and if not available, global option.
 " Pulls from get_codi('interpreter').
 function! s:get_opt(option, ...)
@@ -305,7 +333,7 @@ function! s:codi_hide()
   let codi_bufnr = s:get_codi('bufnr')
   if s:get_opt('autoclose') && codi_bufnr && !s:updating
     " Remember width for when we respawn
-    call s:let_codi('width', winwidth(bufwinnr(codi_bufnr)))
+    call s:let_codi('width', s:pane_width())
     call s:codi_kill()
   endif
 endfunction
@@ -702,7 +730,7 @@ function! s:codi_spawn(filetype)
   " Spawn codi
   exe 'keepjumps keepalt '
         \.(s:get_opt('rightsplit') ? 'rightbelow' : 'leftabove').' '
-        \.(s:get_codi('width', s:get_opt('width'))).'vnew'
+        \.(s:get_codi('width', s:pane_width())).'vnew'
   setlocal filetype=codi
   exe 'setlocal syntax='.a:filetype
   let b:codi_target_bufnr = bufnr
