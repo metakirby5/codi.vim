@@ -187,8 +187,8 @@ function! s:user_au(au)
 endfunction
 
 " If percent / float width, calculate based on buf width
-" If result leaves less than 10 columns of working space,
-" return a width that leaves 10 columns to write code in
+" If result leaves less than |minwidth| / 20 columns of working space,
+" return a width that leaves |minwidth| / 20 columns to write code in
 " Else, return absolute width as given
 function! s:pane_width()
   let width = s:get_opt('width')
