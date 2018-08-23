@@ -245,12 +245,14 @@ g:codi#autocmd
 
                                                                 *g:codi#width*
 g:codi#width
-             The width of the Codi split.
-             It can be a |Number|, a |Float| or a percentage string such as
-             `'33%'` or `'33.33%'`. The width will be clamped between `0.0`
-             and `100.0`. This plugin respects the |minwidth| variable if it
-             is present, otherwise the minimum remaining width is 10 columns.
-             This rule counts for both panes.
+             The width of the Codi split, either a |Number| or a |Float|.
+
+             When a |Float| is supplied, it will be treated as a percentage.
+             This setting will then also respect the |winwidth| builtin which
+             means that each pane will be at least |winwidth| columns wide.
+
+             When a |Number| is supplied, it will be interpreted as the
+             absolute width in columns to use.
 
              Default value is 40.
 

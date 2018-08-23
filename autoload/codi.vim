@@ -187,30 +187,24 @@ function! s:user_au(au)
 endfunction
 
 " If percent / float width, calculate based on buf width
-" If result leaves less than |minwidth| / 20 columns of working space,
-" return a width that leaves |minwidth| / 20 columns to write code in
+" while respecting |winwidth|
 " Else, return absolute width as given
 function! s:pane_width()
   let width = s:get_opt('width')
-  let width = type(width) == type('') ? width : string(width)
 
+  if type(width) == type(0)
+    return width
+  endif
 
-  if match(width, '[.%]') > -1
-    let raw          = str2float(substitute(width, '%', '', 'g'))
-    let clamped      = raw > 100.0 ? 100.0 : (raw < 0.0 ? 0.0 : raw)
-    let min_width    = exists('&winwidth') ? &winwidth : 20
-    let buffer_width = winwidth(bufwinnr('%'))
-    let result       = ceil((buffer_width / 100.0) * clamped)
+  let buf_width = winwidth(bufwinnr('%'))
+  let result    = buf_width * (width < 0.0 ? 0.0 : width) / 100
 
-    if (buffer_width - result) < min_width
-      return buffer_width - min_width
-    elseif result < min_width
-      return min_width
-    else
-      return float2nr(result)
-    endif
+  if (buf_width - result) < &winwidth
+    return buf_width - &winwidth
+  elseif result < &winwidth
+    return &winwidth
   else
-    return str2nr(width)
+    return float2nr(result)
   endif
 endfunction
 
