@@ -247,12 +247,13 @@ g:codi#autocmd
 g:codi#width
              The width of the Codi split, either a |Number| or a |Float|.
 
-             When a |Float| is supplied, it will be treated as a percentage.
-             This setting will then also respect the |winwidth| builtin which
-             means that each pane will be at least |winwidth| columns wide.
-
              When a |Number| is supplied, it will be interpreted as the
              absolute width in columns to use.
+
+             When a |Float| is supplied, it will be treated as a percentage of
+             the current buffer width. This setting will then also respect
+             the |winwidth| builtin which means that each pane will be at
+             least |winwidth| columns wide.
 
              Default value is 40.
 

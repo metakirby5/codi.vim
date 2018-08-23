@@ -196,16 +196,10 @@ function! s:pane_width()
     return width
   endif
 
-  let buf_width = winwidth(bufwinnr('%'))
-  let result    = buf_width * (width < 0.0 ? 0.0 : width) / 100
+  let buf_width  = winwidth(bufwinnr('%'))
+  let pane_width = buf_width * max([0, float2nr(ceil(width))]) / 100
 
-  if (buf_width - result) < &winwidth
-    return buf_width - &winwidth
-  elseif result < &winwidth
-    return &winwidth
-  else
-    return float2nr(result)
-  endif
+  return max([&winwidth, min([buf_width - &winwidth, pane_width])])
 endfunction
 
 " Gets an interpreter option, and if not available, global option.
@@ -327,7 +321,7 @@ function! s:codi_hide()
   let codi_bufnr = s:get_codi('bufnr')
   if s:get_opt('autoclose') && codi_bufnr && !s:updating
     " Remember width for when we respawn
-    call s:let_codi('width', s:pane_width())
+    call s:let_codi('width', winwidth(bufwinnr(codi_bufnr)))
     call s:codi_kill()
   endif
 endfunction
