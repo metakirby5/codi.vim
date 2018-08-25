@@ -197,7 +197,7 @@ function! s:pane_width()
   endif
 
   let buf_width  = winwidth(bufwinnr('%'))
-  let pane_width = buf_width * max([0, float2nr(ceil(width))]) / 100
+  let pane_width = float2nr(round(buf_width * (width > 0.0 ? width : 0.0) / 100))
 
   return max([&winwidth, min([buf_width - &winwidth, pane_width])])
 endfunction
