@@ -368,6 +368,10 @@ elm~
 bin: elm
 maintainer: @metakirby5
 
+elixir~
+bin: iex
+maintainer: @megalithic
+
 haskell~
 bin: ghci
 maintainer: @metakirby5
@@ -422,7 +426,7 @@ program; it supports nothing more than what the underlying bin supports.
 This is why Haskell language pragmas don't work, PureScript only works
 inside a project folder, and OCaml statements must end with ;;. Also, in
 most whitespace-sensitive languages, an empty line represents the end of a
-definition. 
+definition.
 
 OUTPUT SPECIFICATION                           *codi-interpreters-output-spec*
 

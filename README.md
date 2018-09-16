@@ -15,7 +15,7 @@ any language that provides a REPL (interactive interpreter)!
 
 Languages with built-in support:
 Python, JavaScript, CoffeeScript, Haskell, PureScript, Ruby, OCaml, R,
-Clojure/ClojureScript, PHP, Lua, C++, Julia, Elm
+Clojure/ClojureScript, PHP, Lua, C++, Julia, Elm, Elixir
 
 [Pull requests](https://github.com/metakirby5/codi.vim/pulls)
 for new language support welcome!
@@ -70,6 +70,7 @@ Default interpreter dependencies:
   - C++:          `cling`
   - Julia:        `julia`
   - Elm:          `elm`
+  - Elixir:       `iex`
 
 ## Usage
 
