@@ -70,7 +70,7 @@ Default interpreter dependencies:
   - C++:          `cling`
   - Julia:        `julia`
   - Elm:          `elm`
-  - Elixir:          `iex`
+  - Elixir:       `iex`
 
 ## Usage
 
