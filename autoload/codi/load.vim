@@ -189,6 +189,10 @@ let s:codi_default_interpreters = {
          \ 'bin': ['iex'],
          \ 'prompt': '^iex(\d\+). '
          \ },
+      \ 'racket': {
+         \ 'bin': ['racket'],
+         \ 'prompt': '^> '
+         \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
