@@ -413,6 +413,10 @@ notes:
   - Only works inside a purescript project folder
   - End multi-line continuations with :endpaste
 
+racket~
+bin: racket
+maintainer: @midnio
+
 python~
 bin: python
 maintainer: @metakirby5
