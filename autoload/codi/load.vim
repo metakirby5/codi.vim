@@ -126,6 +126,10 @@ let s:codi_default_interpreters = {
           \ 'bin': ['node', '-e', 'require("repl").start({ignoreUndefined: true, useGlobal: true})'],
           \ 'prompt': '^\(>\|\.\.\.\+\) ',
           \ },
+      \ 'typescript': {
+          \ 'bin': ['tsun', '--ignore-undefined'],
+          \ 'prompt': '^\(>\|\.\.\.\+\) ',
+          \ },
       \ 'coffee': {
           \ 'bin': 'coffee',
           \ 'prompt': '^coffee> ',
