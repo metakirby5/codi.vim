@@ -766,3 +766,14 @@ function! codi#run(bang, ...)
     return s:codi_spawn(filetype)
   endif
 endfunction
+
+" Command-line complete function 
+function! codi#complete(arg_lead, cmd_line, cursor_pos)
+    " Get all built-in interpreters and user-defined interpreters
+    let candidates = getcompletion('', 'filetype') + keys(g:codi#interpreters)
+    " Filter matches according to the prefix
+    if a:arg_lead != ""
+        let candidates = filter(candidates, 'v:val[:len(a:arg_lead) - 1] == a:arg_lead')
+    endif
+    return sort(candidates)
+endfunction
