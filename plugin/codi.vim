@@ -73,5 +73,5 @@ if !exists('g:codi#log')
   let g:codi#log = ''
 endif
 
-command! -nargs=? -bang -bar -complete=filetype Codi call codi#run(<bang>0, <f-args>)
+command! -nargs=? -bang -bar -complete=customlist,codi#complete Codi call codi#run(<bang>0, <f-args>)
 command! -bar CodiUpdate call codi#update()
