@@ -20,6 +20,7 @@ INTRODUCTION...............................................|codi-introduction|
     WARNINGS......................................|codi-introduction-warnings|
     DEPENDENCIES..............................|codi-introduction-dependencies|
     GOTCHAS........................................|codi-introduction-gotchas|
+    VIRTUAL TEXT...........................................|codi-virtual-text|
 USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
     :Codi!............................................................|:Codi!|
@@ -39,6 +40,7 @@ CONFIGURATION.............................................|codi-configuration|
     g:codi#sync..................................................|g:codi#sync|
     g:codi#use_buffer_dir..............................|g:codi#use_buffer_dir|
     g:codi#log....................................................|g:codi#log|
+    g:codi#virtual_text..................................|g:codi#virtual_text|
 AUTOCOMMANDS...............................................|codi-autocommands|
     CodiEnterPre................................................|CodiEnterPre|
     CodiEnterPost..............................................|CodiEnterPost|
@@ -65,6 +67,10 @@ Numi (https://numi.io). It opens a pane synchronized to your main buffer which
 displays the results of evaluating each line as you type (with NeoVim or Vim
 with |+job| and |+channel|, asynchronously). It's extensible to nearly any
 language that provides a REPL (interactive interpreter)!
+
+If you're using NeoVim, by default it uses virtual text to print the output
+from the REPL, similar to other plugins used in other popular editors.
+See |codi-virtual-text| for more info.
 
 See |codi-interpreters-defaults| for languages with built-in support.
 
@@ -136,6 +142,19 @@ GOTCHAS                                            *codi-introduction-gotchas*
   "vi-movement-mode" in ~/.inputrc will not send input as expected, since
   <c-j> is '\n'.
 
+VIRTUAL TEXT                                               *codi-virtual_text*
+
+If you're using NeoVim, by default it uses virtual text to print the output
+from the REPL, similar to other plugins used in other popular editors.
+
+Custom Highlight Group~
+Codi uses CodiVirtualText custom highlight group to syntax highlight the
+virtual text output. By defaults is link to Statement group, but you can
+override it by using like this
+
+>
+             highlight CodiVirtualText guifg=cyan
+<
 ==============================================================================
 USAGE                                                             *codi-usage*
 
@@ -317,6 +336,20 @@ g:codi#log
              fixing or submitting issues.
 
              Default value is '', which disbles all logging.
+
+                                                          *g:codi#virtual_text*
+g:codi#virtual_text
+             On nvim, instead of printing the REPL output to the Scratch
+             buffer, it removes that buffer and prints the text next to the
+             corresponding line.
+
+             Default value is 1, if on nvim.
+
+                                                   *g:codi#virtual_text_prefix*
+g:codi#virtual_text_prefix
+             Symbol that is prepend to the output text.
+
+             Default value is "❯ "
 
 ==============================================================================
 AUTOCOMMANDS                                               *codi-autocommands*

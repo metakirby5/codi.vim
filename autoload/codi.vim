@@ -103,6 +103,11 @@ let s:async_jobs = {} " { bufnr: job }
 let s:async_data = {} " { id (nvim -> job, vim -> ch): { data } }
 let s:magic = "\n\<cr>\<c-d>\<c-d>\<cr>" " to get out of REPL
 
+" Is virtual text enabled?
+function! s:is_virtual_text_enabled()
+  return s:nvim && g:codi#virtual_text
+endfunction
+
 " Shell escape on a list to make one string
 function! s:shellescape_list(l)
   let result = []
@@ -360,8 +365,8 @@ endfunction
 
 " Trigger autocommands and silently update
 function! codi#update()
-  " Bail if no codi buf to act on
-  if !s:get_codi('bufnr') | return | endif
+  " Bail if no codi buf to act on except virtual text is enabled and available
+  if !s:is_virtual_text_enabled() && !s:get_codi('bufnr') | return | endif
 
   call s:user_au('CodiUpdatePre')
   silent call s:codi_do_update()
@@ -517,8 +522,13 @@ function! s:codi_handle_data(data, msg)
       if a:data['received'] > a:data['expected']
         call s:log('All prompts received')
         call s:stop_job_for_buf(a:data['bufnr'])
-        silent call s:codi_handle_done(
-              \ a:data['bufnr'], join(a:data['lines'], "\n"))
+        if s:is_virtual_text_enabled()
+          silent call s:virtual_text_codi_handle_done(
+                \ a:data['bufnr'], join(a:data['lines'], "\n"))
+        else
+          silent call s:codi_handle_done(
+                \ a:data['bufnr'], join(a:data['lines'], "\n"))
+        endif
         call s:user_au('CodiUpdatePost')
       endif
     endif
@@ -635,6 +645,79 @@ function! s:codi_handle_done(bufnr, output)
   keepjumps call cursor(ret_line, ret_col)
 endfunction
 
+function! s:virtual_text_codi_handle_done(bufnr, output)
+  let s:updating = 1
+  let i = s:get_codi('interpreter')
+  let num_lines = line('$')
+
+  " Preprocess if we didn't already
+  if !s:get_opt('async', b:codi_target_bufnr)
+    let result = []
+    for line in split(a:output, "\n")
+      call add(result, s:preprocess(line, i))
+    endfor
+    let output = join(result, "\n")
+  else
+    let output = a:output
+  endif
+
+  " Unless raw, parse for prompt
+  " Basic algorithm, for all lines:
+  "   If we hit a prompt,
+  "     If we have already passed the first prompt, record our taken line.
+  "     Otherwise, note that we have passed the first prompt.
+  "   Else,
+  "     If we have passed the first prompt,
+  "       If the line has no leading whitespace (usually stacktraces),
+  "         Save the line as taken.
+  if !s:get_opt('raw', b:codi_target_bufnr)
+    let result = []      " Overall result list
+    let passed_first = 0 " Whether we have passed the first prompt
+    let taken = ''       " What to print at the prompt
+
+    " Iterate through all lines
+    for l in split(output, "\n")
+      " If we hit a prompt
+      if l =~ i['prompt']
+        " If we have passed the first prompt
+        if passed_first
+          " Record what was taken, empty if nothing happens
+          call add(result, len(taken) ? taken : '')
+          let taken = ''
+        else
+          let passed_first = 1
+        endif
+      else
+        " If we have passed the first prompt and it's content worth taking
+        if passed_first && l =~ '^\S'
+          let taken = l
+        endif
+      endif
+    endfor
+
+    call s:nvim_codi_output_to_virtual_text(a:bufnr, result)
+
+    " Only take last num_lines of lines
+    let lines = join(result[:num_lines - 1], "\n")
+  else
+    let lines = output
+  endif
+endfunction
+
+function! s:nvim_codi_output_to_virtual_text(bufnr, result)
+  " Iterate through the result and print using virtual text
+  let i = 0
+  for line in a:result
+    if len(line)
+      call nvim_buf_set_virtual_text(a:bufnr, -1, i, 
+       \ [[g:codi#virtual_text_prefix . line, "CodiVirtualText"]], {})   
+    else
+      call nvim_buf_clear_namespace(a:bufnr, -1, i, i+1)
+    endif
+    let i += 1
+  endfor
+endfunction
+
 function! s:codi_spawn(filetype)
   try
     let i = s:interpreters[
@@ -719,17 +802,21 @@ function! s:codi_spawn(filetype)
     augroup END
   endif
 
-  " Spawn codi
-  exe 'keepjumps keepalt '
-        \.(s:get_opt('rightsplit') ? 'rightbelow' : 'leftabove').' '
-        \.(s:get_codi('width', s:pane_width())).'vnew'
-  setlocal filetype=codi
-  exe 'setlocal syntax='.a:filetype
+  " Spawn codi buffer if virtual text is disabled
+  if !s:is_virtual_text_enabled()
+    exe 'keepjumps keepalt '
+          \.(s:get_opt('rightsplit') ? 'rightbelow' : 'leftabove').' '
+          \.(s:get_codi('width', s:pane_width())).'vnew'
+    setlocal filetype=codi
+    exe 'setlocal syntax='.a:filetype
+  endif
   let b:codi_target_bufnr = bufnr
 
   " Return to target split and save codi bufnr
   keepjumps keepalt wincmd p
-  call s:let_codi('bufnr', bufnr('$'))
+  if s:nvim == 0 || g:codi#virtual_text == 0
+    call s:let_codi('bufnr', bufnr('$'))
+  endif
   silent call codi#update()
   call s:user_au('CodiEnterPost')
 endfunction
