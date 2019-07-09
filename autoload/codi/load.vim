@@ -194,9 +194,9 @@ let s:codi_default_interpreters = {
          \ 'prompt': '^iex(\d\+). '
          \ },
        \ 'mathjs': {
-           \ 'bin': ['mathjs'],
-           \ 'prompt': '^\(>\|\.\.\.\+\) ',
-           \ },
+         \ 'bin': ['mathjs'],
+         \ 'prompt': '^\(>\|\.\.\.\+\) ',
+         \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
