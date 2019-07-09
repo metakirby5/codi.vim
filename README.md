@@ -72,6 +72,7 @@ Default interpreter dependencies:
   - Elm:          `elm`
   - Elixir:       `iex`
   - TypeScript:   `tsun`
+  - Mathjs:       `mathjs`
 
 ## Usage
 
