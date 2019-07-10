@@ -427,6 +427,12 @@ bin: tsun
 notes:
   - Requires at least tsun 0.5.0
 
+mathjs~
+maintainer: @slavaGanzin
+bin: mathjs
+notes:
+  - Evaluation may not work until a newline is entered
+
 Note that Codi is not meant to be a replacement for actually running your
 program; it supports nothing more than what the underlying bin supports.
 This is why Haskell language pragmas don't work, PureScript only works
