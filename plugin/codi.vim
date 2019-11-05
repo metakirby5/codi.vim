@@ -19,6 +19,10 @@ if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}
 endif
 
+if !exists('g:codi#environment_flags')
+  let g:codi#environment_flags = 'INPUTRC=/dev/null'
+endif
+
 " Interpreter aliases
 " Entries are in the form of:
 "   <aliased filetype>: <filetype>
