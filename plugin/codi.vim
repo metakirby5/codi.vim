@@ -19,8 +19,8 @@ if !exists('g:codi#interpreters')
   let g:codi#interpreters = {}
 endif
 
-if !exists('g:codi#environment_flags')
-  let g:codi#environment_flags = 'INPUTRC=/dev/null'
+if !exists('g:codi#command_wrapper')
+  let g:codi#command_wrapper = ['env', 'INPUTRC=/dev/null']
 endif
 
 " Interpreter aliases

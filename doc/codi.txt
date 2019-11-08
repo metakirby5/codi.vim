@@ -215,10 +215,12 @@ g:codi#interpreters
              Default value is {}.
 
                                                     *g:codi#environment_flags*
-g:codi#environment_flags
-             A string of environment flags passed to the interpreter.
-             Defaults to 'INPUTRC=/dev/null' to ensure codi work independent
-             of the user's inputrc settings.
+g:codi#command_wrapper
+             A list of commands and parameters passed to the interpreter.
+             Defaults to ['env', 'INPUTRC=/dev/null'] to ensure that codi
+             works independent of the user's inputrc settings. Can be 
+             used as well to change the priority of Codi's background
+             job by tools such as 'chrt', 'nice' or 'ionice'.
 
                                                               *g:codi#aliases*
 g:codi#aliases
