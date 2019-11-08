@@ -214,6 +214,12 @@ g:codi#interpreters
              Configuration is deeply applied over the default interpreters.
              Default value is {}.
 
+                                                    *g:codi#environment_flags*
+g:codi#environment_flags
+             A string of environment flags passed to the interpreter.
+             Defaults to 'INPUTRC=/dev/null' to ensure codi work independent
+             of the user's inputrc settings.
+
                                                               *g:codi#aliases*
 g:codi#aliases
              A dictionary of user-defined interpreter filetype aliases.
