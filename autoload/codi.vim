@@ -389,7 +389,8 @@ function! s:codi_do_update()
   endif
 
   " Build the command
-  let cmd = 'env ' . g:codi#environment_flags . ' ' . s:to_list(i['bin'])
+  let cmd = ['env', g:codi#environment_flags] + s:to_list(i['bin'])
+
 
   " The purpose of this is to make the REPL start from the buffer directory
   let opt_use_buffer_dir = s:get_opt('use_buffer_dir')
