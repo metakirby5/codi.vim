@@ -28,6 +28,7 @@ USAGE.............................................................|codi-usage|
     SHELL WRAPPER.........................................|codi-usage-wrapper|
 CONFIGURATION.............................................|codi-configuration|
     g:codi#interpreters..................................|g:codi#interpreters|
+    g:codi#command_prefix..............................|g:codi#command_prefix|
     g:codi#aliases............................................|g:codi#aliases|
     g:codi#autocmd............................................|g:codi#autocmd|
     g:codi#width................................................|g:codi#width|
