@@ -214,7 +214,7 @@ g:codi#interpreters
 <
              Configuration is deeply applied over the default interpreters.
              Default value is {}.
-
+             
                                                     *g:codi#command_prefix*
 g:codi#command_prefix
              A list of commands and parameters prepended to the interpreter.
@@ -222,7 +222,7 @@ g:codi#command_prefix
              independent of the user's inputrc. Can be used as well to change
              the priority of Codi's background job by tools such as 'chrt',
              'nice' or 'ionice'.
-
+             
                                                               *g:codi#aliases*
 g:codi#aliases
              A dictionary of user-defined interpreter filetype aliases.
