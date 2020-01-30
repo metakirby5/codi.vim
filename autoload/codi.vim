@@ -85,7 +85,7 @@ let s:missing_deps = s:require(function('s:check_exec'), ['script', 'uname'])
 if len(s:missing_deps)
   function! codi#run(...)
     return s:err(
-          \ 'Codi requires these misssing commands: '
+          \ 'Codi requires these missing commands: '
           \.join(s:missing_deps, ', ').'.')
   endfunction
   finish
