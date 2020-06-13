@@ -62,14 +62,15 @@ endfunction
 
 " Get string or first element of list
 function! s:first_str(o)
-  if type(a:o) == type([])
-    try
+  " Check if a list.
+  if type(a:o) is# v:t_list
+    " Check if list is empty.
+    if len(a:o) > 0
       return a:o[0]
-    " Empty list
-    catch E684
+    else
       return ''
-    endtry
-  " Not a list
+    endif
+  " Not a list.
   else
     return a:o
   endif
@@ -230,7 +231,7 @@ function! s:stop_job_for_buf(buf, ...)
   try
     let job = s:async_jobs[a:buf]
     unlet s:async_jobs[a:buf]
-  catch E716
+  catch /E716/
     return
   endtry
 
@@ -480,7 +481,7 @@ function! s:codi_nvim_callback(job_id, data, event)
       let s:nvim_async_lines[a:job_id] = join(parts[1:], '')
       try
         call s:codi_handle_data(s:async_data[a:job_id], input)
-      catch E716
+      catch /E716/
         " No-op if data isn't ready
       endtry
     endif
@@ -491,7 +492,7 @@ endfunction
 function! codi#__vim_callback(ch, msg)
   try
     call s:codi_handle_data(s:async_data[s:ch_get_id(a:ch)], a:msg)
-  catch E716
+  catch /E716/
     " No-op if data isn't ready
   endtry
 endfunction
