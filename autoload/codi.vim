@@ -1,7 +1,7 @@
 " Log a message
 function! s:log(message)
   " Bail if not logging
-  if g:codi#log == '' | return | endif
+  if g:codi#log ==# '' | return | endif
 
   " Grab stack trace not including log function
   let stacktrace = expand('<sfile>')
@@ -21,7 +21,7 @@ function! s:log(message)
   let decimal_i = stridx(seconds_and_microseconds, '.')
   let seconds = seconds_and_microseconds[:decimal_i - 1]
   let microseconds = seconds_and_microseconds[decimal_i + 1:]
-  let timestamp = strftime("%T.".microseconds, seconds)
+  let timestamp = strftime('%T.'.microseconds, seconds)
 
   " Write to log file
   call writefile(['['.timestamp.'] '.fname.': '.a:message],
@@ -62,14 +62,15 @@ endfunction
 
 " Get string or first element of list
 function! s:first_str(o)
-  if type(a:o) == type([])
-    try
+  " Check if a list.
+  if type(a:o) is# v:t_list
+    " Check if list is empty.
+    if len(a:o) > 0
       return a:o[0]
-    " Empty list
-    catch E684
+    else
       return ''
-    endtry
-  " Not a list
+    endif
+  " Not a list.
   else
     return a:o
   endif
@@ -112,9 +113,9 @@ function! s:shellescape_list(l)
 endfunction
 
 " Detect what version of script to use based on OS
-if has("unix")
-  let s:uname = system("uname -s")
-  if s:uname =~ "Darwin" || s:uname =~ "BSD"
+if has('unix')
+  let s:uname = system('uname -s')
+  if s:uname =~# 'Darwin' || s:uname =~# 'BSD'
     call s:log('Darwin/BSD detected, using `script -q /dev/null $bin`')
     function! s:scriptify(bin)
       " We need to keep the arguments plain
@@ -212,11 +213,11 @@ function! s:get_opt(option, ...)
   endif
 
   " Async is a special case
-  if a:option == 'async'
+  if a:option ==# 'async'
     return !get(i, 'sync', g:codi#sync) && s:async_ok
   endif
 
-  exe 'let default = g:codi#'.a:option
+  exe 'let default = g:codi#' . a:option
   return get(i, a:option, default)
 endfunction
 
@@ -230,7 +231,7 @@ function! s:stop_job_for_buf(buf, ...)
   try
     let job = s:async_jobs[a:buf]
     unlet s:async_jobs[a:buf]
-  catch E716
+  catch /E716/
     return
   endtry
 
@@ -253,7 +254,7 @@ endfunction
 " Utility to get bufnr.
 function! s:nr_bufnr(...)
   if a:0
-    if a:1 == '%' || a:1 == '$'
+    if a:1 ==# '%' || a:1 ==# '$'
       return bufnr(a:1)
     else
       return a:1
@@ -394,7 +395,7 @@ function! s:codi_do_update()
   " The purpose of this is to make the REPL start from the buffer directory
   let opt_use_buffer_dir = s:get_opt('use_buffer_dir')
   if opt_use_buffer_dir
-    let buf_dir = expand("%:p:h")
+    let buf_dir = expand('%:p:h')
     if !s:nvim
       let cwd = getcwd()
       exe 'cd '.fnameescape(buf_dir)
@@ -480,7 +481,7 @@ function! s:codi_nvim_callback(job_id, data, event)
       let s:nvim_async_lines[a:job_id] = join(parts[1:], '')
       try
         call s:codi_handle_data(s:async_data[a:job_id], input)
-      catch E716
+      catch /E716/
         " No-op if data isn't ready
       endtry
     endif
@@ -491,7 +492,7 @@ endfunction
 function! codi#__vim_callback(ch, msg)
   try
     call s:codi_handle_data(s:async_data[s:ch_get_id(a:ch)], a:msg)
-  catch E716
+  catch /E716/
     " No-op if data isn't ready
   endtry
 endfunction
@@ -591,7 +592,7 @@ function! s:codi_handle_done(bufnr, output)
         endif
       else
         " If we have passed the first prompt and it's content worth taking
-        if passed_first && l =~ '^\S'
+        if passed_first && l =~? '^\S'
           let taken = l
         endif
       endif
@@ -626,9 +627,9 @@ function! s:codi_handle_done(bufnr, output)
   exe 'keepjumps keepalt buf! '.ret_bufnr
 
   " Restore mode and position
-  if ret_mode =~ '[vV]'
+  if ret_mode =~? '[vV]'
     keepjumps normal! gv
-  elseif ret_mode =~ '[sS]'
+  elseif ret_mode =~? '[sS]'
     exe "keepjumps normal! gv\<c-g>"
   endif
   keepjumps call cursor(ret_line, ret_col)
@@ -692,18 +693,18 @@ function! s:codi_spawn(filetype)
   " Set up autocommands
   let opt_async = s:get_opt('async')
   let opt_autocmd = s:get_opt('autocmd')
-  if opt_autocmd != 'None'
+  if opt_autocmd !=# 'None'
     exe 'augroup CODI_TARGET_'.bufnr
       au!
       " === g:codi#update() ===
       " Instant
-      if opt_async && opt_autocmd == 'TextChanged'
+      if opt_async && opt_autocmd ==# 'TextChanged'
         au TextChanged,TextChangedI <buffer> call codi#update()
       " 'updatetime'
-      elseif opt_autocmd == 'CursorHold'
+      elseif opt_autocmd ==# 'CursorHold'
         au CursorHold,CursorHoldI <buffer> call codi#update()
       " Insert mode left
-      elseif opt_autocmd == 'InsertLeave'
+      elseif opt_autocmd ==# 'InsertLeave'
         au InsertLeave <buffer> call codi#update()
       " Defaults
       else
@@ -738,7 +739,7 @@ function! codi#run(bang, ...)
   " Handle arg
   if a:0
     " Double-bang case
-    if a:bang && a:1 =~ '^!'
+    if a:bang && a:1 =~? '^!'
       " Slice off the bang
       let filetype = substitute(a:1[1:], '^\s*', '', '')
       let toggle = 1
@@ -775,7 +776,7 @@ function! codi#complete(arg_lead, cmd_line, cursor_pos)
     " Get all built-in interpreters and user-defined interpreters
     let candidates = getcompletion('', 'filetype') + keys(g:codi#interpreters)
     " Filter matches according to the prefix
-    if a:arg_lead != ""
+    if a:arg_lead !=# ''
         let candidates = filter(candidates, 'v:val[:len(a:arg_lead) - 1] == a:arg_lead')
     endif
     return sort(candidates)
