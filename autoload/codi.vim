@@ -546,9 +546,9 @@ function! s:codi_handle_done(bufnr, output)
   " Go to target buf
   exe 'keepjumps keepalt buf! '.a:bufnr
   let s:updating = 1
-  let i = s:get_codi('interpreter')
   let codi_bufnr = s:get_codi('bufnr')
   let codi_winwidth = winwidth(bufwinnr(codi_bufnr))
+  let interpreter = s:get_codi('interpreter')
   let num_lines = line('$')
 
   " So we can jump back later
@@ -563,56 +563,7 @@ function! s:codi_handle_done(bufnr, output)
   exe 'keepjumps keepalt buf! '.codi_bufnr
   setlocal modifiable
 
-  " Preprocess if we didn't already
-  if !s:get_opt('async', b:codi_target_bufnr)
-    let result = []
-    for line in split(a:output, "\n")
-      call add(result, s:preprocess(line, i))
-    endfor
-    let output = join(result, "\n")
-  else
-    let output = a:output
-  endif
-
-  " Unless raw, parse for prompt
-  " Basic algorithm, for all lines:
-  "   If we hit a prompt,
-  "     If we have already passed the first prompt, record our taken line.
-  "     Otherwise, note that we have passed the first prompt.
-  "   Else,
-  "     If we have passed the first prompt,
-  "       If the line has no leading whitespace (usually stacktraces),
-  "         Save the line as taken.
-  if !s:get_opt('raw', b:codi_target_bufnr)
-    let result = []      " Overall result list
-    let passed_first = 0 " Whether we have passed the first prompt
-    let taken = ''       " What to print at the prompt
-
-    " Iterate through all lines
-    for l in split(output, "\n")
-      " If we hit a prompt
-      if l =~ i['prompt']
-        " If we have passed the first prompt
-        if passed_first
-          " Record what was taken, empty if nothing happens
-          call add(result, len(taken) ? taken : '')
-          let taken = ''
-        else
-          let passed_first = 1
-        endif
-      else
-        " If we have passed the first prompt and it's content worth taking
-        if passed_first && l =~? '^\S'
-          let taken = l
-        endif
-      endif
-    endfor
-
-    " Only take last num_lines of lines
-    let lines = join(result[:num_lines - 1], "\n")
-  else
-    let lines = output
-  endif
+  let lines = s:preprocess_and_parse(a:output, interpreter, num_lines)
 
   " Read the result into the codi buf
   1,$d _ | 0put =lines
@@ -645,16 +596,12 @@ function! s:codi_handle_done(bufnr, output)
   keepjumps call cursor(ret_line, ret_col)
 endfunction
 
-function! s:virtual_text_codi_handle_done(bufnr, output)
-  let s:updating = 1
-  let i = s:get_codi('interpreter')
-  let num_lines = line('$')
-
+function! s:preprocess_and_parse(output, interpreter, num_lines)
   " Preprocess if we didn't already
   if !s:get_opt('async', b:codi_target_bufnr)
     let result = []
     for line in split(a:output, "\n")
-      call add(result, s:preprocess(line, i))
+      call add(result, s:preprocess(line, a:interpreter))
     endfor
     let output = join(result, "\n")
   else
@@ -678,7 +625,7 @@ function! s:virtual_text_codi_handle_done(bufnr, output)
     " Iterate through all lines
     for l in split(output, "\n")
       " If we hit a prompt
-      if l =~ i['prompt']
+      if l =~ a:interpreter['prompt']
         " If we have passed the first prompt
         if passed_first
           " Record what was taken, empty if nothing happens
@@ -689,25 +636,33 @@ function! s:virtual_text_codi_handle_done(bufnr, output)
         endif
       else
         " If we have passed the first prompt and it's content worth taking
-        if passed_first && l =~ '^\S'
+        if passed_first && l =~? '^\S'
           let taken = l
         endif
       endif
     endfor
 
-    call s:nvim_codi_output_to_virtual_text(a:bufnr, result)
-
     " Only take last num_lines of lines
-    let lines = join(result[:num_lines - 1], "\n")
+    let lines = join(result[:a:num_lines - 1], "\n")
   else
     let lines = output
   endif
+
+  return lines
 endfunction
 
-function! s:nvim_codi_output_to_virtual_text(bufnr, result)
+function! s:virtual_text_codi_handle_done(bufnr, output)
+  let s:updating = 1
+  let interpreter = s:get_codi('interpreter')
+  let num_lines = line('$')
+  let result = s:preprocess_and_parse(a:output, interpreter, num_lines)
+  call s:nvim_codi_output_to_virtual_text(a:bufnr, result)
+endfunction
+
+function! s:nvim_codi_output_to_virtual_text(bufnr, lines)
   " Iterate through the result and print using virtual text
   let i = 0
-  for line in a:result
+  for line in split(a:lines, "\n", 1)
     if len(line)
       call nvim_buf_set_virtual_text(a:bufnr, -1, i, 
        \ [[g:codi#virtual_text_prefix . line, "CodiVirtualText"]], {})   
@@ -814,7 +769,7 @@ function! s:codi_spawn(filetype)
 
   " Return to target split and save codi bufnr
   keepjumps keepalt wincmd p
-  if s:nvim == 0 || g:codi#virtual_text == 0
+  if !s:is_virtual_text_enabled()
     call s:let_codi('bufnr', bufnr('$'))
   endif
   silent call codi#update()

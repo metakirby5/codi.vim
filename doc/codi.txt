@@ -40,7 +40,6 @@ CONFIGURATION.............................................|codi-configuration|
     g:codi#sync..................................................|g:codi#sync|
     g:codi#use_buffer_dir..............................|g:codi#use_buffer_dir|
     g:codi#log....................................................|g:codi#log|
-    g:codi#virtual_text..................................|g:codi#virtual_text|
 AUTOCOMMANDS...............................................|codi-autocommands|
     CodiEnterPre................................................|CodiEnterPre|
     CodiEnterPost..............................................|CodiEnterPost|
@@ -142,18 +141,6 @@ GOTCHAS                                            *codi-introduction-gotchas*
   "vi-movement-mode" in ~/.inputrc will not send input as expected, since
   <c-j> is '\n'.
 
-VIRTUAL TEXT                                               *codi-virtual_text*
-
-If you're using NeoVim, by default it uses virtual text to print the output
-from the REPL, similar to other plugins used in other popular editors.
-
-Custom Highlight Group~
-Codi uses CodiVirtualText custom highlight group to syntax highlight the
-virtual text output. By defaults is link to Statement group, but you can
-override it by using like this
-
->
-             highlight CodiVirtualText guifg=cyan
 <
 ==============================================================================
 USAGE                                                             *codi-usage*
@@ -350,6 +337,16 @@ g:codi#virtual_text_prefix
              Symbol that is prepend to the output text.
 
              Default value is "❯ "
+             
+                                            *codi-virtual-text-highlight-group*
+
+CodiVirtualText
+             Codi uses CodiVirtualText custom highlight group to syntax
+             highlight the virtual text output. By defaults is link to
+             Statement group, but you can override it by using like this
+
+>
+             highlight CodiVirtualText guifg=cyan
 
 ==============================================================================
 AUTOCOMMANDS                                               *codi-autocommands*

@@ -77,7 +77,7 @@ if !exists('g:codi#log')
   let g:codi#log = ''
 endif
 
-" Path for the file where Codi log information. Logging is disabled by default 
+" Toggle virtual text
 if !exists('g:codi#virtual_text')
   if has('nvim')
     let g:codi#virtual_text = 1
