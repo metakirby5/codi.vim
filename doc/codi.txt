@@ -71,7 +71,7 @@ language that provides a REPL (interactive interpreter)!
 
 If you're using NeoVim, by default it uses virtual text to print the output
 from the REPL, similar to other plugins used in other popular editors.
-See |codi-virtual-text| for more info.
+See |g:codi#virtual_text| for more info.
 
 See |codi-interpreters-defaults| for languages with built-in support.
 
