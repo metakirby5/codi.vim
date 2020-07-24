@@ -20,7 +20,6 @@ INTRODUCTION...............................................|codi-introduction|
     WARNINGS......................................|codi-introduction-warnings|
     DEPENDENCIES..............................|codi-introduction-dependencies|
     GOTCHAS........................................|codi-introduction-gotchas|
-    VIRTUAL TEXT...........................................|codi-virtual-text|
 USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
     :Codi!............................................................|:Codi!|
@@ -40,6 +39,9 @@ CONFIGURATION.............................................|codi-configuration|
     g:codi#sync..................................................|g:codi#sync|
     g:codi#use_buffer_dir..............................|g:codi#use_buffer_dir|
     g:codi#log....................................................|g:codi#log|
+    g:codi#virtual_text..................................|g:codi#virtual_text|
+    g:codi#virtual_text_prefix....................|g:codi#virtual_text_prefix|
+    CodiVirtualText..........................................|CodiVirtualText|
 AUTOCOMMANDS...............................................|codi-autocommands|
     CodiEnterPre................................................|CodiEnterPre|
     CodiEnterPost..............................................|CodiEnterPost|
@@ -141,7 +143,6 @@ GOTCHAS                                            *codi-introduction-gotchas*
   "vi-movement-mode" in ~/.inputrc will not send input as expected, since
   <c-j> is '\n'.
 
-<
 ==============================================================================
 USAGE                                                             *codi-usage*
 
@@ -220,7 +221,7 @@ g:codi#interpreters
 <
              Configuration is deeply applied over the default interpreters.
              Default value is {}.
-             
+
                                                     *g:codi#command_prefix*
 g:codi#command_prefix
              A list of commands and parameters prepended to the interpreter.
@@ -228,7 +229,7 @@ g:codi#command_prefix
              independent of the user's inputrc. Can be used as well to change
              the priority of Codi's background job by tools such as 'chrt',
              'nice' or 'ionice'.
-             
+
                                                               *g:codi#aliases*
 g:codi#aliases
              A dictionary of user-defined interpreter filetype aliases.
@@ -337,16 +338,16 @@ g:codi#virtual_text_prefix
              Symbol that is prepend to the output text.
 
              Default value is "❯ "
-             
-                                            *codi-virtual-text-highlight-group*
 
+                                                              *CodiVirtualText*
 CodiVirtualText
-             Codi uses CodiVirtualText custom highlight group to syntax
-             highlight the virtual text output. By defaults is link to
-             Statement group, but you can override it by using like this
+             Codi uses CodiVirtualText the custom highlight group to syntax
+             highlight the virtual text output. By default, this is linked to
+             the Statement group, but you can override like so.
 
 >
              highlight CodiVirtualText guifg=cyan
+<
 
 ==============================================================================
 AUTOCOMMANDS                                               *codi-autocommands*
