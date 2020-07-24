@@ -77,5 +77,22 @@ if !exists('g:codi#log')
   let g:codi#log = ''
 endif
 
+" Toggle virtual text
+if !exists('g:codi#virtual_text')
+  if has('nvim')
+    let g:codi#virtual_text = 1
+  else
+    let g:codi#virtual_text = 0
+  endif
+endif
+
+" Character prepended on every virtual text
+if !exists('g:codi#virtual_text_prefix')
+  let g:codi#virtual_text_prefix = "❯ "
+endif
+
+" Highlight group for virtual text output
+highlight default link CodiVirtualText Statement
+
 command! -nargs=? -bang -bar -complete=customlist,codi#complete Codi call codi#run(<bang>0, <f-args>)
 command! -bar CodiUpdate call codi#update()
