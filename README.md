@@ -1,4 +1,4 @@
-# codi.vim [![Gitter](https://badges.gitter.im/codi-vim/Lobby.svg)](https://gitter.im/codi-vim/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+# codi.vim [![Gitter](https://badges.gitter.im/codi-vim/Lobby.svg)](https://gitter.im/codi-vim/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge) <a href='https://ko-fi.com/V7V81YYAA' target='_blank'><img height='20' src='https://www.ko-fi.com/img/githubbutton_sm.svg' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 The interactive scratchpad for hackers.
 
