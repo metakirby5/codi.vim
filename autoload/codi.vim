@@ -96,6 +96,7 @@ endif
 let s:interpreters = codi#load#interpreters()
 let s:aliases = codi#load#aliases()
 let s:nvim = has('nvim')
+let s:virtual_text_namespace = 0
 let s:async_ok = has('job') && has('channel') || s:nvim
 let s:updating = 0
 let s:codis = {} " { bufnr: { codi_bufnr, codi_width, codi_restore } }
@@ -659,12 +660,18 @@ function! s:virtual_text_codi_handle_done(bufnr, output)
   call s:nvim_codi_output_to_virtual_text(a:bufnr, result)
 endfunction
 
+function! s:nvim_codi_clear_virtual_text()
+  call nvim_buf_clear_namespace(bufnr('%'),
+   \ s:virtual_text_namespace, 0, -1)
+endfunction
+
 function! s:nvim_codi_output_to_virtual_text(bufnr, lines)
   " Iterate through the result and print using virtual text
   let i = 0
   for line in split(a:lines, "\n", 1)
     if len(line)
-      call nvim_buf_set_virtual_text(a:bufnr, -1, i, 
+      let s:virtual_text_namespace = nvim_buf_set_virtual_text(a:bufnr,
+       \ s:virtual_text_namespace, i,
        \ [[g:codi#virtual_text_prefix . line, "CodiVirtualText"]], {})   
     else
       call nvim_buf_clear_namespace(a:bufnr, -1, i, i+1)
@@ -799,6 +806,10 @@ function! codi#run(bang, ...)
     let filetype = &filetype
   else
     exe 'setlocal filetype='.filetype
+  endif
+
+  if s:is_virtual_text_enabled()
+    call s:nvim_codi_clear_virtual_text()
   endif
 
   " Bang -> kill
