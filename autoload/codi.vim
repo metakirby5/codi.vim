@@ -540,8 +540,7 @@ function! s:codi_handle_done(bufnr, output)
   " Save for later
   let ret_bufnr = bufnr('%')
   let ret_mode = mode()
-  let ret_line = line('.')
-  let ret_col = col('.')
+  let ret_winview = winsaveview()
 
   " Go to target buf
   exe 'keepjumps keepalt buf! '.a:bufnr
@@ -551,12 +550,8 @@ function! s:codi_handle_done(bufnr, output)
   let interpreter = s:get_codi('interpreter')
   let num_lines = line('$')
 
-  " So we can jump back later
-  let top = line('w0') + &scrolloff
-  let line = line('.')
-  let col = col('.')
-
   " So we can syncbind later
+  let winview = winsaveview()
   silent! exe "keepjumps normal! \<esc>gg"
 
   " Go to codi buf
@@ -579,9 +574,9 @@ function! s:codi_handle_done(bufnr, output)
 
   " Restore target buf position
   exe 'keepjumps keepalt buf! '.b:codi_target_bufnr
-  exe 'keepjumps '.top
-  keepjumps normal! zt
-  keepjumps call cursor(line, col)
+  keepjumps normal! ggzt
+  call winrestview(winview)
+  exe "normal! \<esc>"
   let s:updating = 0
 
   " Go back to original buf
@@ -593,7 +588,7 @@ function! s:codi_handle_done(bufnr, output)
   elseif ret_mode =~? '[sS]'
     exe "keepjumps normal! gv\<c-g>"
   endif
-  keepjumps call cursor(ret_line, ret_col)
+  call winrestview(ret_winview)
 endfunction
 
 function! s:preprocess_and_parse(output, interpreter, num_lines)
