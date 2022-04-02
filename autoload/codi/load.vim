@@ -193,9 +193,14 @@ let s:codi_default_interpreters = {
          \ 'bin': ['iex'],
          \ 'prompt': '^iex(\d\+). '
          \ },
-       \ 'mathjs': {
+      \ 'mathjs': {
          \ 'bin': ['mathjs'],
          \ 'prompt': '^\(>\|\.\.\.\+\) ',
+         \ },
+      \ 'haxe': {
+         \ 'bin': ['haxelib', 'run', 'ihx', '-codi'],
+         \ 'prompt': '>> ',
+         \ 'quitcmd': 'exit',
          \ },
       \ }
 function! codi#load#interpreters()

@@ -473,6 +473,12 @@ bin: mathjs
 notes:
   - Evaluation may not work until a newline is entered
 
+haxe~
+bin: ihx 
+maintainer: @grepsuzette
+notes:
+  - `ihx` is an haxe interpreter and should be installed with `haxelib install ihx`
+
 Note that Codi is not meant to be a replacement for actually running your
 program; it supports nothing more than what the underlying bin supports.
 This is why Haskell language pragmas don't work, PureScript only works
