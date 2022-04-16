@@ -56,7 +56,7 @@ need `ghci`.
 
 Default interpreter dependencies:
 
-  - Python:       `python`
+  - Python:       `python` (Note: Python 3 requires config - see `:h codi-configuration`)
   - JavaScript:   `node`
   - CoffeeScript: `coffee`
   - Haskell:      `ghci` (be really careful with lazy evaluation!)
