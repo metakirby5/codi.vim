@@ -828,3 +828,32 @@ function! codi#complete(arg_lead, cmd_line, cursor_pos)
     endif
     return sort(candidates)
 endfunction
+
+function! codi#new(ft)
+  noswapfile hide enew
+  setlocal buftype=nofile
+  setlocal bufhidden=hide
+
+  call codi#run(0, a:ft)
+endfunction
+
+lua << EOF
+function _G.codi_select(interpreters)
+  local filetypes = {}
+  local n = 0
+  for k, v in pairs(interpreters) do
+    n = n + 1
+    filetypes[n] = k
+  end
+
+  vim.ui.select(filetypes, {
+    prompt = "Codi Filetype",
+  }, function(ft)
+    vim.fn["codi#new"](ft)
+  end)
+end
+EOF
+
+function! codi#select()
+  call v:lua.codi_select(s:interpreters)
+endfunction

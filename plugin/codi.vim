@@ -96,3 +96,5 @@ highlight default link CodiVirtualText Statement
 
 command! -nargs=? -bang -bar -complete=customlist,codi#complete Codi call codi#run(<bang>0, <f-args>)
 command! -bar CodiUpdate call codi#update()
+command! -nargs=1 -complete=filetype CodiNew call codi#new(<f-args>)
+command! CodiSelect call codi#select()

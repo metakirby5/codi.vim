@@ -82,6 +82,9 @@ Default interpreter dependencies:
 - `Codi!` deactivates Codi for the current buffer.
 - `Codi!! [filetype]` toggles Codi for the current buffer, using the provided
   filetype or the buffer's filetype.
+- `CodiNew filetype` create a new scratch buffer with Codi in it.
+- `CodiSelect` open a select menu and create a new scratch buffer of the
+  selected filetype with Codi in it. Only available on neovim.
 
 ### Shell wrapper
 
