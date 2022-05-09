@@ -829,21 +829,32 @@ function! codi#complete(arg_lead, cmd_line, cursor_pos)
     return sort(candidates)
 endfunction
 
-function! codi#new(ft)
+function! codi#new(...)
+  let ft = a:0 ? a:1 : &filetype
+
+  " Check if an interpreter exists for the given filetype.
+  try
+    let i = s:interpreters[get(s:aliases, ft, ft)]
+  catch /E71\(3\|6\)/
+    if empty(ft)
+      return s:err('Cannot run Codi with empty filetype.')
+    else
+      return s:err('No Codi interpreter for '.ft.'.')
+    endif
+  endtry
+
   noswapfile hide enew
   setlocal buftype=nofile
   setlocal bufhidden=hide
 
-  call codi#run(0, a:ft)
+  call codi#run(0, ft)
 endfunction
 
 lua << EOF
 function _G.codi_select(interpreters)
   local filetypes = {}
-  local n = 0
   for k, v in pairs(interpreters) do
-    n = n + 1
-    filetypes[n] = k
+    filetypes[#filetypes + 1] = k
   end
 
   vim.ui.select(filetypes, {
