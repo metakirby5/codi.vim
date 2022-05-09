@@ -167,12 +167,12 @@ USAGE                                                             *codi-usage*
 
                                                                     *:CodiNew*
 :CodiNew {filetype}
-             Create a new scratch buffer and run codi in it. This keeps your
+             Create a new scratch buffer and run Codi in it. This keeps your
              current buffer intact.
 
                                                                  *:CodiSelect*
 :CodiSelect
-             Opens a popup menu to select the filetype and open a new codi
+             Opens a popup menu to select the filetype and open a new Codi
              scratch buffer (see :CodiNew).
 
              Only available on neovim.

@@ -674,18 +674,26 @@ function! s:nvim_codi_output_to_virtual_text(bufnr, lines)
   endfor
 endfunction
 
-function! s:codi_spawn(filetype)
+" Return the interpreter to use far the given filetype or null if not found.
+" If null is returned, an error is logged.
+function! s:get_interpreter(ft)
   try
-    let i = s:interpreters[
-          \ get(s:aliases, a:filetype, a:filetype)]
-  " If interpreter not found...
+    return s:interpreters[get(s:aliases, a:ft, a:ft)]
   catch /E71\(3\|6\)/
-    if empty(a:filetype)
-      return s:err('Cannot run Codi with empty filetype.')
+    if empty(a:ft)
+      call s:err('Cannot run Codi with empty filetype.')
     else
-      return s:err('No Codi interpreter for '.a:filetype.'.')
+      call s:err('No Codi interpreter for '.a:ft.'.')
     endif
+    return v:null
   endtry
+endfunction
+
+function! s:codi_spawn(filetype)
+  let i = s:get_interpreter(a:filetype)
+  if i is v:null
+    return
+  endif
 
   " Error checking
   let interpreter_str = 'Codi interpreter for '.a:filetype
@@ -832,16 +840,9 @@ endfunction
 function! codi#new(...)
   let ft = a:0 ? a:1 : &filetype
 
-  " Check if an interpreter exists for the given filetype.
-  try
-    let i = s:interpreters[get(s:aliases, ft, ft)]
-  catch /E71\(3\|6\)/
-    if empty(ft)
-      return s:err('Cannot run Codi with empty filetype.')
-    else
-      return s:err('No Codi interpreter for '.ft.'.')
-    endif
-  endtry
+  if s:get_interpreter(ft) is v:null 
+    return
+  endif
 
   noswapfile hide enew
   setlocal buftype=nofile
