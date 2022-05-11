@@ -165,6 +165,18 @@ USAGE                                                             *codi-usage*
              Manually triggers a Codi update. Useful in conjunction with the
              "None" setting for |g:codi#autocmd|.
 
+                                                                    *:CodiNew*
+:CodiNew {filetype}
+             Create a new scratch buffer and run Codi in it. This keeps your
+             current buffer intact.
+
+                                                                 *:CodiSelect*
+:CodiSelect
+             Opens a popup menu to select the filetype and open a new Codi
+             scratch buffer (see :CodiNew).
+
+             Only available on neovim.
+
 SHELL WRAPPER                                             *codi-usage-wrapper*
 
              A nice way to use Codi is through a shell wrapper that you can
