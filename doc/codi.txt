@@ -25,6 +25,9 @@ USAGE.............................................................|codi-usage|
     :Codi!............................................................|:Codi!|
     :Codi!! {filetype}...............................................|:Codi!!|
     :CodiUpdate..................................................|:CodiUpdate|
+    :CodiNew........................................................|:CodiNew|
+    :CodiSelect.................................................|:CodiiSelect|
+    :CodiExpand..................................................|:CodiExpand|
     SHELL WRAPPER.........................................|codi-usage-wrapper|
 CONFIGURATION.............................................|codi-configuration|
     g:codi#interpreters..................................|g:codi#interpreters|
@@ -174,6 +177,13 @@ USAGE                                                             *codi-usage*
 :CodiSelect
              Opens a popup menu to select the filetype and open a new Codi
              scratch buffer (see :CodiNew).
+
+             Only available on neovim.
+
+                                                                 *:CodiExpand*
+:CodiExpand
+             Expand the output of the current line in a popup menu to display
+             multi-line content.
 
              Only available on neovim.
 
@@ -353,10 +363,10 @@ g:codi#virtual_text_prefix
 
                                                       *g:codi#virtual_text_pos
 g:codi#virtual_text_pos
-             Position of the virtual text. Supported values: "eof",
+             Position of the virtual text. Supported values: "eol",
              "right_align", or a number for a specific column (ex: 90).
 
-             Default value is "eof".
+             Default value is "eol".
 
                                                               *CodiVirtualText*
 CodiVirtualText

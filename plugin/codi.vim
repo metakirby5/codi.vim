@@ -99,4 +99,5 @@ command! -bar CodiUpdate call codi#update()
 command! -nargs=? -complete=customlist,codi#complete CodiNew call codi#new(<f-args>)
 if has("nvim")
   command! CodiSelect call codi#select()
+  command! CodiExpand call codi#expand()
 endif
