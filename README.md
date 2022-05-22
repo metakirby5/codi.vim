@@ -7,6 +7,10 @@ The interactive scratchpad for hackers.
 _Using Codi as a Python scratchpad through the
 [shell wrapper](#shell-wrapper)_
 
+![Codi expand demo.](assets/codi_expand.png)
+
+_Using :CodiExpand on a javascript object_
+
 Codi is an interactive scratchpad for hackers, with a similar interface to
 [Numi](https://numi.io). It opens a pane synchronized to your main buffer
 which displays the results of evaluating each line *as you type* (with NeoVim
@@ -85,6 +89,8 @@ Default interpreter dependencies:
 - `CodiNew [filetype]` creates a new scratch buffer with Codi in it.
 - `CodiSelect` opens a select menu and creates a new scratch buffer with the
   selected filetype and Codi in it. Only available on neovim.
+- `CodiExpand` expands the output of the current line in a popup menu to
+  display multi-line content. Only available on neovim.
 
 ### Shell wrapper
 
