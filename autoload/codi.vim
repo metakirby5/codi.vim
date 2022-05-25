@@ -692,7 +692,7 @@ function! s:nvim_codi_output_to_virtual_text(bufnr, lines)
       let extmarks[i] = nvim_buf_set_extmark(a:bufnr, s:virtual_text_namespace, i, 0, opts)
       call s:let_codi("extmarks", extmarks)
     else
-      call nvim_buf_clear_namespace(a:bufnr, -1, i, i+1)
+      call nvim_buf_clear_namespace(a:bufnr, s:virtual_text_namespace, i, i+1)
     endif
     let i += 1
   endfor
