@@ -28,7 +28,6 @@ for new language support welcome!
 than text change.
 
 For more information, check out the [documentation](doc/codi.txt).
-Watch a [screencast](https://ptpb.pw/t/~codi)!
 
 ## Installation
 
