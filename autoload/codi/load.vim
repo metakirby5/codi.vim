@@ -147,7 +147,7 @@ let s:codi_default_interpreters = {
           \ 'quitcmd': ':q',
           \ },
       \ 'ruby': {
-          \ 'bin': ['irb', '-f'],
+          \ 'bin': ['irb', '-f', '--nomultiline'],
           \ 'prompt': '^irb(\w\+):\d\+:\d\+. ',
           \ 'preprocess': function('s:pp_remove_fat_arrow'),
           \ },
