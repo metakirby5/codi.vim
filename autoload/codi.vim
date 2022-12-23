@@ -83,7 +83,7 @@ endfunction
 
 " Check for missing commands
 let s:missing_deps = s:require(function('s:check_exec'), ['script', 'uname'])
-if len(s:missing_deps)
+if len(s:missing_deps) && !has('win32')
   function! codi#run(...)
     return s:err(
           \ 'Codi requires these missing commands: '
