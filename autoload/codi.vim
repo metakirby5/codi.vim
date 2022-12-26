@@ -521,6 +521,7 @@ function! s:codi_handle_data(data, msg)
 
   for line in split(out, "\n")
     call s:log('[DATA] '.line)
+    call s:log('[PROMPT] '.i['prompt'])
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
