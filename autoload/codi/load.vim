@@ -118,7 +118,7 @@ endfunction
 
 let s:codi_default_interpreters = {
       \ 'python': {
-          \ 'bin': ['env', 'PYTHONSTARTUP=', 'python'],
+          \ 'bin': ['set', 'PYTHONSTARTUP=', 'python'],
           \ 'prompt': '^\(>>>\|\.\.\.\) ',
           \ 'rephrase': function('s:rp_py'),
           \ },
