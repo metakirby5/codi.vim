@@ -420,7 +420,7 @@ function! s:codi_do_update()
             \ 'pty': 1,
             \ 'on_stdout': function('s:codi_nvim_callback'),
             \ 'on_stderr': function('s:codi_nvim_callback'),
-            \ 'env': {'SHELL': 'sh'}
+            "\ 'env': {'SHELL': 'sh'}
             \}
       if opt_use_buffer_dir
         let job_options.cwd = buf_dir
