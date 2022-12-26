@@ -534,6 +534,7 @@ function! s:codi_handle_data(data, msg)
           silent call s:virtual_text_codi_handle_done(
                 \ a:data['bufnr'], join(a:data['lines'], "\n"))
         else
+          call s:log('Virtual text not enabled')
           silent call s:codi_handle_done(
                 \ a:data['bufnr'], join(a:data['lines'], "\n"))
         endif
