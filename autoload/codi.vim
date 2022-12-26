@@ -401,7 +401,8 @@ function! s:codi_do_update()
   endif
 
   " Build the command
-  let cmd = g:codi#command_prefix + s:to_list(i['bin'])
+  "let cmd = g:codi#command_prefix + s:to_list(i['bin'])
+  let cmd = s:to_list(i['bin'])
   call s:log('Command is '.join(cmd, ' '))
 
   " The purpose of this is to make the REPL start from the buffer directory
