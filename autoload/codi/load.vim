@@ -120,7 +120,7 @@ let s:codi_default_interpreters = {
       \ 'python': {
           "\ 'bin': ['env', 'PYTHONSTARTUP=', 'python'],
           \ 'bin': ['python'],
-          \ 'prompt': '^\(>>>\|\.\.\.\) ',
+          \ 'prompt': '^\(>>>\|\.\.\.\) \=',
           \ 'rephrase': function('s:rp_py'),
           \ },
       \ 'javascript': {
