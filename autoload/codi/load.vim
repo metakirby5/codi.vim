@@ -124,7 +124,7 @@ let s:codi_default_interpreters = {
           \ },
       \ 'javascript': {
           \ 'bin': ['node', '-e', 'require("repl").start({ignoreUndefined: true, useGlobal: true})'],
-          \ 'prompt': '^\(>\|\.\.\.\+\) ',
+          \ 'prompt': '^\(>\|\.\.\.\+\) \=',
           \ },
       \ 'typescript': {
           \ 'bin': ['tsun', '--ignore-undefined'],
