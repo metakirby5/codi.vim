@@ -424,7 +424,7 @@ function! s:codi_do_update()
             \ 'pty': 1,
             \ 'on_stdout': function('s:codi_nvim_callback'),
             \ 'on_stderr': function('s:codi_nvim_callback'),
-            \ 'env': {'SHELL': 'powershell.exe'}
+            "\ 'env': {'SHELL': 'powershell.exe'}
             \}
       if opt_use_buffer_dir
         let job_options.cwd = buf_dir
@@ -434,7 +434,7 @@ function! s:codi_do_update()
     else
       let job = job_start(s:scriptify(cmd), { 
             \ 'callback': 'codi#__vim_callback', 
-            \ 'env': {'SHELL': 'powershell.exe'}
+            \ 'env': {'SHELL': 'sh'}
             \})
       let ch = job_getchannel(job)
       let id = s:ch_get_id(ch)
