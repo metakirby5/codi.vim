@@ -679,6 +679,7 @@ endfunction
 
 function! s:nvim_codi_output_to_virtual_text(bufnr, lines)
   " Iterate through the result and print using virtual text
+  call s:log("Nvim_codi_output_to_virtual_text")
   let i = 0
   for line in split(a:lines, "\n", 1)
     if len(line)
