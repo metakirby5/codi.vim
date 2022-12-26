@@ -142,6 +142,9 @@ if has('unix')
   endif
 else
   call s:log ('Windows deteced, using')
+  function! s:scriptify(bin)
+      call s:log('Scriptify is not set up for windows')
+  endfunction
 endif
 
 " Actions on codi
@@ -399,6 +402,7 @@ function! s:codi_do_update()
 
   " Build the command
   let cmd = g:codi#command_prefix + s:to_list(i['bin'])
+  call s:log('Command is '.cmd)
 
   " The purpose of this is to make the REPL start from the buffer directory
   let opt_use_buffer_dir = s:get_opt('use_buffer_dir')
