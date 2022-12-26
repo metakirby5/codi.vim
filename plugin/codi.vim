@@ -20,7 +20,8 @@ if !exists('g:codi#interpreters')
 endif
 
 if !exists('g:codi#command_prefix')
-  let g:codi#command_prefix = ['env' , 'INPUTRC=/dev/null']
+  "let g:codi#command_prefix = ['env' , 'INPUTRC=/dev/null']
+  let g:codi#command_prefix = ['$env:INPUTRC' , '=',  '$null']
 endif
 
 " Interpreter aliases
