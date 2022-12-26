@@ -390,7 +390,8 @@ function! s:codi_do_update()
   let bufnr = bufnr('%')
 
   " Build input
-  let input = join(getline('^', '$'), "\n")
+  "let input = join(getline('^', '$'), "\n")
+  let input = join(getline('^', '$'), "--")
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
