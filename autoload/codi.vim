@@ -141,8 +141,7 @@ if has('unix')
     endfunction
   endif
 else
-  call s:log ('Windows detected, erroring out')
-  call s:err('Codi does not support Windows yet.')
+  call s:log ('Windows deteced, using')
 endif
 
 " Actions on codi
@@ -460,6 +459,7 @@ function! s:codi_do_update()
       call ch_sendraw(ch, input)
     endif
   else
+    call s:log("Async off")
     " Convert command to string
     call s:codi_handle_done(bufnr,
           \ system(s:shellescape_list(s:scriptify(cmd)), input))
