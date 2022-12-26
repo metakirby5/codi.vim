@@ -391,7 +391,7 @@ function! s:codi_do_update()
 
   " Build input
   "let input = join(getline('^', '$'), "\n")
-  let input = join(getline('^', '$'), "--")
+  let input = join(getline('^', '$'), "\r\n")
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
