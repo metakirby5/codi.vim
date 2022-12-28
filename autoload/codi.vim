@@ -140,8 +140,12 @@ if has('unix')
       return ['script', '-qfec', tmp_bin, '/dev/null']
     endfunction
   endif
-else
-  call s:log ('Windows deteced, using')
+else  
+  if s:nvim
+    call s:log ('Windows detected')
+  else
+    call s:log('Windows only supports nvim')
+  endif
   function! s:scriptify(bin)
       call s:log('Scriptify is not set up for windows')
   endfunction
@@ -390,8 +394,11 @@ function! s:codi_do_update()
   let bufnr = bufnr('%')
 
   " Build input
-  "let input = join(getline('^', '$'), "\n")
-  let input = join(getline('^', '$'), "\r\n")
+  if has('win32')
+    let input = join(getline('^', '$'), "\r\n")
+  else
+    let input = join(getline('^', '$'), "\n")
+  endif
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
@@ -403,8 +410,6 @@ function! s:codi_do_update()
 
   " Build the command
   let cmd = g:codi#command_prefix + s:to_list(i['bin'])
-  let cmd = s:to_list(i['bin'])
-  call s:log('Command is '.join(cmd, ' '))
 
   " The purpose of this is to make the REPL start from the buffer directory
   let opt_use_buffer_dir = s:get_opt('use_buffer_dir')
@@ -426,7 +431,8 @@ function! s:codi_do_update()
             \ 'pty': 1,
             \ 'on_stdout': function('s:codi_nvim_callback'),
             \ 'on_stderr': function('s:codi_nvim_callback'),
-            \ 'env': {'SHELL': 'powershell.exe'}
+            \ 'env': {'SHELL': has('win32') ? 'powershell.exe'
+            \                               : 'sh'}
             \}
       if opt_use_buffer_dir
         let job_options.cwd = buf_dir
@@ -465,7 +471,6 @@ function! s:codi_do_update()
       call ch_sendraw(ch, input)
     endif
   else
-    call s:log("Async off")
     " Convert command to string
     call s:codi_handle_done(bufnr,
           \ system(s:shellescape_list(s:scriptify(cmd)), input))
@@ -535,7 +540,6 @@ function! s:codi_handle_data(data, msg)
           silent call s:virtual_text_codi_handle_done(
                 \ a:data['bufnr'], join(a:data['lines'], "\n"))
         else
-          call s:log('Virtual text not enabled')
           silent call s:codi_handle_done(
                 \ a:data['bufnr'], join(a:data['lines'], "\n"))
         endif
@@ -680,7 +684,6 @@ endfunction
 
 function! s:nvim_codi_output_to_virtual_text(bufnr, lines)
   " Iterate through the result and print using virtual text
-  call s:log("Nvim_codi_output_to_virtual_text")
   let i = 0
   for line in split(a:lines, "\n", 1)
     if len(line)
