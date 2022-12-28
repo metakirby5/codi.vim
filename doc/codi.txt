@@ -361,7 +361,7 @@ g:codi#virtual_text_prefix
 
              Default value is "❯ "
 
-                                                      *g:codi#virtual_text_pos
+                                                      *g:codi#virtual_text_pos*
 g:codi#virtual_text_pos
              Position of the virtual text. Supported values: "eol",
              "right_align", or a number for a specific column (ex: 90).
