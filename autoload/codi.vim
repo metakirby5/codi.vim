@@ -402,7 +402,7 @@ function! s:codi_do_update()
   endif
 
   " Build the command
-  "let cmd = g:codi#command_prefix + s:to_list(i['bin'])
+  let cmd = g:codi#command_prefix + s:to_list(i['bin'])
   let cmd = s:to_list(i['bin'])
   call s:log('Command is '.join(cmd, ' '))
 
@@ -522,7 +522,6 @@ function! s:codi_handle_data(data, msg)
 
   for line in split(out, "\n")
     call s:log('[DATA] '.line)
-    call s:log('[PROMPT] '.i['prompt'])
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
