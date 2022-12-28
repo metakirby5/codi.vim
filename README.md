@@ -45,7 +45,7 @@ Plug 'metakirby5/codi.vim'
 
 ### Dependencies
 
-- OS X or Linux (Windows support coming
+- OS X, Linux and limited Windows support
   [soon](https://github.com/metakirby5/codi.vim/issues/14)!)
 - Vim 7.4 (with `+job` and `+channel` for asynchronous evaluation) or
   NeoVim (still in its infancy - please report bugs!)

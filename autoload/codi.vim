@@ -144,7 +144,7 @@ else
   if s:nvim
     call s:log ('Windows detected')
   else
-    call s:log('Windows only supports nvim')
+    call s:err('Only nvim is supported for Codi on windows')
   endif
   function! s:scriptify(bin)
       call s:log('Scriptify is not set up for windows')
