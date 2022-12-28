@@ -125,8 +125,7 @@ use "csh", you may need to add the following line to your .vimrc:
 <
 DEPENDENCIES                                  *codi-introduction-dependencies*
 
-- OS X or Linux (Windows support coming soon!)
-  https://github.com/metakirby5/codi.vim/issues/14
+- OS X, Linux and limited Windows support
 - Vim 7.4 (with |+job| and |+channel| for asynchronous evaluation) or
   NeoVim (still in its infancy - please report bugs!)
 - "uname"
@@ -219,7 +218,7 @@ g:codi#interpreters
              let g:codi#interpreters = {
                    \ 'python': {
                        \ 'bin': 'python',
-                       \ 'prompt': '^\(>>>\|\.\.\.\) ',
+                       \ 'prompt': '^\(>>>\|\.\.\.\) \=',
                        \ },
                    \ }
 <
@@ -227,7 +226,7 @@ g:codi#interpreters
 >
              let g:codi#interpreters = {
                    \ 'haskell': {
-                       \ 'prompt': '^> ',
+                       \ 'prompt': '^> \=',
                        \ },
                    \ }
 <
@@ -563,7 +562,7 @@ in Vimscript, you still need to add forward slashes for continuing newlines.)
 >
              'javascript': {
                  'bin': 'node',
-                 'prompt': '^\(>\|\.\.\.\+\) ',
+                 'prompt': '^\(>\|\.\.\.\+\) \=',
                  'preprocess': function('s:pp_js'),
                  'rephrase': function('s:rp_js'),
              }
