@@ -63,7 +63,7 @@ endif
 
 " Disable prompt parsing?
 if !exists('g:codi#raw')
-  let g:codi#raw = 0
+  let g:codi#raw = 1
 endif
 
 " Force sync?
