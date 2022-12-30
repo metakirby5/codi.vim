@@ -63,7 +63,7 @@ endif
 
 " Disable prompt parsing?
 if !exists('g:codi#raw')
-  let g:codi#raw = 1
+  let g:codi#raw = 0
 endif
 
 " Force sync?
@@ -78,7 +78,7 @@ endif
 
 " Path for the file where Codi log information. Logging is disabled by default 
 if !exists('g:codi#log')
-  let g:codi#log = ''
+  let g:codi#log = 'C:\Users\jaces\Desktop\nvim\codi.vim\log.txt'
 endif
 
 " Toggle virtual text
