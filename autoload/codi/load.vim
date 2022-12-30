@@ -124,7 +124,8 @@ let s:codi_default_interpreters = {
           \ 'rephrase': function('s:rp_py'),
           \ },
       \ 'javascript': {
-          \ 'bin': ['node', '-e', 'require("repl").start({ignoreUndefined: true, useGlobal: true})'],
+          \ 'bin': has('win32') ? ['node']
+          \    : ['node', '-e', 'require("repl").start({ignoreUndefined: true, useGlobal: true})'],
           \ 'prompt': '^\(>\|\.\.\.\+\) \=',
           \ },
       \ 'typescript': {
