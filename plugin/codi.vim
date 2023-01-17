@@ -78,7 +78,7 @@ endif
 
 " Path for the file where Codi log information. Logging is disabled by default 
 if !exists('g:codi#log')
-  let g:codi#log = 'C:\Users\jaces\Desktop\nvim\codi.vim\log.txt'
+  let g:codi#log = ''
 endif
 
 " Toggle virtual text
