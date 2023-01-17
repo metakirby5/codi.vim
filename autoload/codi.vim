@@ -315,7 +315,8 @@ endfunction
 " Preprocess (default + interpreter)
 function! s:preprocess(text, ...)
   " Default pre-process
-  let out = substitute(substitute(substitute(a:text,
+  let out = substitute(substitute(substitute(substitute(a:text,
+        \ "\<esc>".'\][0-9;]*\a:'.'[A-Za-z0-9\\\. ]\+'.'[\x07]', '', 'g'),
         \ "\<cr>".'\|'."\<c-h>", '', 'g'),
         \ '\(^\|\n\)\(\^D\)\+', '\1', 'g'),
         \ "\<esc>".'\[?*[0-9;]*\a', '', 'g')
@@ -403,7 +404,11 @@ function! s:codi_do_update()
     let input = i['rephrase'](input)
   endif
   if has_key(i, 'quitcmd')
-    let input = input."\n".i['quitcmd']."\n"
+    if has('win32')
+      let input = input."\r\n".i['quitcmd']."\r\n"
+    else
+      let input = input."\n".i['quitcmd']."\n"
+    endif
   else
     let input = input.s:magic
   endif
@@ -431,8 +436,7 @@ function! s:codi_do_update()
             \ 'pty': 1,
             \ 'on_stdout': function('s:codi_nvim_callback'),
             \ 'on_stderr': function('s:codi_nvim_callback'),
-            \ 'env': {'SHELL': has('win32') ? 'powershell.exe'
-            \                               : 'sh'}
+            \ 'env': {'SHELL': 'sh'}
             \}
       if opt_use_buffer_dir
         let job_options.cwd = buf_dir

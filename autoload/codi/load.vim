@@ -122,10 +122,12 @@ let s:codi_default_interpreters = {
           \    : ['env', 'PYTHONSTARTUP=', 'python'],
           \ 'prompt': '^\(>>>\|\.\.\.\) \=',
           \ 'rephrase': function('s:rp_py'),
+          \ 'quitcmd': 'exit()',
           \ },
       \ 'javascript': {
-          \ 'bin': ['node', '-e', 'require("repl").start({ignoreUndefined: true, useGlobal: true})'],
+          \ 'bin': ['node', '-e', 'require(''repl'').start({ignoreUndefined: true, useGlobal: true})'],
           \ 'prompt': '^\(>\|\.\.\.\+\) \=',
+          \ 'quitcmd': '.exit',
           \ },
       \ 'typescript': {
           \ 'bin': ['tsun', '--ignore-undefined'],
