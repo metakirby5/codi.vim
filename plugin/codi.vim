@@ -11,7 +11,7 @@
 " For example:
 "   'javascript': {
 "       'bin': 'node',
-"       'prompt': '^\(>\|\.\.\.\+\) \=',
+"       'prompt': '^\(>\|\.\.\.\+\) ',
 "       'preprocess': function('s:pp_js'),
 "       'rephrase': function('s:rp_js'),
 "    }
