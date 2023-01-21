@@ -125,7 +125,7 @@ let s:codi_default_interpreters = {
           \ 'quitcmd': 'exit()',
           \ },
       \ 'javascript': {
-          \ 'bin': ['node', '-e', 'require(''repl'').start({ignoreUndefined: true, useGlobal: true})'],
+          \ 'bin': ['node', '-e', 'require("repl").start({ignoreUndefined: true, useGlobal: true})'],
           \ 'prompt': '^\(>\|\.\.\.\+\) ',
           \ 'quitcmd': '.exit',
           \ },
