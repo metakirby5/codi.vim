@@ -141,9 +141,8 @@ if has('unix')
     endfunction
   endif
 else  
-  if s:nvim
-    call s:log ('Windows detected')
-  else
+  call s:log ('Windows detected')
+  if !s:nvim
     call s:err('Only nvim is supported for Codi on windows')
   endif
   function! s:scriptify(bin)
@@ -395,20 +394,13 @@ function! s:codi_do_update()
   let bufnr = bufnr('%')
 
   " Build input
-  if has('win32')
-    let input = join(getline('^', '$'), "\r\n")
-  else
-    let input = join(getline('^', '$'), "\n")
-  endif
+  let newline = has('win32') ? "\r\n" : "\n"
+  let input = join(getline('^', '$'), newline)
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
   if has_key(i, 'quitcmd')
-    if has('win32')
-      let input = input."\r\n".i['quitcmd']."\r\n"
-    else
-      let input = input."\n".i['quitcmd']."\n"
-    endif
+    let input = input.newline.i['quitcmd'].newline
   else
     let input = input.s:magic
   endif
@@ -534,7 +526,7 @@ function! s:codi_handle_data(data, msg)
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
-    if line =~ i['prompt']
+    if line =~ i['prompt'].' \='
       call s:log('Matched prompt')
       let a:data['received'] += 1
       if a:data['received'] > a:data['expected']
@@ -641,7 +633,7 @@ function! s:preprocess_and_parse(output, interpreter, num_lines)
     " Iterate through all lines
     for l in split(output, "\n")
       " If we hit a prompt
-      if l =~ a:interpreter['prompt']
+      if l =~ a:interpreter['prompt'].' \='
         " If we have passed the first prompt
         if passed_first
           " Record what was taken, empty if nothing happens

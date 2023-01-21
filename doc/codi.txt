@@ -20,6 +20,7 @@ INTRODUCTION...............................................|codi-introduction|
     WARNINGS......................................|codi-introduction-warnings|
     DEPENDENCIES..............................|codi-introduction-dependencies|
     GOTCHAS........................................|codi-introduction-gotchas|
+    WINDOWS........................................|codi-introduction-windows|
 USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
     :Codi!............................................................|:Codi!|
@@ -145,6 +146,17 @@ GOTCHAS                                            *codi-introduction-gotchas*
   "vi-movement-mode" in ~/.inputrc will not send input as expected, since
   <c-j> is '\n'.
 
+WINDOWS                                            *codi-introduction-windows*
+
+Windows for Codi currently only supports nvim with async jobs. If codi is
+freezing, this is due to two possible problems:
+
+1. Using <C-d> to exit the REPL works differently on Windows and may require
+   a quitcmd. This is easily tested in command prompt or powershell.
+2. Nvim jobstop() function does not always kill background processes on
+   Windows which can build up and slow down Codi. This may require a buffer
+   delete or nvim reload.
+
 ==============================================================================
 USAGE                                                             *codi-usage*
 
@@ -218,7 +230,7 @@ g:codi#interpreters
              let g:codi#interpreters = {
                    \ 'python': {
                        \ 'bin': 'python',
-                       \ 'prompt': '^\(>>>\|\.\.\.\) \=',
+                       \ 'prompt': '^\(>>>\|\.\.\.\) ',
                        \ },
                    \ }
 <
@@ -226,7 +238,7 @@ g:codi#interpreters
 >
              let g:codi#interpreters = {
                    \ 'haskell': {
-                       \ 'prompt': '^> \=',
+                       \ 'prompt': '^> ',
                        \ },
                    \ }
 <
@@ -562,7 +574,7 @@ in Vimscript, you still need to add forward slashes for continuing newlines.)
 >
              'javascript': {
                  'bin': 'node',
-                 'prompt': '^\(>\|\.\.\.\+\) \=',
+                 'prompt': '^\(>\|\.\.\.\+\) ',
                  'preprocess': function('s:pp_js'),
                  'rephrase': function('s:rp_js'),
              }

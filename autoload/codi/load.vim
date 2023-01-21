@@ -120,22 +120,22 @@ let s:codi_default_interpreters = {
       \ 'python': {
           \ 'bin': has('win32') ? ['python']
           \    : ['env', 'PYTHONSTARTUP=', 'python'],
-          \ 'prompt': '^\(>>>\|\.\.\.\) \=',
+          \ 'prompt': '^\(>>>\|\.\.\.\) ',
           \ 'rephrase': function('s:rp_py'),
           \ 'quitcmd': 'exit()',
           \ },
       \ 'javascript': {
           \ 'bin': ['node', '-e', 'require(''repl'').start({ignoreUndefined: true, useGlobal: true})'],
-          \ 'prompt': '^\(>\|\.\.\.\+\) \=',
+          \ 'prompt': '^\(>\|\.\.\.\+\) ',
           \ 'quitcmd': '.exit',
           \ },
       \ 'typescript': {
           \ 'bin': ['tsun', '--ignore-undefined'],
-          \ 'prompt': '^\(>\|\.\.\.\+\) \=',
+          \ 'prompt': '^\(>\|\.\.\.\+\) ',
           \ },
       \ 'coffee': {
           \ 'bin': 'coffee',
-          \ 'prompt': '^coffee> \=',
+          \ 'prompt': '^coffee> ',
           \ },
       \ 'haskell': {
           \ 'bin': ['ghci', '-ignore-dot-ghci'],
@@ -144,39 +144,39 @@ let s:codi_default_interpreters = {
           \ },
       \ 'purescript': {
           \ 'bin': ['pulp', 'psci'],
-          \ 'prompt': '^[^>…]*[>…] \=',
+          \ 'prompt': '^[^>…]*[>…] ',
           \ 'rephrase': function('s:rp_purs'),
           \ 'preprocess': function('s:pp_purs'),
           \ 'quitcmd': ':q',
           \ },
       \ 'ruby': {
           \ 'bin': ['irb', '-f', '--nomultiline'],
-          \ 'prompt': '^irb(\w\+):\d\+:\d\+. \=',
+          \ 'prompt': '^irb(\w\+):\d\+:\d\+. ',
           \ 'preprocess': function('s:pp_remove_fat_arrow'),
           \ },
       \ 'ocaml': {
           \ 'bin': 'ocaml',
-          \ 'prompt': '^# \=',
+          \ 'prompt': '^# ',
           \ 'preprocess': function('s:pp_ml'),
           \ },
       \ 'r': {
           \ 'bin': 'R',
-          \ 'prompt': '^> \=',
+          \ 'prompt': '^> ',
           \ 'preprocess': function('s:pp_r'),
           \ },
       \ 'clojure': {
           \ 'bin': ['planck', '--verbose', '--dumb-terminal'],
-          \ 'prompt': '^.\{-}=> \=',
+          \ 'prompt': '^.\{-}=> ',
           \ },
       \ 'php': {
           \ 'bin': ['psysh'],
-          \ 'prompt': '^\(>>>\|\.\.\.\) \=',
+          \ 'prompt': '^\(>>>\|\.\.\.\) ',
           \ 'rephrase': function('s:rp_php'),
           \ 'preprocess': function('s:pp_remove_fat_arrow'),
           \ },
       \ 'lua': {
           \ 'bin': ['lua'],
-          \ 'prompt': '^\(>\|>>\) \=',
+          \ 'prompt': '^\(>\|>>\) ',
           \ },
       \ 'cpp': {
          \ 'bin': 'cling',
@@ -190,19 +190,19 @@ let s:codi_default_interpreters = {
          \ },
       \ 'elm': {
          \ 'bin': ['elm', 'repl'],
-         \ 'prompt': '^> \='
+         \ 'prompt': '^> '
          \ },
       \ 'elixir': {
          \ 'bin': ['iex'],
-         \ 'prompt': '^iex(\d\+). \='
+         \ 'prompt': '^iex(\d\+). '
          \ },
       \ 'mathjs': {
          \ 'bin': ['mathjs'],
-         \ 'prompt': '^\(>\|\.\.\.\+\) \=',
+         \ 'prompt': '^\(>\|\.\.\.\+\) ',
          \ },
       \ 'haxe': {
          \ 'bin': ['haxelib', 'run', 'ihx', '-codi'],
-         \ 'prompt': '>> \=',
+         \ 'prompt': '>> ',
          \ 'quitcmd': 'exit',
          \ },
       \ }
