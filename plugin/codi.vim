@@ -20,11 +20,7 @@ if !exists('g:codi#interpreters')
 endif
 
 if !exists('g:codi#command_prefix')
-  if !has('win32')
-    let g:codi#command_prefix = ['env' , 'INPUTRC=/dev/null']
-  else
-    let g:codi#command_prefix = []
-  endif
+  let g:codi#command_prefix = has('win32') ? [] : ['env' , 'INPUTRC=/dev/null']
 endif
 
 " Interpreter aliases
