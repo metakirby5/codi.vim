@@ -83,7 +83,7 @@ endfunction
 
 " Check for missing commands
 let s:missing_deps = s:require(function('s:check_exec'), ['script', 'uname'])
-if len(s:missing_deps)
+if len(s:missing_deps) && !has('win32')
   function! codi#run(...)
     return s:err(
           \ 'Codi requires these missing commands: '
@@ -140,9 +140,14 @@ if has('unix')
       return ['script', '-qfec', tmp_bin, '/dev/null']
     endfunction
   endif
-else
-  call s:log ('Windows detected, erroring out')
-  call s:err('Codi does not support Windows yet.')
+else  
+  call s:log('Windows detected')
+  if !s:nvim
+    call s:err('Only nvim is supported for Codi on windows')
+  endif
+  function! s:scriptify(bin)
+    call s:err('Scriptify is not set up for windows')
+  endfunction
 endif
 
 " Actions on codi
@@ -309,7 +314,8 @@ endfunction
 " Preprocess (default + interpreter)
 function! s:preprocess(text, ...)
   " Default pre-process
-  let out = substitute(substitute(substitute(a:text,
+  let out = substitute(substitute(substitute(substitute(a:text,
+        \ "\<esc>".'\][0-9;]*\a:'.'[A-Za-z0-9\\\. ]\+'.'[\x07]', '', 'g'),
         \ "\<cr>".'\|'."\<c-h>", '', 'g'),
         \ '\(^\|\n\)\(\^D\)\+', '\1', 'g'),
         \ "\<esc>".'\[?*[0-9;]*\a', '', 'g')
@@ -388,12 +394,13 @@ function! s:codi_do_update()
   let bufnr = bufnr('%')
 
   " Build input
-  let input = join(getline('^', '$'), "\n")
+  let newline = has('win32') ? "\r\n" : "\n"
+  let input = join(getline('^', '$'), newline)
   if has_key(i, 'rephrase')
     let input = i['rephrase'](input)
   endif
   if has_key(i, 'quitcmd')
-    let input = input."\n".i['quitcmd']."\n"
+    let input = input.newline.i['quitcmd'].newline
   else
     let input = input.s:magic
   endif
@@ -519,7 +526,7 @@ function! s:codi_handle_data(data, msg)
     call add(a:data['lines'], line)
 
     " Count our prompts, and stop if we've reached the right amount
-    if line =~ i['prompt']
+    if line =~ i['prompt'].'\='
       call s:log('Matched prompt')
       let a:data['received'] += 1
       if a:data['received'] > a:data['expected']
@@ -626,7 +633,7 @@ function! s:preprocess_and_parse(output, interpreter, num_lines)
     " Iterate through all lines
     for l in split(output, "\n")
       " If we hit a prompt
-      if l =~ a:interpreter['prompt']
+      if l =~ a:interpreter['prompt'].'\='
         " If we have passed the first prompt
         if passed_first
           " Record what was taken, empty if nothing happens

@@ -20,6 +20,7 @@ INTRODUCTION...............................................|codi-introduction|
     WARNINGS......................................|codi-introduction-warnings|
     DEPENDENCIES..............................|codi-introduction-dependencies|
     GOTCHAS........................................|codi-introduction-gotchas|
+    WINDOWS........................................|codi-introduction-windows|
 USAGE.............................................................|codi-usage|
     :Codi {filetype}...................................................|:Codi|
     :Codi!............................................................|:Codi!|
@@ -125,8 +126,7 @@ use "csh", you may need to add the following line to your .vimrc:
 <
 DEPENDENCIES                                  *codi-introduction-dependencies*
 
-- OS X or Linux (Windows support coming soon!)
-  https://github.com/metakirby5/codi.vim/issues/14
+- OS X, Linux and limited Windows support
 - Vim 7.4 (with |+job| and |+channel| for asynchronous evaluation) or
   NeoVim (still in its infancy - please report bugs!)
 - "uname"
@@ -145,6 +145,17 @@ GOTCHAS                                            *codi-introduction-gotchas*
   with some readline configurations. For example, binding <c-j> to
   "vi-movement-mode" in ~/.inputrc will not send input as expected, since
   <c-j> is '\n'.
+
+WINDOWS                                            *codi-introduction-windows*
+
+Windows for Codi currently only supports nvim with async jobs. If codi is
+freezing, this is due to two possible problems:
+
+1. Using <C-d> to exit the REPL works differently on Windows and may require
+   a quitcmd. This is easily tested in command prompt or powershell.
+2. Nvim jobstop() function does not always kill background processes on
+   Windows which can build up and slow down Codi. This may require a buffer
+   delete or nvim reload.
 
 ==============================================================================
 USAGE                                                             *codi-usage*
@@ -361,7 +372,7 @@ g:codi#virtual_text_prefix
 
              Default value is "❯ "
 
-                                                      *g:codi#virtual_text_pos
+                                                      *g:codi#virtual_text_pos*
 g:codi#virtual_text_pos
              Position of the virtual text. Supported values: "eol",
              "right_align", or a number for a specific column (ex: 90).
