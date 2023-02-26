@@ -205,6 +205,10 @@ let s:codi_default_interpreters = {
          \ 'prompt': '>> ',
          \ 'quitcmd': 'exit',
          \ },
+      \ 'nim': {
+          \ 'bin': ['inim'],
+          \ 'prompt': '^\(nim>\|\.\.\.\) ',
+          \ },
       \ }
 function! codi#load#interpreters()
   return s:deep_extend(s:codi_default_interpreters, g:codi#interpreters)
